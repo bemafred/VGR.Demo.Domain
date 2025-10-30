@@ -1,0 +1,14 @@
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VGR.Domain\VGR.Domain.csproj" />
+    <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj" />
+    <ProjectReference Include="..\VGR.Infrastructure.EF\VGR.Infrastructure.EF.csproj" />
+  </ItemGroup>
+</Project>

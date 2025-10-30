@@ -1,0 +1,9 @@
+
+root = true
+
+[*.cs]
+dotnet_diagnostic.VGR001.severity = error
+dotnet_diagnostic.VGR002.severity = error
+
+# Guideline: prefer readonly auto-properties
+csharp_style_prefer_readonly_auto_properties = true:suggestion
