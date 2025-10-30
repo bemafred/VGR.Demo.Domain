@@ -26,6 +26,7 @@ public readonly struct Outcome<T>
         Value = value; 
         Error = error;
     }
+
     public static Outcome<T> Ok(T value) => new(true, value, null);
     public static Outcome<T> Fail(string error) => new(false, default, error);
 }

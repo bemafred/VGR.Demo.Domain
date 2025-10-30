@@ -21,10 +21,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Domain.Tests", "src\VGR
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
-		docs\ADR-Index.md = docs\ADR-Index.md
 		docs\ANALYS.md = docs\ANALYS.md
-		docs\KODERGONOMI.md = docs\KODERGONOMI.md
 		docs\ANALYZER_REGLER.md = docs\ANALYZER_REGLER.md
+		docs\KODERGONOMI.md = docs\KODERGONOMI.md
 		docs\PLACERING.md = docs\PLACERING.md
 		docs\POLICY.md = docs\POLICY.md
 		README.md = README.md

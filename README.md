@@ -84,4 +84,4 @@ Projekt **VGR.Analyzers** innehåller Roslyn-regler som appliceras på `VGR.Doma
 - `VGR001` – förhindrar `public set` på domän-egenskaper
 - `VGR002` – förhindrar publika muterbara samlingar (ICollection/IList/List)
 
-Se `ANALYZER_RULES.md`. Severity konfigureras i `.editorconfig` (default = error).
+Se `ANALYZER_REGLER.md`. Severity konfigureras i `.editorconfig` (default = error).

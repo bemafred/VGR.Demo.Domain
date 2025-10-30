@@ -19,7 +19,7 @@ public sealed class SkapaPersonInteractor(ReadDbContext read, WriteDbContext wri
         var dubblett = await read.Personer
             .AnyAsync(p =>
                 p.Personnummer == pnr &&
-                EF.Property<RegionId>(p, "RegionId") == cmd.RegionId, ct);
+                EF.Property<RegionId>(p, "RegionId") == cmd.RegionId, ct); // TODO: Ej optimalt med EF.Property, lösning för detta?
 
         if (dubblett)
             return Outcome<PersonId>.Fail($"Personnummer redan registrerat: {pnr}");
