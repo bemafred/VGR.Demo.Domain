@@ -156,6 +156,13 @@ public static class Throw
                 $"{nameof(Vårdval)}.{nameof(AktivtFinnsRedan)}",
                 "Det finns redan ett aktivt vårdval och ytterligare får inte skapas.");
 
+        /// <summary>Försök skapa ett nytt vårdval fast ett aktivt redan finns.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void IngetAktivtVårdvalFinns()
+            => throw new DomainInvariantViolationException(
+                $"{nameof(Vårdval)}.{nameof(IngetAktivtVårdvalFinns)}",
+                "Det finns inget aktivt vårdval.");
+
         /// <summary>Försök att avsluta ett redan avslutat vårdval.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void RedanAvslutat()

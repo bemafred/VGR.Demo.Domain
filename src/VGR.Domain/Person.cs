@@ -23,30 +23,38 @@ public sealed class Person
     internal static Person Skapa(RegionId regionId, Personnummer pnr, DateTimeOffset nu)
         => new() { Id = new(), RegionId = regionId, Personnummer = pnr, SkapadTid = nu };
 
+    public Vårdval AvslutaAktuelltVårdval(DateOnly slut)
+    {
+        var öppet = AktivtVårdval;
+            
+        if (öppet is null)
+            Throw.Vårdval.IngetAktivtVårdvalFinns();
+
+        öppet.Avsluta(slut);
+        return öppet;
+    }
+
     public Vårdval SkapaVårdval(HsaId enhetHsaId, Tidsrymd giltighet, DateTimeOffset nu)
     {
-        var aktivt = AktivtVårdval;
-
         if (Vårdval.Any(v => v.EnhetsHsaId == enhetHsaId && v.Giltighet.Överlappar(giltighet)))
             Throw.Vårdval.ÖverlappEjTillåtet(enhetHsaId, giltighet);
+
+        var aktivt = AktivtVårdval;
 
         if (aktivt is not null)
         {
             if (giltighet.Start < aktivt.Giltighet.Start)
                 Throw.Vårdval.SlutFöreStart(aktivt.Giltighet.Start, giltighet.Start);
 
-            if (aktivt.EnhetsHsaId == enhetHsaId && aktivt.Giltighet.Start == giltighet.Start)
-                Throw.Vårdval.AktivtFinnsRedan();
-
-            aktivt.Avsluta(giltighet.Start);
+            AvslutaAktuelltVårdval(DateOnly.FromDateTime(giltighet.Start.DateTime));
         }
 
-        var vv = Domain.Vårdval.Skapa(Id, enhetHsaId, giltighet, nu);
-        Vårdval.Add(vv);
+        var nytt = Domain.Vårdval.Skapa(Id, enhetHsaId, giltighet, nu);
+        Vårdval.Add(nytt);
 
         Raise(new VårdvalSkapat(RegionId, Id, Personnummer, nu));
 
-        return vv;
+        return nytt;
     }
 
     public sealed record VårdvalSkapat(RegionId RegionId, PersonId PersonId, Personnummer Personnummer, DateTimeOffset OccurredAt) : IDomainEvent

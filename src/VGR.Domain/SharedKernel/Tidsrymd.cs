@@ -218,7 +218,7 @@ public readonly record struct Tidsrymd
         return Datumintervall.FrånTidsrymd(this);
     }
 
-    private static DateTimeOffset StartAvDag(DateOnly dag, TimeZoneInfo tz)
+    public static DateTimeOffset StartAvDag(DateOnly dag, TimeZoneInfo tz)
     {
         // Lokal midnatt (okänd kind så att tz-regler gäller)
         var local = new DateTime(dag.Year, dag.Month, dag.Day, 0, 0, 0, DateTimeKind.Unspecified);

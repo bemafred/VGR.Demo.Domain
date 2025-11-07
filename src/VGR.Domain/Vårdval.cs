@@ -6,12 +6,6 @@ namespace VGR.Domain;
 
 public sealed class Vårdval
 {
-    public static class Expression
-    {
-        public static readonly Expression<Func<Vårdval, bool>> ÄrÖppet
-            = v => v.Giltighet.Slut == null;
-    }
-
     public VårdvalId Id { get; private set; }
     public PersonId PersonId { get; private set; }
     public HsaId EnhetsHsaId { get; private set; }
@@ -32,5 +26,5 @@ public sealed class Vårdval
         Giltighet = Tidsrymd.Skapa(Giltighet.Start, slut);
     }
 
-    public void Avsluta(DateOnly slut) => Avsluta(new DateTimeOffset(slut, TimeOnly.MinValue, TimeSpan.Zero));
+    public void Avsluta(DateOnly slut) => Avsluta(Tidsrymd.StartAvDag(slut, TimeZoneInfo.Local));
 }
