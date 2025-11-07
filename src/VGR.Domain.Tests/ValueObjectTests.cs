@@ -44,7 +44,7 @@ public class ValueObjectTests
     [Fact]
     public void HsaId_Parse_SätterTestFlagga()
     {
-        var id = HsaId.Parse("HSA-T-123");
+        var id = HsaId.Tolka("HSA-T-123");
         id.IsTest.Should().BeTrue();
     }
 }

@@ -13,14 +13,14 @@ public readonly record struct Tidsrymd
     public DateTimeOffset Start { get; }
 
     /// <summary>Sluttid (exkluderad). <c>null</c> betyder tillsvidare (öppet slut).</summary>
-    public DateTimeOffset? Slut  { get; }
+    public DateTimeOffset? Slut  { get;  }
 
     /// <summary>Sant om intervallet saknar slut (tillsvidare).</summary>
     public bool ÄrTillsvidare => Slut is null;
 
     /// <summary>Varaktighet: <c>Slut - Start</c>. Kastar om slut saknas.</summary>
     public TimeSpan Varaktighet
-        => Slut is null ? throw new InvalidOperationException("Varaktighet är odefinierad för tillsvidare-intervall.")
+        => Slut is null ? throw new InvalidOperationException("Varaktighet är odefinierad för tillsvidare-intervall.") // TODO: Till lämplig DomainException
                         : Slut.Value - Start;
 
     /// <summary>Sant om intervallet är tomt (<c>Start == Slut</c>).</summary>
@@ -30,7 +30,7 @@ public readonly record struct Tidsrymd
     private Tidsrymd(DateTimeOffset start, DateTimeOffset? slut)
     {
         if (slut is { } e && e < start)
-            throw new ArgumentOutOfRangeException(nameof(slut), "Slut måste vara ≥ Start.");
+            throw new ArgumentOutOfRangeException(nameof(slut), "Slut måste vara ≥ Start."); // TODO: Till lämplig DomainException
 
         Start = start;
         Slut  = slut;

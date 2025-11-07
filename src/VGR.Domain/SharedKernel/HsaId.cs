@@ -9,15 +9,15 @@ public readonly record struct HsaId
     public string Value { get; }
     private HsaId(string v) => Value = v;
 
-    public static HsaId Parse(string input)
+    public static HsaId Tolka(string input)
     {
-        if (!TryParse(input, out var v)) 
+        if (!FörsökTolka(input, out var v)) 
             Throw.HsaId.Ogiltigt(input);
 
         return v;
     }
 
-    public static bool TryParse(string? input, out HsaId id)
+    public static bool FörsökTolka(string? input, out HsaId id)
     {
         id = default;
         if (string.IsNullOrWhiteSpace(input)) return false;

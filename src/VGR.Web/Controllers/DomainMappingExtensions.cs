@@ -7,7 +7,7 @@ namespace VGR.Web.Controllers;
 
 public static class DomainMappingExtensions
 {
-    public static async Task<IActionResult> Map(this ControllerBase self, Func<CancellationToken, Task<Outcome>> action, CancellationToken ct)
+    public static async Task<IActionResult> Map(this ControllerBase self, Func<CancellationToken, Task<Utfall>> action, CancellationToken ct)
     {
         try
         {
@@ -20,7 +20,7 @@ public static class DomainMappingExtensions
         }
     }
 
-    public static async Task<IActionResult> Map<T>(this ControllerBase self, Func<CancellationToken, Task<Outcome<T>>> action, CancellationToken ct, Func<T, object>? shape = null)
+    public static async Task<IActionResult> Map<T>(this ControllerBase self, Func<CancellationToken, Task<Utfall<T>>> action, CancellationToken ct, Func<T, object>? shape = null)
     {
         try
         {
@@ -33,10 +33,10 @@ public static class DomainMappingExtensions
         }
     }
 
-    private static IActionResult ToHttp(ControllerBase self, Outcome outcome)
-        => outcome.IsSuccess ? self.Ok() : Problem(self, outcome.Error);
+    private static IActionResult ToHttp(ControllerBase self, Utfall utfall)
+        => utfall.IsSuccess ? self.Ok() : Problem(self, utfall.Error);
 
-    private static IActionResult ToHttp<T>(ControllerBase self, Outcome<T> outcome, Func<T, object>? shape = null)
+    private static IActionResult ToHttp<T>(ControllerBase self, Utfall<T> outcome, Func<T, object>? shape = null)
         => outcome.IsSuccess
             ? self.Ok(shape is null ? (object?)outcome.Value! : shape(outcome.Value!))
             : Problem(self, outcome.Error);

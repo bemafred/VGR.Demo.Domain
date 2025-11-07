@@ -10,6 +10,8 @@ using VGR.Infrastructure.EF;
 using VGR.Technical;
 using Xunit;
 
+using VGR.Domain.SharedKernel.Exceptions;
+
 namespace VGR.Tests;
 
 public class SmokeTests
@@ -17,41 +19,42 @@ public class SmokeTests
     private sealed class TestClock : IClock { public DateTimeOffset UtcNow => new DateTimeOffset(2024,1,1,12,0,0,TimeSpan.Zero); }
 
     [Fact]
-    public async Task CreatePerson_Then_CreateVårdval_Succeeds()
+    public async Task SkapaPerson_GerSkapaVårdvalLyckas()
     {
         await using var h = new SqliteHarness();
+
         var write = h.Write;
         var read = h.Read;
         var clock = new TestClock();
         var ct = CancellationToken.None;
 
-        // Seed a Region
+        // Initiera en region
         var region = Region.Skapa("14");
         write.Regioner.Add(region);
 
         await write.SaveChangesAsync(ct);
 
-        // Create person
+        // Skapa person
         var skapaPerson = new SkapaPersonInteractor(read, write, clock);
         var cmdP = new SkapaPersonCmd(region.Id, "19900101-1234");
         var resP = await skapaPerson.ProcessAsync(cmdP, ct);
         Assert.True(resP.IsSuccess);
 
-        var personId = resP.Value!; // keep as PersonId
+        var personId = resP.Value!; // Behåll som PersonId
 
-        // Create vardval
+        // Skapa vårdval
         var skapaVv = new SkapaVårdvalInteractor(read, write, clock);
-        var cmdV = new SkapaVårdvalCmd(personId, "HSA-ENHET-1", "HSA-LAKARE-1", new DateOnly(2024,1,1), null);
+        var cmdV = new SkapaVårdvalCmd(personId, "HSA-ENHET-1", new DateOnly(2024,1,1), null);
         var resV = await skapaVv.ProcessAsync(cmdV, ct);
         Assert.True(resV.IsSuccess);
 
-        // Verify persisted
+        // Verifiera att det sparats
         var count = await read.Vardval.CountAsync(v => v.PersonId == personId, ct);
         Assert.Equal(1, count);
     }
 
     [Fact]
-    public async Task CreateVardval_Overlapping_ReturnsFail()
+    public async Task SkapaVårdval_Överlapp_Kastar()
     {
         await using var h = new SqliteHarness();
         var write = h.Write;
@@ -59,7 +62,7 @@ public class SmokeTests
         var clock = new TestClock();
         var ct = CancellationToken.None;
 
-        // Seed region + person via aggregate to avoid duplicate tracked instances
+        // Initiera region och person via aggregat för att undvika dubbla spårade instanser
         var region = Region.Skapa("14");
         var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), clock.UtcNow);
 
@@ -69,13 +72,14 @@ public class SmokeTests
         var interactor = new SkapaVårdvalInteractor(read, write, clock);
 
         var ok = await interactor.ProcessAsync(
-            new SkapaVårdvalCmd(person.Id, "HSA-ENHET-1", "HSA-LAKARE-1", new DateOnly(2024,1,1), new DateOnly(2024,12,31)),
+            new SkapaVårdvalCmd(person.Id, "HSA-ENHET-1", new DateOnly(2024,1,1), new DateOnly(2024,12,31)),
             ct);
         Assert.True(ok.IsSuccess);
 
-        var fail = await interactor.ProcessAsync(
-            new SkapaVårdvalCmd(person.Id, "HSA-ENHET-1", "HSA-LAKARE-1", new DateOnly(2024,6,1), null),
-            ct);
-        Assert.False(fail.IsSuccess);
+        // Förvänta domän-exception, inte Utfall.Fail
+        await Assert.ThrowsAsync<DomainInvariantViolationException>(async () =>
+            await interactor.ProcessAsync(
+                new SkapaVårdvalCmd(person.Id, "HSA-ENHET-1", new DateOnly(2024, 6, 1), null),
+                ct));
     }
 }

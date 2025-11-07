@@ -11,18 +11,16 @@ public sealed record SkapaPersonCmd(RegionId RegionId, string Personnummer);
 
 public sealed class SkapaPersonInteractor(ReadDbContext read, WriteDbContext write, IClock clock)
 {
-    public async Task<Outcome<PersonId>> ProcessAsync(SkapaPersonCmd cmd, CancellationToken ct)
+    public async Task<Utfall<PersonId>> ProcessAsync(SkapaPersonCmd cmd, CancellationToken ct)
     {
         var pnr = Personnummer.Parse(cmd.Personnummer);
 
         // Pushdown: dubblett inom region?
         var dubblett = await read.Personer
-            .AnyAsync(p =>
-                p.Personnummer == pnr &&
-                EF.Property<RegionId>(p, "RegionId") == cmd.RegionId, ct); // TODO: Ej optimalt med EF.Property, lösning för detta?
+            .AnyAsync(p => p.RegionId == cmd.RegionId && p.Personnummer == pnr, ct); 
 
         if (dubblett)
-            return Outcome<PersonId>.Fail($"Personnummer redan registrerat: {pnr}");
+            return Utfall<PersonId>.Fail($"Personnummer redan registrerat: {pnr}"); // <-- Billigt svar
 
         // Ladda region (tracking) för att nyttja fabriken för Person
         var region = await write.Regioner.FirstOrDefaultAsync(r => r.Id == cmd.RegionId, ct);
@@ -34,6 +32,6 @@ public sealed class SkapaPersonInteractor(ReadDbContext read, WriteDbContext wri
 
         await write.SaveChangesAsync(ct);
 
-        return Outcome<PersonId>.Ok(person.Id);
+        return Utfall<PersonId>.Ok(person.Id);
     }
 }

@@ -10,12 +10,12 @@ namespace VGR.Web.Controllers;
 [Route("api/personer/{personId:guid}/vardval")]
 public sealed class VårdvalController(SkapaVårdvalInteractor interactor) : ControllerBase
 {
-    public sealed record SkapaVårdvalDto(string EnhetsHsaId, string LäkaresHsaId, DateOnly Start, DateOnly? Slut);
+    public sealed record SkapaVårdvalDto(string EnhetsHsaId, DateOnly Start, DateOnly? Slut);
 
     [HttpPost]
     public async Task<IActionResult> Skapa(Guid personId, [FromBody] SkapaVårdvalDto body, CancellationToken ct)
     {
-        var command = new SkapaVårdvalCmd(new(personId), body.EnhetsHsaId, body.LäkaresHsaId, body.Start, body.Slut);
+        var command = new SkapaVårdvalCmd(new(personId), body.EnhetsHsaId, body.Start, body.Slut);
         return await this.Map(cancellationToken => interactor.ProcessAsync(command, cancellationToken), ct);
     }
 }

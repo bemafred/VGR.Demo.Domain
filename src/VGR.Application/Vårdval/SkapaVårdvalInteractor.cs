@@ -7,38 +7,37 @@ using VGR.Domain.SharedKernel.Exceptions;
 
 namespace VGR.Application.Vårdval;
 
-public sealed record SkapaVårdvalCmd(PersonId PersonId, string EnhetsHsaId, string LäkaresHsaId, DateOnly Start, DateOnly? Slut);
+public sealed record SkapaVårdvalCmd(PersonId PersonId, string EnhetsHsaId, DateOnly Start, DateOnly? Slut);
 
 public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext write, IClock clock)
 {
-    public async Task<Outcome<VardvalId>> ProcessAsync(SkapaVårdvalCmd cmd, CancellationToken ct)
+    public async Task<Utfall<VårdvalId>> ProcessAsync(SkapaVårdvalCmd cmd, CancellationToken ct)
     {
-        var enhet = HsaId.Parse(cmd.EnhetsHsaId);
-        var läkare = HsaId.Parse(cmd.LäkaresHsaId);
+        // 1) Validera indata
+        var enhet = HsaId.Tolka(cmd.EnhetsHsaId);
         var giltighet = Tidsrymd.Skapa(cmd.Start, cmd.Slut);
 
-        var kandidater = await read.Vardval
-            .Where(v => v.PersonId == cmd.PersonId && v.EnhetsHsaId == enhet)
-            .ToListAsync(ct);
+        // 2) Ladda personen
+        var person = await write.Personer
+            .FirstOrDefaultAsync(p => p.Id == cmd.PersonId, ct);
 
-        var överlapp = kandidater.Any(v => v.Giltighet.Överlappar(giltighet));
-
-        if (överlapp)
-            return Outcome<VardvalId>.Fail($"Överlappande vårdval för enhet {enhet} under {giltighet}.");
-
-        var person = await write.Personer.FirstOrDefaultAsync(p => p.Id == cmd.PersonId, ct);
-
-        if (person == null)
+        if (person is null)
             Throw.Person.Saknas(cmd.PersonId);
 
+        // 3) Ladda endast det gällande, öppna vårdval som domänen behöver
         await write.Entry(person).Collection(p => p.AllaVårdval).Query()
-            .Where(v => v.EnhetsHsaId == enhet)
+            .Where(Domain.Vårdval.Expression.ÄrÖppet)
             .LoadAsync(ct);
 
+        // 4) Skapa vårdvalet via domänen (stänger gällande, öppet vårdval)
         var vårdval = person.SkapaVårdval(enhet, giltighet, clock.UtcNow);
 
+        //messageBus.EnqueueEvents(person.DequeueEvents());
+
+        // 5) Uppdatera datalagrets tillstånd
         await write.SaveChangesAsync(ct);
 
-        return Outcome<VardvalId>.Ok(vårdval.Id);
+        // 6) Svara med nya id utfallet
+        return Utfall<VårdvalId>.Ok(vårdval.Id);
     }
 }

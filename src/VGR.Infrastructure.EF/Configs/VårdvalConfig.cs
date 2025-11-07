@@ -13,14 +13,14 @@ internal sealed class VårdvalConfig : IEntityTypeConfiguration<Vårdval>
         b.HasKey(x => x.Id);
 
         b.Property(x => x.Id)
-         .HasConversion(v => v.Value, v => new VardvalId(v))
+         .HasConversion(v => v.Value, v => new VårdvalId(v))
          .ValueGeneratedNever();
 
         b.Property(x => x.PersonId)
          .HasConversion(v => v.Value, v => new PersonId(v));
 
         b.Property(x => x.EnhetsHsaId)
-         .HasConversion(v => v.Value, v => HsaId.Parse(v))
+         .HasConversion(v => v.Value, v => HsaId.Tolka(v))
          .HasMaxLength(64).IsUnicode(false).IsRequired();
 
         b.ComplexProperty(x => x.Giltighet, nb =>

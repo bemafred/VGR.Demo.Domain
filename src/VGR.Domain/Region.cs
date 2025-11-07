@@ -23,7 +23,7 @@ public sealed class Region
         if (Personer.Any(p => p.Personnummer == pnr))
             Throw.Person.Dubblett(pnr);
 
-        var person = Person.Skapa(pnr, nu);
+        var person = Person.Skapa(Id, pnr, nu);
         Personer.Add(person);
 
         Raise(new PersonSkapad(Id, person.Id, pnr, nu));
@@ -31,14 +31,5 @@ public sealed class Region
         return person;
     }
 }
-
-public interface IDomainEvent
-{
-    Guid EventId { get; }
-    DateTimeOffset OccurredAt { get; }
-}
-
-public sealed record PersonSkapad(RegionId RegionId, PersonId PersonId, Personnummer Personnummer, DateTimeOffset OccurredAt) : IDomainEvent
-{
-    public Guid EventId { get; } = Guid.NewGuid();
-}
+public sealed record PersonSkapad(RegionId RegionId, PersonId PersonId, Personnummer Personnummer, DateTimeOffset OccurredAt) 
+    : DomainEvent(OccurredAt);
