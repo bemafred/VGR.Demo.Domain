@@ -49,7 +49,7 @@ public class SmokeTests
         Assert.True(resV.IsSuccess);
 
         // Verifiera att det sparats
-        var count = await read.Vardval.CountAsync(v => v.PersonId == personId, ct);
+        var count = await read.Vårdval.CountAsync(v => v.PersonId == personId, ct);
         Assert.Equal(1, count);
     }
 

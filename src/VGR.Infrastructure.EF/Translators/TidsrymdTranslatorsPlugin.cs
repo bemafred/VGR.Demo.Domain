@@ -3,16 +3,16 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace VGR.Infrastructure.EF.Translators;
 
-internal sealed class TidsrymdTranslatorsPlugin :
-    IMemberTranslatorPlugin,
-    IMethodCallTranslatorPlugin
+internal sealed class TidsrymdTranslatorsPlugin(ISqlExpressionFactory sqlExpressionFactory)
+    : IMemberTranslatorPlugin, IMethodCallTranslatorPlugin
 {
-    public TidsrymdTranslatorsPlugin(ISqlExpressionFactory sql)
-    {
-        MemberTranslators = new IMemberTranslator[] { new TidsrymdMemberTranslator(sql) };
-        MethodCallTranslators = new IMethodCallTranslator[] { new TidsrymdMethodTranslator(sql) };
-    }
+    public IEnumerable<IMemberTranslator> Translators { get; } =
+    [
+        new TidsrymdMemberTranslator(sqlExpressionFactory)
+    ];
 
-    public IEnumerable<IMemberTranslator> MemberTranslators { get; }
-    public IEnumerable<IMethodCallTranslator> MethodCallTranslators { get; }
+    IEnumerable<IMethodCallTranslator> IMethodCallTranslatorPlugin.Translators { get; } =
+    [
+        new TidsrymdMethodTranslator(sqlExpressionFactory)
+    ];
 }

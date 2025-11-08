@@ -7,7 +7,7 @@ namespace VGR.Infrastructure.EF;
 public sealed class ReadDbContext : DbContext
 {
     public DbSet<Person> Personer => Set<Person>();
-    public DbSet<V�rdval> Vardval => Set<V�rdval>();
+    public DbSet<Vårdval> Vårdval => Set<Vårdval>();
     public DbSet<Region> Regioner => Set<Region>();
 
     public ReadDbContext(DbContextOptions<ReadDbContext> options) : base(options) { }
@@ -15,7 +15,7 @@ public sealed class ReadDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder mb)
     {
         mb.ApplyConfiguration(new PersonConfig());
-        mb.ApplyConfiguration(new V�rdvalConfig());
+        mb.ApplyConfiguration(new VårdvalConfig());
         mb.ApplyConfiguration(new RegionConfig());
     }
 

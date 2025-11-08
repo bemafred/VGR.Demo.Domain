@@ -210,6 +210,19 @@ public readonly record struct Tidsrymd
         return new(min, max);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ts"></param>
+    /// <returns></returns>
+    public bool VararLängreÄn(TimeSpan ts)
+    {
+        if (ÄrTillsvidare)
+            return true;
+        
+        return Slut - Start > ts;
+    }
+    
     /// <summary>Skapar ett <see cref="Datumintervall"/> genom att kasta bort tid (behåller endast datumdelar).</summary>
     public Datumintervall TillDatumintervall()
     {

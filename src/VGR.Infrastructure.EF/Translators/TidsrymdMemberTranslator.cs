@@ -1,19 +1,18 @@
 using System;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using VGR.Domain;
+
+using VGR.Domain.SharedKernel;
 
 namespace VGR.Infrastructure.EF.Translators;
 
-internal sealed class TidsrymdMemberTranslator : IMemberTranslator
+internal sealed class TidsrymdMemberTranslator(ISqlExpressionFactory sql) : IMemberTranslator
 {
-    private readonly ISqlExpressionFactory _sql;
-    public TidsrymdMemberTranslator(ISqlExpressionFactory sql) => _sql = sql;
-
     public SqlExpression? Translate(
-        SqlExpression instance,
+        SqlExpression? instance,
         MemberInfo member,
         Type returnType,
         IDiagnosticsLogger<DbLoggerCategory.Query> logger)
@@ -23,8 +22,8 @@ internal sealed class TidsrymdMemberTranslator : IMemberTranslator
 
         if (member.Name == nameof(Tidsrymd.ÄrTillsvidare))
         {
-            var slut = _sql.Property(instance, typeof(DateTimeOffset?), nameof(Tidsrymd.Slut));
-            return _sql.IsNull(slut);
+            var slut = sql.Property(instance, typeof(DateTimeOffset?), nameof(Tidsrymd.Slut));
+            return sql.IsNull(slut);
         }
 
         return null;

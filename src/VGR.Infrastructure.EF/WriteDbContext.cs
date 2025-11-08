@@ -7,7 +7,7 @@ namespace VGR.Infrastructure.EF;
 public sealed class WriteDbContext : DbContext
 {
     public DbSet<Person> Personer => Set<Person>();
-    public DbSet<Vårdval> Vardval => Set<Vårdval>();
+    public DbSet<VÃ¥rdval> Vardval => Set<VÃ¥rdval>();
     public DbSet<Region> Regioner => Set<Region>();
 
     public WriteDbContext(DbContextOptions<WriteDbContext> options) : base(options) { }
@@ -15,7 +15,7 @@ public sealed class WriteDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder mb)
     {
         mb.ApplyConfiguration(new PersonConfig());
-        mb.ApplyConfiguration(new VårdvalConfig());
+        mb.ApplyConfiguration(new VÃ¥rdvalConfig());
         mb.ApplyConfiguration(new RegionConfig());
     }
 }
