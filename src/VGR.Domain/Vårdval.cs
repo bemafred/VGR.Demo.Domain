@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using VGR.Domain.SharedKernel;
 using VGR.Domain.SharedKernel.Exceptions;
+using VGR.Semantics;
 
 namespace VGR.Domain;
 
@@ -11,7 +12,10 @@ public sealed class Vårdval
     public HsaId EnhetsHsaId { get; private set; }
     public Tidsrymd Period { get; internal set; }
     public DateTimeOffset SkapadTid { get; private set; }
+    
+    [QuerySemantic]
     public bool ÄrAktivt => Period.ÄrTillsvidare; 
+    
     public bool ÄrAvslutat => !ÄrAktivt;
 
     private Vårdval() { }

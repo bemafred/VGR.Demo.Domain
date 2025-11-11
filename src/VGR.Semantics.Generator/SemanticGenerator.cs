@@ -15,12 +15,14 @@ public sealed class SemanticGenerator : ISourceGenerator
     public void Execute(GeneratorExecutionContext context)
     {
         if (context.SyntaxReceiver is not Receiver rx) return;
+        
         var comp = context.Compilation;
         var expansionAttr = comp.GetTypeByMetadataName("VGR.Semantics.ExpansionForAttribute");
         var queryAttr = comp.GetTypeByMetadataName("VGR.Semantics.QuerySemanticAttribute");
         if (expansionAttr is null || queryAttr is null) return;
 
         var pairs = new System.Collections.Generic.List<(IMethodSymbol Target, IMethodSymbol Factory, int Arity)>();
+        
         foreach (var methodDecl in rx.Candidates)
         {
             var model = comp.GetSemanticModel(methodDecl.SyntaxTree);
@@ -33,14 +35,33 @@ public sealed class SemanticGenerator : ISourceGenerator
                 var targetName = attr.ConstructorArguments[1].Value as string;
                 if (targetType is null || targetName is null) continue;
 
-                var candidates = targetType.GetMembers(targetName).OfType<IMethodSymbol>()
-                    .Where(m => m.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, queryAttr)))
+                var candidates = targetType.GetMembers(targetName)
+                    .Where(m =>
+                        (m is IMethodSymbol mm && mm.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, queryAttr))) ||
+                        (m is IPropertySymbol pp && pp.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, queryAttr)))
+                    )
                     .ToArray();
-                if (candidates.Length == 0) continue;
-                var target = candidates[0];
-                var arity = (target.IsStatic ? 0 : 1) + target.Parameters.Length;
-                pairs.Add((target, factory, arity));
-            }
+                
+                if (candidates.Length == 0) 
+                    continue;
+                
+                IMethodSymbol target;
+                int arity;
+
+                if (candidates[0] is IMethodSymbol mm)
+                {
+                    target = mm;
+                    arity  = (target.IsStatic ? 0 : 1) + target.Parameters.Length;
+                }
+                else if (candidates[0] is IPropertySymbol pp && pp.GetMethod is not null)
+                {
+                    target = pp.GetMethod; // property ⇒ get_*
+                    arity  = (target.IsStatic ? 0 : 1) + target.Parameters.Length; // oftast 1
+                }
+                else
+                    continue;
+
+                pairs.Add((target, factory, arity));            }
         }
 
         var sb = new StringBuilder();
