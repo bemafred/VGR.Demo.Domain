@@ -8,6 +8,7 @@
     
   <ItemGroup>
     <ProjectReference Include="..\VGR.Analyzers\VGR.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\VGR.Semantics\VGR.Semantics.csproj" />
   </ItemGroup>
 
   <ItemGroup>
