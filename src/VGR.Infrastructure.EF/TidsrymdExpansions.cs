@@ -16,6 +16,7 @@ public static class TidsrymdExpansions
         var body = Expression.AndAlso(Expression.GreaterThanOrEqual(t, start), Expression.LessThan(t, slut));
         return Expression.Lambda(body, r, t);
     }
+    
     [ExpansionFor(typeof(Tidsrymd), nameof(Tidsrymd.Överlappar))]
     public static LambdaExpression Överlappar_Expansion()
     {

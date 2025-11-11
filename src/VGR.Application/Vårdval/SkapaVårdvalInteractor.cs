@@ -26,7 +26,7 @@ public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext w
 
         // 3) Ladda endast det gällande, öppna vårdval som domänen behöver
         await write.Entry(person).Collection(p => p.AllaVårdval).Query()
-            .Where(vårdval => vårdval.Giltighet.Slut == null)
+            .Where(vårdval => vårdval.Period.Slut == null)
             .LoadAsync(ct);
 
         // 4) Skapa vårdvalet via domänen (stänger gällande, öppet vårdval)

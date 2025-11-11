@@ -1,5 +1,7 @@
 using System.Linq.Expressions;
 using FluentAssertions;
+using Xunit;
+
 
 namespace VGR.QuerySemantics.Tests;
 

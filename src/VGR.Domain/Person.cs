@@ -13,7 +13,7 @@ public sealed class Person
 
     internal readonly List<Vårdval> Vårdval = [];
     public IReadOnlyList<Vårdval> AllaVårdval => Vårdval;
-    public Vårdval? AktivtVårdval => Vårdval.LastOrDefault(v => v.ÄrÖppet); 
+    public Vårdval? AktivtVårdval => Vårdval.LastOrDefault(v => v.ÄrAktivt); 
 
     private readonly List<IDomainEvent> _events = [];
     private void Raise(IDomainEvent e) => _events.Add(e);
@@ -36,15 +36,15 @@ public sealed class Person
 
     public Vårdval SkapaVårdval(HsaId enhetHsaId, Tidsrymd giltighet, DateTimeOffset nu)
     {
-        if (Vårdval.Any(v => v.EnhetsHsaId == enhetHsaId && v.Giltighet.Överlappar(giltighet)))
+        if (Vårdval.Any(v => v.EnhetsHsaId == enhetHsaId && v.Period.Överlappar(giltighet)))
             Throw.Vårdval.ÖverlappEjTillåtet(enhetHsaId, giltighet);
 
         var aktivt = AktivtVårdval;
 
         if (aktivt is not null)
         {
-            if (giltighet.Start < aktivt.Giltighet.Start)
-                Throw.Vårdval.SlutFöreStart(aktivt.Giltighet.Start, giltighet.Start);
+            if (giltighet.Start < aktivt.Period.Start)
+                Throw.Vårdval.SlutFöreStart(aktivt.Period.Start, giltighet.Start);
 
             AvslutaAktuelltVårdval(DateOnly.FromDateTime(giltighet.Start.DateTime));
         }

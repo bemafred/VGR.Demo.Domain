@@ -23,7 +23,7 @@ internal sealed class VårdvalConfig : IEntityTypeConfiguration<Vårdval>
          .HasConversion(v => v.Value, v => HsaId.Tolka(v))
          .HasMaxLength(64).IsUnicode(false).IsRequired();
 
-        b.ComplexProperty(x => x.Giltighet, nb =>
+        b.ComplexProperty(x => x.Period, nb =>
         {
             nb.Property(p => p.Start).HasColumnName("Start").IsRequired();
             nb.Property(p => p.Slut).HasColumnName("Slut");
