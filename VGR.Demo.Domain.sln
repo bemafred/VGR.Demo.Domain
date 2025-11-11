@@ -37,8 +37,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Generator", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics", "src\VGR.Semantics\VGR.Semantics.csproj", "{E220B182-2707-4F80-AAB0-00893CD8529A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{31D7E653-A8E1-446B-AAF9-EF0980A0EA05}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

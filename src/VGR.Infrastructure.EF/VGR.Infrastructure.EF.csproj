@@ -16,4 +16,9 @@
     <ProjectReference Include="..\VGR.Semantics\VGR.Semantics.csproj" />
     <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj" />
   </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\VGR.Semantics.Generator\VGR.Semantics.Generator.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false" />
+    </ItemGroup>
 </Project>

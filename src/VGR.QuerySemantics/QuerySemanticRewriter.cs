@@ -41,6 +41,34 @@ internal sealed class QuerySemanticRewriter : ExpressionVisitor
     }
 
     /// <summary>
+    /// Visits a <see cref="MemberExpression"/> within an expression tree and rewrites it
+    /// if the associated member (property) has a <see cref="QuerySemanticAttribute"/>.
+    /// </summary>
+    /// <param name="node">The <see cref="MemberExpression"/> representing a property access in an expression tree.</param>
+    /// <returns>
+    /// The transformed <see cref="Expression"/> if the property is annotated with <see cref="QuerySemanticAttribute"/>
+    /// and a corresponding semantic transformation exists; otherwise, the original or a base-visited expression.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when no semantic transformation exists in the registry for the accessed property.
+    /// </exception>
+    protected override Expression VisitMember(MemberExpression node)
+    {
+        if (node.Member is PropertyInfo pi && pi.GetCustomAttribute<QuerySemanticAttribute>() is not null)
+        {
+            var getter = pi.GetMethod;
+            if (getter is not null && SemanticRegistry.TryGet(getter, (node.Expression is null ? 0 : 1), out var lambda))
+            {
+                var args = new List<Expression>();
+                if (node.Expression is not null) args.Add(node.Expression);
+                var body = new Sub(lambda.Parameters, args).Visit(lambda.Body);
+                return Visit(body);
+            }
+        }
+        return base.VisitMember(node);
+    }    
+    
+    /// <summary>
     /// The <see cref="Sub"/> class is responsible for substituting parameter expressions with their corresponding
     /// replacements within an expression tree. It creates a mapping of parameter expressions to their replacement
     /// expressions during construction and applies this mapping when visiting nodes in the tree.
