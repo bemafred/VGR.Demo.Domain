@@ -2,8 +2,10 @@ using System;
 using System.Linq.Expressions;
 using VGR.Domain;
 using VGR.Domain.SharedKernel;
-using VGR.Semantics;
+using VGR.Semantics.Abstractions;
+
 namespace VGR.Infrastructure.EF;
+
 public static class TidsrymdExpansions
 {
     [ExpansionFor(typeof(Tidsrymd), nameof(Tidsrymd.Innehåller))]

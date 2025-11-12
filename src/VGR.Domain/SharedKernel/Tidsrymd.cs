@@ -1,8 +1,10 @@
-namespace VGR.Domain.SharedKernel;
 
 using System.Collections.Generic;
 using System.Linq;
 
+using VGR.Semantics.Abstractions;
+
+namespace VGR.Domain.SharedKernel;
 /// <summary>
 /// Ett exakt tidsintervall med halvöppen semantik: <c>[Start, Slut)</c>.
 /// <para><b>Start ingår.</b> <b>Slut ingår inte.</b> Krav: <c>Slut ≥ Start</c> (om slut finns).</para>
@@ -15,6 +17,7 @@ public readonly record struct Tidsrymd
     /// <summary>Sluttid (exkluderad). <c>null</c> betyder tillsvidare (öppet slut).</summary>
     public DateTimeOffset? Slut  { get;  }
 
+    [SemanticQueryable]
     /// <summary>Sant om intervallet saknar slut (tillsvidare).</summary>
     public bool ÄrTillsvidare => Slut is null;
 

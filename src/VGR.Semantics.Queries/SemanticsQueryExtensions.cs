@@ -1,14 +1,14 @@
 using System.Linq.Expressions;
 
-namespace VGR.QuerySemantics;
+namespace VGR.Semantics.Queries;
 
-public static class QueryableSemanticsExtensions
+public static class SemanticQueryExtensions
 {
-    public static IQueryable<T> WithSemantics<T>(this IQueryable<T> source, QuerySemantics semantics)
+    public static IQueryable<T> WithSemantics<T>(this IQueryable<T> source, Semantic semantic)
     {
         if (source is null) throw new ArgumentNullException(nameof(source));
-        if (semantics is null) throw new ArgumentNullException(nameof(semantics));
-        return new SemanticQueryable<T>(source, semantics);
+        if (semantic is null) throw new ArgumentNullException(nameof(semantic));
+        return new SemanticQueryable<T>(source, semantic);
     }
 
     private sealed class SemanticQueryable<T> : IQueryable<T>, IQueryProvider
@@ -16,10 +16,10 @@ public static class QueryableSemanticsExtensions
         private readonly IQueryable<T> _inner;
         private readonly IQueryProvider _provider;
 
-        public SemanticQueryable(IQueryable<T> inner, QuerySemantics semantics)
+        public SemanticQueryable(IQueryable<T> inner, Semantic semantic)
         {
             _inner = inner;
-            _provider = new SemanticQueryProvider(inner.Provider, semantics);
+            _provider = new SemanticQueryProvider(inner.Provider, semantic);
         }
 
         public Type ElementType => typeof(T);

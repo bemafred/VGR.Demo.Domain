@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="VGR.QuerySemantics.Tests" />
+        <InternalsVisibleTo Include="VGR.Semantics.Queries.Tests" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\VGR.Semantics\VGR.Semantics.csproj" />
+      <ProjectReference Include="..\VGR.Semantics.Abstractions\VGR.Semantics.Abstractions.csproj" />
     </ItemGroup>
     
 </Project>
