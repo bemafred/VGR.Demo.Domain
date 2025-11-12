@@ -4,12 +4,14 @@ using VGR.Infrastructure.EF;
 using VGR.Technical;
 using Microsoft.EntityFrameworkCore;
 using VGR.Domain.SharedKernel.Exceptions;
+using VGR.QuerySemantics;
+
 
 namespace VGR.Application.Vårdval;
 
 public sealed record SkapaVårdvalCmd(PersonId PersonId, string EnhetsHsaId, DateOnly Start, DateOnly? Slut);
 
-public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext write, IClock clock)
+public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext write, IClock clock, QuerySemantics.QuerySemantics semantics)
 {
     public async Task<Utfall<VårdvalId>> ProcessAsync(SkapaVårdvalCmd cmd, CancellationToken ct)
     {
@@ -26,6 +28,7 @@ public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext w
 
         // 3) Ladda endast det gällande, öppna vårdval som domänen behöver
         await write.Entry(person).Collection(p => p.AllaVårdval).Query()
+            .WithSemantics(semantics)
             .Where(vårdval => vårdval.Period.Slut == null)
             .LoadAsync(ct);
 
