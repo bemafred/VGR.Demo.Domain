@@ -8,11 +8,11 @@
     
   <ItemGroup>
     <ProjectReference Include="..\VGR.Analyzers\VGR.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\VGR.Semantics\VGR.Semantics.csproj" />
+    <ProjectReference Include="..\VGR.Semantics.Abstractions\VGR.Semantics.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-      <InternalsVisibleTo Include="VGR.Infrastructure.EF"/>
+      <InternalsVisibleTo Include="VGR.Infrastructure.EF" />
     <InternalsVisibleTo Include="VGR.Domain.Tests" />
   </ItemGroup>
 

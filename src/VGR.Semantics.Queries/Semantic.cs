@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace VGR.QuerySemantics;
+namespace VGR.Semantics.Queries;
 
 /// <summary>
 /// Central registry of domain-method → EF-friendly expression rewrites.
 /// </summary>
-public sealed class QuerySemantics
+public sealed class Semantic
 {
     private readonly Dictionary<MethodInfo, LambdaExpression> _registry = new();
 
-    public QuerySemantics Register(MethodInfo domainMethod, LambdaExpression efExpression)
+    public Semantic Register(MethodInfo domainMethod, LambdaExpression efExpression)
     {
         if (domainMethod is null) throw new ArgumentNullException(nameof(domainMethod));
         if (efExpression is null) throw new ArgumentNullException(nameof(efExpression));
@@ -18,7 +18,7 @@ public sealed class QuerySemantics
         return this;
     }
 
-    public QuerySemantics Register<T1, T2, TResult>(
+    public Semantic Register<T1, T2, TResult>(
         Expression<Func<T1, T2, TResult>> domainCall,
         Expression<Func<T1, T2, TResult>> efExpression)
     {
@@ -27,7 +27,7 @@ public sealed class QuerySemantics
         return Register(m.Method, efExpression);
     }
 
-    public QuerySemantics Register<T1, TResult>(
+    public Semantic Register<T1, TResult>(
         Expression<Func<T1, TResult>> domainCall,
         Expression<Func<T1, TResult>> efExpression)
     {
