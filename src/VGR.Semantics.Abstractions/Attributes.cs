@@ -1,12 +1,12 @@
 using System;
-namespace VGR.Semantics;
+namespace VGR.Semantics.Abstractions;
 
 /// <summary>
 /// Represents an attribute used to denote that a method has a semantic meaning in query-related contexts.
 /// This attribute is applied to methods to indicate they participate in custom query processing or rewriting.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-public sealed class QuerySemanticAttribute : Attribute { }
+public sealed class SemanticQueryableAttribute : Attribute { }
 
 /// <summary>
 /// Represents an attribute used to specify an expansion method for a target type and method.

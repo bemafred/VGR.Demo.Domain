@@ -13,12 +13,10 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="9.0.0" PrivateAssets="all" />  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VGR.Domain\VGR.Domain.csproj" />
-    <ProjectReference Include="..\VGR.Semantics\VGR.Semantics.csproj" />
+    <ProjectReference Include="..\VGR.Semantics.Abstractions\VGR.Semantics.Abstractions.csproj" />
     <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj" />
   </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\VGR.Semantics.Generator\VGR.Semantics.Generator.csproj"
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\VGR.Semantics.Generator\VGR.Semantics.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 </Project>

@@ -4,12 +4,13 @@ using VGR.Infrastructure.EF;
 using VGR.Technical;
 using Microsoft.EntityFrameworkCore;
 using VGR.Domain.SharedKernel.Exceptions;
+using VGR.Semantics.Queries;
 
 namespace VGR.Application.Personer;
 
 public sealed record SkapaPersonCmd(RegionId RegionId, string Personnummer);
 
-public sealed class SkapaPersonInteractor(ReadDbContext read, WriteDbContext write, IClock clock)
+public sealed class SkapaPersonInteractor(ReadDbContext read, WriteDbContext write, IClock clock, Semantic semantic)
 {
     public async Task<Utfall<PersonId>> ProcessAsync(SkapaPersonCmd cmd, CancellationToken ct)
     {

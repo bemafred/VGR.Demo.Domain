@@ -7,12 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\VGR.Semantics.Queries\VGR.Semantics.Queries.csproj" />
     <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj" />
     <ProjectReference Include="..\VGR.Infrastructure.EF\VGR.Infrastructure.EF.csproj" />
   </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\VGR.Semantics.Generator\VGR.Semantics.Generator.csproj"
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\VGR.Semantics.Generator\VGR.Semantics.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 </Project>

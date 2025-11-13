@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-namespace VGR.Semantics;
+using VGR.Semantics.Abstractions;
+
+namespace VGR.Semantics.Queries;
 
 /// <summary>
 /// The <see cref="QuerySemanticRewriter"/> class rewrites LINQ expression trees by applying transformations based on
@@ -30,7 +32,7 @@ internal sealed class QuerySemanticRewriter : ExpressionVisitor
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
         var m = node.Method;
-        if (m.GetCustomAttribute<QuerySemanticAttribute>() is null) return base.VisitMethodCall(node);
+        if (m.GetCustomAttribute<SemanticQueryableAttribute>() is null) return base.VisitMethodCall(node);
         if (!SemanticRegistry.TryGet(m, (node.Object is null ? 0 : 1) + node.Arguments.Count, out var lambda))
             throw new InvalidOperationException($"No expansion for {m.DeclaringType?.Name}.{m.Name}");
         var args = new System.Collections.Generic.List<Expression>();
@@ -54,7 +56,7 @@ internal sealed class QuerySemanticRewriter : ExpressionVisitor
     /// </exception>
     protected override Expression VisitMember(MemberExpression node)
     {
-        if (node.Member is PropertyInfo pi && pi.GetCustomAttribute<QuerySemanticAttribute>() is not null)
+        if (node.Member is PropertyInfo pi && pi.GetCustomAttribute<SemanticQueryableAttribute>() is not null)
         {
             var getter = pi.GetMethod;
             if (getter is not null && SemanticRegistry.TryGet(getter, (node.Expression is null ? 0 : 1), out var lambda))
