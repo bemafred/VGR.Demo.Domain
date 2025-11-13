@@ -11,7 +11,7 @@ public class RewriterTests
     [Fact]
     public void Rewrites_domain_method_call_to_plain_expression()
     {
-        var sem = new VGR.Semantics.Queries.Semantic()
+        var sem = new VGR.Semantics.Queries.SemanticMappings()
             .Register<SamplePeriod, DateTimeOffset, bool>(
                 (p, t) => p.Contains(t),
                 (p, t) => p.Start <= t && (p.End == null || t < p.End));

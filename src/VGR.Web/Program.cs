@@ -6,7 +6,7 @@ using VGR.Infrastructure.EF;
 using VGR.Technical;
 using VGR.Domain;
 using VGR.Domain.SharedKernel;
-using VGR.QuerySemantics;
+using VGR.Semantics.Queries;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,12 +19,13 @@ builder.Services.AddDbContext<WriteDbContext>(o => o.UseInMemoryDatabase("vgr"))
 builder.Services.AddSingleton<IClock, SystemClock>();
 
 // Query semantics registry (manuell bootstrap tills generatorn exponerar en registry)
-var semantics = new QuerySemantics()
+var semantic = new SemanticMappings()
     .Register<Tidsrymd, DateTimeOffset, bool>((r, t) => r.Innehåller(t),
         (r, t) => r.Start <= t && (r.Slut == null || t < r.Slut))
-    .Register<Vårdval, DateTimeOffset, bool>((v, t) => v.ÄrAktivt(t),
-        (v, t) => v.Period.Start <= t && (v.Period.Slut == null || t < v.Period.Slut));
-builder.Services.AddSingleton(semantics);
+    .Register<Vårdval, bool>((v) => v.ÄrAktivt,
+        (v) => v.Period.Slut == null);
+
+builder.Services.AddSingleton(semantic);
 
 // Interactors
 builder.Services.AddScoped<SkapaPersonInteractor>();

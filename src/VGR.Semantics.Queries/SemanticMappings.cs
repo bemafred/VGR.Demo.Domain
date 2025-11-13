@@ -6,11 +6,11 @@ namespace VGR.Semantics.Queries;
 /// <summary>
 /// Central registry of domain-method → EF-friendly expression rewrites.
 /// </summary>
-public sealed class Semantic
+public sealed class SemanticMappings
 {
     private readonly Dictionary<MethodInfo, LambdaExpression> _registry = new();
 
-    public Semantic Register(MethodInfo domainMethod, LambdaExpression efExpression)
+    public SemanticMappings Register(MethodInfo domainMethod, LambdaExpression efExpression)
     {
         if (domainMethod is null) throw new ArgumentNullException(nameof(domainMethod));
         if (efExpression is null) throw new ArgumentNullException(nameof(efExpression));
@@ -18,7 +18,7 @@ public sealed class Semantic
         return this;
     }
 
-    public Semantic Register<T1, T2, TResult>(
+    public SemanticMappings Register<T1, T2, TResult>(
         Expression<Func<T1, T2, TResult>> domainCall,
         Expression<Func<T1, T2, TResult>> efExpression)
     {
@@ -27,7 +27,7 @@ public sealed class Semantic
         return Register(m.Method, efExpression);
     }
 
-    public Semantic Register<T1, TResult>(
+    public SemanticMappings Register<T1, TResult>(
         Expression<Func<T1, TResult>> domainCall,
         Expression<Func<T1, TResult>> efExpression)
     {

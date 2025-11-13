@@ -10,7 +10,7 @@ namespace VGR.Application.Vårdval;
 
 public sealed record SkapaVårdvalCmd(PersonId PersonId, string EnhetsHsaId, DateOnly Start, DateOnly? Slut);
 
-public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext write, IClock clock, Semantic semantic)
+public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext write, IClock clock, SemanticMappings semanticMappings)
 {
     public async Task<Utfall<VårdvalId>> ProcessAsync(SkapaVårdvalCmd cmd, CancellationToken ct)
     {
@@ -27,7 +27,7 @@ public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext w
 
         // 3) Ladda endast det gällande, öppna vårdval som domänen behöver
         await write.Entry(person).Collection(p => p.AllaVårdval).Query()
-            .WithSemantics(semantic)
+            .WithSemantics(semanticMappings)
             .Where(vårdval => vårdval.ÄrAktivt)
             .LoadAsync(ct);   
 

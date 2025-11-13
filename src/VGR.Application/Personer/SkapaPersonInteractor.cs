@@ -10,7 +10,7 @@ namespace VGR.Application.Personer;
 
 public sealed record SkapaPersonCmd(RegionId RegionId, string Personnummer);
 
-public sealed class SkapaPersonInteractor(ReadDbContext read, WriteDbContext write, IClock clock, Semantic semantic)
+public sealed class SkapaPersonInteractor(ReadDbContext read, WriteDbContext write, IClock clock, SemanticMappings semanticMappings)
 {
     public async Task<Utfall<PersonId>> ProcessAsync(SkapaPersonCmd cmd, CancellationToken ct)
     {

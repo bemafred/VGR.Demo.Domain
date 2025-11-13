@@ -29,7 +29,7 @@ public class SmokeTests
         var clock = new TestClock();
         var ct = CancellationToken.None;
 
-        var semantic = new Semantic();
+        var semantic = new SemanticMappings();
 
         // Initiera en region
         var region = Region.Skapa("14");
@@ -65,7 +65,7 @@ public class SmokeTests
         var clock = new TestClock();
         var ct = CancellationToken.None;
 
-        var semantic = new Semantic();
+        var semantic = new SemanticMappings();
 
         // Initiera region och person via aggregat för att undvika dubbla spårade instanser
         var region = Region.Skapa("14");

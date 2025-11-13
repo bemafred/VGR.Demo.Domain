@@ -29,8 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{02EA681E-C
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Queries", "src\VGR.Semantic.Queries\VGR.Semantic.Queries.csproj", "{0CF4BB92-6A8A-4CE3-92C5-843EE316449B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Queries.Tests", "src\VGR.Semantics.Queries.Tests\VGR.Semantics.Queries.Tests.csproj", "{3BCA3464-EC0A-44D1-91C9-61B4607A9CF6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Generator", "src\VGR.Semantics.Generator\VGR.Semantics.Generator.csproj", "{92ADC47A-F375-451E-BFEB-A4EC43E89DF7}"
