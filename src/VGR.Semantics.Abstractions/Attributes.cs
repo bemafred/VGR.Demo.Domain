@@ -6,7 +6,7 @@ namespace VGR.Semantics.Abstractions;
 /// This attribute is applied to methods to indicate they participate in custom query processing or rewriting.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-public sealed class SemanticQueryableAttribute : Attribute { }
+public sealed class SemanticQueryAttribute : Attribute { }
 
 /// <summary>
 /// Represents an attribute used to specify an expansion method for a target type and method.

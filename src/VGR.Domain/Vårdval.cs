@@ -13,7 +13,7 @@ public sealed class Vårdval
     public Tidsrymd Period { get; internal set; }
     public DateTimeOffset SkapadTid { get; private set; }
     
-    [SemanticQueryable]
+    [SemanticQuery]
     public bool ÄrAktivt => Period.ÄrTillsvidare; 
     
     public bool ÄrAvslutat => !ÄrAktivt;

@@ -17,7 +17,7 @@ public readonly record struct Tidsrymd
     /// <summary>Sluttid (exkluderad). <c>null</c> betyder tillsvidare (öppet slut).</summary>
     public DateTimeOffset? Slut  { get;  }
 
-    [SemanticQueryable]
+    [SemanticQuery]
     /// <summary>Sant om intervallet saknar slut (tillsvidare).</summary>
     public bool ÄrTillsvidare => Slut is null;
 

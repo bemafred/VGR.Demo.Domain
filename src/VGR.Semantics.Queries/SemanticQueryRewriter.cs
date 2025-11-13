@@ -7,7 +7,7 @@ using VGR.Semantics.Abstractions;
 namespace VGR.Semantics.Queries;
 
 /// <summary>
-/// The <see cref="QuerySemanticRewriter"/> class rewrites LINQ expression trees by applying transformations based on
+/// The <see cref="SemanticQueryRewriter"/> class rewrites LINQ expression trees by applying transformations based on
 /// custom query semantics. It identifies methods annotated with the <see cref="QuerySemanticAttribute"/> and replaces
 /// them with semantically equivalent expressions as defined within the system.
 /// </summary>
@@ -15,7 +15,7 @@ namespace VGR.Semantics.Queries;
 /// This class is an internal implementation detail and should not be used directly by consumers of the API.
 /// It extends <see cref="ExpressionVisitor"/> to traverse and transform expression trees.
 /// </remarks>
-internal sealed class QuerySemanticRewriter : ExpressionVisitor
+internal sealed class SemanticQueryRewriter : ExpressionVisitor
 {
     /// <summary>
     /// Visits a <see cref="MethodCallExpression"/> within an expression tree and rewrites it
@@ -32,7 +32,7 @@ internal sealed class QuerySemanticRewriter : ExpressionVisitor
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
         var m = node.Method;
-        if (m.GetCustomAttribute<SemanticQueryableAttribute>() is null) return base.VisitMethodCall(node);
+        if (m.GetCustomAttribute<SemanticQueryAttribute>() is null) return base.VisitMethodCall(node);
         if (!SemanticRegistry.TryGet(m, (node.Object is null ? 0 : 1) + node.Arguments.Count, out var lambda))
             throw new InvalidOperationException($"No expansion for {m.DeclaringType?.Name}.{m.Name}");
         var args = new System.Collections.Generic.List<Expression>();
@@ -56,7 +56,7 @@ internal sealed class QuerySemanticRewriter : ExpressionVisitor
     /// </exception>
     protected override Expression VisitMember(MemberExpression node)
     {
-        if (node.Member is PropertyInfo pi && pi.GetCustomAttribute<SemanticQueryableAttribute>() is not null)
+        if (node.Member is PropertyInfo pi && pi.GetCustomAttribute<SemanticQueryAttribute>() is not null)
         {
             var getter = pi.GetMethod;
             if (getter is not null && SemanticRegistry.TryGet(getter, (node.Expression is null ? 0 : 1), out var lambda))
@@ -97,7 +97,7 @@ internal sealed class QuerySemanticRewriter : ExpressionVisitor
 /// <remarks>
 /// This class is used internally to manage the installation and lookup of semantic expansions for methods
 /// defined within the system. It provides functionality to query for transformation expressions that are
-/// subsequently utilized by the <see cref="QuerySemanticRewriter"/>.
+/// subsequently utilized by the <see cref="SemanticQueryRewriter"/>.
 /// </remarks>
 internal static partial class SemanticRegistry
 {
