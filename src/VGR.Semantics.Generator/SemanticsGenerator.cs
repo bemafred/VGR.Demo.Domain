@@ -18,7 +18,7 @@ public sealed class SemanticGenerator : ISourceGenerator
         
         var comp = context.Compilation;
         var expansionAttr = comp.GetTypeByMetadataName("VGR.Semantics.Abstractions.ExpansionForAttribute"); // <-- Keep magic string
-        var queryAttr = comp.GetTypeByMetadataName("VGR.Semantics.Abstractions.SemanticQueryableAttribute"); // <-- Keep magic string
+        var queryAttr = comp.GetTypeByMetadataName("VGR.Semantics.Abstractions.SemanticQueryAttribute"); // <-- Keep magic string
         if (expansionAttr is null || queryAttr is null) return;
 
         var pairs = new System.Collections.Generic.List<(IMethodSymbol Target, IMethodSymbol Factory, int Arity)>();

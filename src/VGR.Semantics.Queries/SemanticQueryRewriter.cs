@@ -8,7 +8,7 @@ namespace VGR.Semantics.Queries;
 
 /// <summary>
 /// The <see cref="SemanticQueryRewriter"/> class rewrites LINQ expression trees by applying transformations based on
-/// custom query semantics. It identifies methods annotated with the <see cref="QuerySemanticAttribute"/> and replaces
+/// custom query semantics. It identifies methods annotated with the <see cref="SemanticQueryAttribute"/> and replaces
 /// them with semantically equivalent expressions as defined within the system.
 /// </summary>
 /// <remarks>
@@ -44,11 +44,11 @@ internal sealed class SemanticQueryRewriter : ExpressionVisitor
 
     /// <summary>
     /// Visits a <see cref="MemberExpression"/> within an expression tree and rewrites it
-    /// if the associated member (property) has a <see cref="QuerySemanticAttribute"/>.
+    /// if the associated member (property) has a <see cref="SemanticQueryAttribute"/>.
     /// </summary>
     /// <param name="node">The <see cref="MemberExpression"/> representing a property access in an expression tree.</param>
     /// <returns>
-    /// The transformed <see cref="Expression"/> if the property is annotated with <see cref="QuerySemanticAttribute"/>
+    /// The transformed <see cref="Expression"/> if the property is annotated with <see cref="SemanticQueeryAttribute"/>
     /// and a corresponding semantic transformation exists; otherwise, the original or a base-visited expression.
     /// </returns>
     /// <exception cref="InvalidOperationException">
@@ -90,7 +90,7 @@ internal sealed class SemanticQueryRewriter : ExpressionVisitor
 
 /// <summary>
 /// The <see cref="SemanticRegistry"/> class serves as a registry for resolving semantic transformations
-/// associated with methods annotated with the <see cref="QuerySemanticAttribute"/>. It maps method metadata
+/// associated with methods annotated with the <see cref="SemanticQueryAttribute"/>. It maps method metadata
 /// to their corresponding lambda expression implementations, enabling the application of customized query semantics
 /// during the rewriting of expression trees.
 /// </summary>
