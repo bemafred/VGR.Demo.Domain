@@ -19,13 +19,13 @@ builder.Services.AddDbContext<WriteDbContext>(o => o.UseInMemoryDatabase("vgr"))
 builder.Services.AddSingleton<IClock, SystemClock>();
 
 // Query semantics registry (manuell bootstrap tills generatorn exponerar en registry)
-var semantic = new SemanticMappings()
+var semantics = new SemanticMappings()
     .Register<Tidsrymd, DateTimeOffset, bool>((r, t) => r.Innehåller(t),
         (r, t) => r.Start <= t && (r.Slut == null || t < r.Slut))
     .Register<Vårdval, bool>((v) => v.ÄrAktivt,
         (v) => v.Period.Slut == null);
 
-builder.Services.AddSingleton(semantic);
+builder.Services.AddSingleton(semantics);
 
 // Interactors
 builder.Services.AddScoped<SkapaPersonInteractor>();
