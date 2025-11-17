@@ -4,7 +4,7 @@ using VGR.Domain;
 using VGR.Domain.SharedKernel;
 using VGR.Semantics.Abstractions;
 
-namespace VGR.Infrastructure.EF;
+namespace VGR.Infrastructure.EF.Expansions;
 
 public static class TidsrymdExpansions
 {

@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using VGR.Application.Personer;
 using VGR.Application.Vårdval;
@@ -18,14 +17,14 @@ builder.Services.AddDbContext<WriteDbContext>(o => o.UseInMemoryDatabase("vgr"))
 // Clock
 builder.Services.AddSingleton<IClock, SystemClock>();
 
-// Query semantics registry (manuell bootstrap tills generatorn exponerar en registry)
-var semantics = new SemanticMappings()
-    .Register<Tidsrymd, DateTimeOffset, bool>((r, t) => r.Innehåller(t),
-        (r, t) => r.Start <= t && (r.Slut == null || t < r.Slut))
-    .Register<Vårdval, bool>((v) => v.ÄrAktivt,
-        (v) => v.Period.Slut == null);
-
-builder.Services.AddSingleton(semantics);
+// Query semantics registry (manuell bootstrap ska fungera som alternativ till generatorn)
+builder.Services.AddQuerySemantics(r =>
+{
+    r.Register<Tidsrymd, DateTimeOffset, bool>((range, t) => range.Innehåller(t),
+                                               (range, t) => range.Start <= t && (range.Slut == null || t < range.Slut));
+    r.Register<Vårdval, bool>(v => v.ÄrAktivt,
+                              v => v.Period.Slut == null);
+});
 
 // Interactors
 builder.Services.AddScoped<SkapaPersonInteractor>();

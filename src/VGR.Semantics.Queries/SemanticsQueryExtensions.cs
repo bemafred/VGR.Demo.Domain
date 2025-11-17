@@ -4,11 +4,10 @@ namespace VGR.Semantics.Queries;
 
 public static class SemanticQueryExtensions
 {
-    public static IQueryable<T> WithSemantics<T>(this IQueryable<T> source, SemanticMappings semanticMappings)
+    public static IQueryable<T> WithSemantics<T>(this IQueryable<T> source)
     {
         if (source is null) throw new ArgumentNullException(nameof(source));
-        if (semanticMappings is null) throw new ArgumentNullException(nameof(semanticMappings));
-        return new SemanticQueryable<T>(source, semanticMappings);
+        return new SemanticQueryable<T>(source);
     }
 
     private sealed class SemanticQueryable<T> : IQueryable<T>, IQueryProvider
@@ -16,10 +15,10 @@ public static class SemanticQueryExtensions
         private readonly IQueryable<T> _inner;
         private readonly IQueryProvider _provider;
 
-        public SemanticQueryable(IQueryable<T> inner, SemanticMappings semanticMappings)
+        public SemanticQueryable(IQueryable<T> inner)
         {
             _inner = inner;
-            _provider = new SemanticQueryProvider(inner.Provider, semanticMappings);
+            _provider = new SemanticQueryProvider(inner.Provider);
         }
 
         public Type ElementType => typeof(T);

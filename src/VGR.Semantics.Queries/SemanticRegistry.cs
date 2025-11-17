@@ -6,37 +6,38 @@ namespace VGR.Semantics.Queries;
 /// <summary>
 /// Central registry of domain-method → EF-friendly expression rewrites.
 /// </summary>
-public sealed class SemanticMappings
+internal static partial class SemanticRegistry
 {
-    private readonly Dictionary<MethodInfo, LambdaExpression> _registry = new();
+    private static readonly Dictionary<MethodInfo, LambdaExpression> _registry = [];
 
-    public SemanticMappings Register(MethodInfo domainMethod, LambdaExpression efExpression)
+    public static void Register(MethodInfo domainMethod, LambdaExpression efExpression)
     {
         if (domainMethod is null) throw new ArgumentNullException(nameof(domainMethod));
         if (efExpression is null) throw new ArgumentNullException(nameof(efExpression));
         _registry[domainMethod] = efExpression;
-        return this;
     }
 
-    public SemanticMappings Register<T1, T2, TResult>(
+    public static void Register<T1, T2, TResult>(
         Expression<Func<T1, T2, TResult>> domainCall,
         Expression<Func<T1, T2, TResult>> efExpression)
     {
         if (domainCall.Body is not MethodCallExpression m)
             throw new InvalidOperationException("domainCall must be MethodCallExpression");
-        return Register(m.Method, efExpression);
+
+        Register(m.Method, efExpression);
     }
 
-    public SemanticMappings Register<T1, TResult>(
+    public static void Register<T1, TResult>(
         Expression<Func<T1, TResult>> domainCall,
         Expression<Func<T1, TResult>> efExpression)
     {
         if (domainCall.Body is not MethodCallExpression m)
             throw new InvalidOperationException("domainCall must be MethodCallExpression");
-        return Register(m.Method, efExpression);
+
+        Register(m.Method, efExpression);
     }
 
-    internal Expression Rewrite(Expression expr) => new Rewriter(_registry).Visit(expr)!;
+    internal static Expression Rewrite(Expression expr) => new Rewriter(_registry).Visit(expr)!;
 
     private sealed class Rewriter : ExpressionVisitor
     {

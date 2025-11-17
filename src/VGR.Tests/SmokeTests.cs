@@ -29,8 +29,6 @@ public class SmokeTests
         var clock = new TestClock();
         var ct = CancellationToken.None;
 
-        var semantic = new SemanticMappings();
-
         // Initiera en region
         var region = Region.Skapa("14");
         write.Regioner.Add(region);
@@ -38,7 +36,7 @@ public class SmokeTests
         await write.SaveChangesAsync(ct);
 
         // Skapa person
-        var skapaPerson = new SkapaPersonInteractor(read, write, clock, semantic);
+        var skapaPerson = new SkapaPersonInteractor(read, write, clock);
         var cmdP = new SkapaPersonCmd(region.Id, "19900101-1234");
         var resP = await skapaPerson.ProcessAsync(cmdP, ct);
         Assert.True(resP.IsSuccess);
@@ -46,7 +44,7 @@ public class SmokeTests
         var personId = resP.Value!; // Behåll som PersonId
 
         // Skapa vårdval
-        var skapaVv = new SkapaVårdvalInteractor(read, write, clock, semantic);
+        var skapaVv = new SkapaVårdvalInteractor(read, write, clock);
         var cmdV = new SkapaVårdvalCmd(personId, "HSA-ENHET-1", new DateOnly(2024,1,1), null);
         var resV = await skapaVv.ProcessAsync(cmdV, ct);
         Assert.True(resV.IsSuccess);
@@ -65,8 +63,6 @@ public class SmokeTests
         var clock = new TestClock();
         var ct = CancellationToken.None;
 
-        var semantic = new SemanticMappings();
-
         // Initiera region och person via aggregat för att undvika dubbla spårade instanser
         var region = Region.Skapa("14");
         var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), clock.UtcNow);
@@ -74,7 +70,7 @@ public class SmokeTests
         write.Regioner.Add(region);
         await write.SaveChangesAsync(ct);
 
-        var interactor = new SkapaVårdvalInteractor(read, write, clock, semantic);
+        var interactor = new SkapaVårdvalInteractor(read, write, clock);
 
         var ok = await interactor.ProcessAsync(
             new SkapaVårdvalCmd(person.Id, "HSA-ENHET-1", new DateOnly(2024,1,1), new DateOnly(2024,12,31)),

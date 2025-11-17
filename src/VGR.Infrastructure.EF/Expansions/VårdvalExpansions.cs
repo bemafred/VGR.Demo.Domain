@@ -4,7 +4,7 @@ using VGR.Domain;
 using VGR.Domain.SharedKernel;
 using VGR.Semantics.Abstractions;
 
-namespace VGR.Infrastructure.EF;
+namespace VGR.Infrastructure.EF.Expansions;
 
 /// <summary>
 /// Provides extension methods for defining and utilizing custom expansions on the <see cref="Vårdval"/> class,
