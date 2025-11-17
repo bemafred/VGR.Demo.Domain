@@ -28,10 +28,18 @@ internal static partial class SemanticRegistry
         Expression<Func<T1, TResult>> domainCall,
         Expression<Func<T1, TResult>> efExpression)
     {
-        if (domainCall.Body is not MethodCallExpression m)
-            throw new InvalidOperationException("domainCall must be MethodCallExpression");
-
-        Register(m.Method, efExpression);
+        switch (domainCall.Body)
+        {
+            case MethodCallExpression m:
+                Register(m.Method, efExpression);
+                break;
+            case MemberExpression me when me.Member is PropertyInfo pi:
+                var getter = pi.GetGetMethod(true) ?? throw new InvalidOperationException("Property has no getter.");
+                Register(getter, efExpression);
+                break;
+            default:
+                throw new InvalidOperationException("domainCall must be a MethodCallExpression or a property access.");
+        }
     }
 
     private static void Register(MethodInfo domainMethod, LambdaExpression efExpression)
@@ -43,10 +51,9 @@ internal static partial class SemanticRegistry
     
     internal static Expression Rewrite(Expression expr) => new Rewriter(_registry).Visit(expr)!;
 
-    private sealed class Rewriter : ExpressionVisitor
+    private sealed class Rewriter(IReadOnlyDictionary<MethodInfo, LambdaExpression> map) : ExpressionVisitor
     {
-        private readonly IReadOnlyDictionary<MethodInfo, LambdaExpression> _map;
-        public Rewriter(IReadOnlyDictionary<MethodInfo, LambdaExpression> map) => _map = map;
+        private readonly IReadOnlyDictionary<MethodInfo, LambdaExpression> _map = map;
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
@@ -63,6 +70,29 @@ internal static partial class SemanticRegistry
 
                 var subst = new ParameterSubstituter(replacement.Parameters, args);
                 return subst.Visit(replacement.Body);
+            }
+
+            return visited;
+        }
+
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            var visited = (MemberExpression)base.VisitMember(node);
+
+            if (visited.Member is PropertyInfo pi)
+            {
+                var getter = pi.GetGetMethod(true);
+                if (getter is not null && _map.TryGetValue(getter, out var replacement))
+                {
+                    var args = new List<Expression>(visited.Expression is null ? 0 : 1);
+                    if (visited.Expression is not null) args.Add(visited.Expression);
+
+                    if (replacement.Parameters.Count != args.Count)
+                        throw new InvalidOperationException("Replacement parameter count mismatch");
+
+                    var subst = new ParameterSubstituter(replacement.Parameters, args);
+                    return subst.Visit(replacement.Body);
+                }
             }
 
             return visited;
