@@ -10,12 +10,9 @@ internal static partial class SemanticRegistry
 {
     private static readonly Dictionary<MethodInfo, LambdaExpression> _registry = [];
 
-    public static void Register(MethodInfo domainMethod, LambdaExpression efExpression)
-    {
-        if (domainMethod is null) throw new ArgumentNullException(nameof(domainMethod));
-        if (efExpression is null) throw new ArgumentNullException(nameof(efExpression));
-        _registry[domainMethod] = efExpression;
-    }
+    public static bool TryGet(MethodInfo m, out LambdaExpression lambda)
+        => _registry.TryGetValue(m, out lambda!);
+    
 
     public static void Register<T1, T2, TResult>(
         Expression<Func<T1, T2, TResult>> domainCall,
@@ -37,6 +34,13 @@ internal static partial class SemanticRegistry
         Register(m.Method, efExpression);
     }
 
+    private static void Register(MethodInfo domainMethod, LambdaExpression efExpression)
+    {
+        if (domainMethod is null) throw new ArgumentNullException(nameof(domainMethod));
+        if (efExpression is null) throw new ArgumentNullException(nameof(efExpression));
+        _registry[domainMethod] = efExpression;
+    }
+    
     internal static Expression Rewrite(Expression expr) => new Rewriter(_registry).Visit(expr)!;
 
     private sealed class Rewriter : ExpressionVisitor

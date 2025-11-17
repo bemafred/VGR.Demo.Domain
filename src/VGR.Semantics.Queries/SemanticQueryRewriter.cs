@@ -33,7 +33,7 @@ internal sealed class SemanticQueryRewriter : ExpressionVisitor
     {
         var m = node.Method;
         if (m.GetCustomAttribute<SemanticQueryAttribute>() is null) return base.VisitMethodCall(node);
-        if (!SemanticRegistry.TryGet(m, (node.Object is null ? 0 : 1) + node.Arguments.Count, out var lambda))
+        if (!SemanticRegistry.TryGet(m, out var lambda))
             throw new InvalidOperationException($"No expansion for {m.DeclaringType?.Name}.{m.Name}");
         var args = new System.Collections.Generic.List<Expression>();
         if (node.Object is not null) args.Add(node.Object);
@@ -59,7 +59,7 @@ internal sealed class SemanticQueryRewriter : ExpressionVisitor
         if (node.Member is PropertyInfo pi && pi.GetCustomAttribute<SemanticQueryAttribute>() is not null)
         {
             var getter = pi.GetMethod;
-            if (getter is not null && SemanticRegistry.TryGet(getter, (node.Expression is null ? 0 : 1), out var lambda))
+            if (getter is not null && SemanticRegistry.TryGet(getter, out var lambda))
             {
                 var args = new List<Expression>();
                 if (node.Expression is not null) args.Add(node.Expression);
@@ -88,34 +88,3 @@ internal sealed class SemanticQueryRewriter : ExpressionVisitor
     }
 }
 
-/// <summary>
-/// The <see cref="SemanticRegistry"/> class serves as a registry for resolving semantic transformations
-/// associated with methods annotated with the <see cref="SemanticQueryAttribute"/>. It maps method metadata
-/// to their corresponding lambda expression implementations, enabling the application of customized query semantics
-/// during the rewriting of expression trees.
-/// </summary>
-/// <remarks>
-/// This class is used internally to manage the installation and lookup of semantic expansions for methods
-/// defined within the system. It provides functionality to query for transformation expressions that are
-/// subsequently utilized by the <see cref="SemanticQueryRewriter"/>.
-/// </remarks>
-internal static partial class SemanticRegistry
-{
-    /// <summary>
-    /// Attempts to retrieve a registered semantic transformation for a given method with a specified number of arguments.
-    /// </summary>
-    /// <param name="m">The <see cref="MethodInfo"/> representing the method being analyzed.</param>
-    /// <param name="arity">The number of arguments (including the instance, if applicable) for the method call.</param>
-    /// <param name="lambda">
-    /// When the method is found in the registry, contains the corresponding <see cref="LambdaExpression"/>
-    /// representing the semantic transformation. If not found, this will be null.
-    /// </param>
-    /// <returns>
-    /// <c>true</c> if a semantic transformation exists for the specified method and arity; otherwise, <c>false</c>.
-    /// </returns>
-    public static bool TryGet(MethodInfo m, int arity, out LambdaExpression lambda)
-    {
-        lambda = null!;
-        return false;
-    }
-}
