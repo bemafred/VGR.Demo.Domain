@@ -4,6 +4,8 @@ using System;
 using System.Linq;
 using System.Text;
 
+using VGR.Semantics.Abstractions;
+
 namespace VGR.Semantics.Generator;
 
 [Generator]
@@ -17,9 +19,11 @@ public sealed class SemanticGenerator : ISourceGenerator
         if (context.SyntaxReceiver is not Receiver rx) return;
         
         var comp = context.Compilation;
-        var expansionAttr = comp.GetTypeByMetadataName("VGR.Semantics.Abstractions.ExpansionForAttribute"); // <-- Keep magic string
-        var queryAttr = comp.GetTypeByMetadataName("VGR.Semantics.Abstractions.SemanticQueryAttribute"); // <-- Keep magic string
-        if (expansionAttr is null || queryAttr is null) return;
+        var expansionForAttrName = typeof(ExpansionForAttribute).FullName!;
+        var expansionAttr = comp.GetTypeByMetadataName(expansionForAttrName);
+        var semanticQueryAttrName = typeof(SemanticQueryAttribute).FullName!;
+        var semanticAttr = comp.GetTypeByMetadataName(semanticQueryAttrName); 
+        if (expansionAttr is null || semanticAttr is null) return;
 
         var pairs = new System.Collections.Generic.List<(IMethodSymbol Target, IMethodSymbol Factory, int Arity)>();
         
@@ -37,8 +41,8 @@ public sealed class SemanticGenerator : ISourceGenerator
 
                 var candidates = targetType.GetMembers(targetName)
                     .Where(m =>
-                        (m is IMethodSymbol mm && mm.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, queryAttr))) ||
-                        (m is IPropertySymbol pp && pp.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, queryAttr)))
+                        (m is IMethodSymbol mm && mm.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, semanticAttr))) ||
+                        (m is IPropertySymbol pp && pp.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, semanticAttr)))
                     )
                     .ToArray();
                 
