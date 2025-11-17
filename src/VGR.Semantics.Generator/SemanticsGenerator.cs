@@ -73,7 +73,7 @@ public sealed class SemanticGenerator : ISourceGenerator
         sb.AppendLine("using System.Linq.Expressions;");
         sb.AppendLine("using System.Reflection;");
         sb.AppendLine("using System.Linq;");
-        sb.AppendLine("namespace VGR.Semantics;");
+        sb.AppendLine("namespace VGR.Semantics.Queries;");
         sb.AppendLine("internal static partial class SemanticRegistry");
         sb.AppendLine("{");
         sb.AppendLine("  private static readonly System.Collections.Generic.Dictionary<(MethodInfo,int), LambdaExpression> __map = new();");

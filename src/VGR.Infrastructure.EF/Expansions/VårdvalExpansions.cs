@@ -22,14 +22,6 @@ public static class VårdvalExpansions
     /// based on its time period.
     /// </returns>
     [ExpansionFor(typeof(Vårdval), nameof(Vårdval.ÄrAktivt))]
-    public static LambdaExpression ÄrAktivt_Expansion()
-    {
-        var v = Expression.Parameter(typeof(Vårdval), "v");
-        var t = Expression.Parameter(typeof(DateTimeOffset), "t");
-        var period = Expression.Property(v, nameof(Vårdval.Period));
-        var start = Expression.Property(period, nameof(Tidsrymd.Start));
-        var slut  = Expression.Property(period, nameof(Tidsrymd.Slut));
-        var body = Expression.AndAlso(Expression.GreaterThanOrEqual(t, start), Expression.LessThan(t, slut));
-        return Expression.Lambda(body, v, t);
-    }
+    public static Expression<Func<Vårdval, bool>> ÄrAktivt_Expansion()
+        => v => v.Period.Slut == null;
 }

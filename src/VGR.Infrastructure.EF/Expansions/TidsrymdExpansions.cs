@@ -9,26 +9,12 @@ namespace VGR.Infrastructure.EF.Expansions;
 public static class TidsrymdExpansions
 {
     [ExpansionFor(typeof(Tidsrymd), nameof(Tidsrymd.Innehåller))]
-    public static LambdaExpression Innehåller_Expansion()
-    {
-        var r = Expression.Parameter(typeof(Tidsrymd), "r");
-        var t = Expression.Parameter(typeof(DateTimeOffset), "t");
-        var start = Expression.Property(r, nameof(Tidsrymd.Start));
-        var slut  = Expression.Property(r, nameof(Tidsrymd.Slut));
-        var body = Expression.AndAlso(Expression.GreaterThanOrEqual(t, start), Expression.LessThan(t, slut));
-        return Expression.Lambda(body, r, t);
-    }
-    
+    public static Expression<Func<Tidsrymd, DateTimeOffset, bool>> Innehåller_Expansion()
+        => (r, t) => r.Start <= t && (r.Slut == null || t < r.Slut);
+
     [ExpansionFor(typeof(Tidsrymd), nameof(Tidsrymd.Överlappar))]
-    public static LambdaExpression Överlappar_Expansion()
-    {
-        var a = Expression.Parameter(typeof(Tidsrymd), "a");
-        var b = Expression.Parameter(typeof(Tidsrymd), "b");
-        var aStart = Expression.Property(a, nameof(Tidsrymd.Start));
-        var aSlut  = Expression.Property(a, nameof(Tidsrymd.Slut));
-        var bStart = Expression.Property(b, nameof(Tidsrymd.Start));
-        var bSlut  = Expression.Property(b, nameof(Tidsrymd.Slut));
-        var body = Expression.AndAlso(Expression.LessThan(aStart, bSlut), Expression.LessThan(bStart, aSlut));
-        return Expression.Lambda(body, a, b);
-    }
+    public static Expression<Func<Tidsrymd, Tidsrymd, bool>> Överlappar_Expansion()
+        => (a, b) =>
+            a.Start < (b.Slut ?? DateTimeOffset.MaxValue) &&
+            b.Start < (a.Slut ?? DateTimeOffset.MaxValue);
 }
