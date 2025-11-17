@@ -84,6 +84,7 @@ public readonly record struct Tidsrymd
         => new(StartAvDag(start, tz), null);
 
     /// <summary>True om tidpunkten <paramref name="t"/> ingår i intervallet.</summary>
+    [SemanticQuery]
     public bool Innehåller(DateTimeOffset t) => Start <= t && (Slut is null || t < Slut.Value);
 
     /// <summary>True om tidpunkten <paramref name="t"/> (nullable) ingår i intervallet. <c>null</c> ger false.</summary>

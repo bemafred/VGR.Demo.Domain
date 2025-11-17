@@ -1,4 +1,4 @@
-namespace VGR.Domain.SharedKernel;
+namespace VGR.Domain.SharedKernel.Abstractions;
 
 public interface IDomainEvent
 {

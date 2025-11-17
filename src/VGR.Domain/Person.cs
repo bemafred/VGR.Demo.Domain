@@ -1,4 +1,5 @@
 using VGR.Domain.SharedKernel;
+using VGR.Domain.SharedKernel.Abstractions;
 using VGR.Domain.SharedKernel.Exceptions;
 
 namespace VGR.Domain;
