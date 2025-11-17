@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace VGR.Semantics.Queries
 {
     // Fluent builder that forwards registrations to the internal SemanticRegistry.
-    public sealed class SemanticsRegistrationBuilder
+    public sealed class SemanticsRegistrationsBuilder
     {
-        public SemanticsRegistrationBuilder Register<T1, T2, TResult>(
+        public SemanticsRegistrationsBuilder Register<T1, T2, TResult>(
             Expression<Func<T1, T2, TResult>> domainCall,
             Expression<Func<T1, T2, TResult>> efExpression)
         {
@@ -15,7 +15,7 @@ namespace VGR.Semantics.Queries
             return this;
         }
 
-        public SemanticsRegistrationBuilder Register<T1, TResult>(
+        public SemanticsRegistrationsBuilder Register<T1, TResult>(
             Expression<Func<T1, TResult>> domainCall,
             Expression<Func<T1, TResult>> efExpression)
         {
@@ -27,9 +27,9 @@ namespace VGR.Semantics.Queries
     public static class SemanticsRegistrationExtensions
     {
         // Keeps the IServiceCollection-centric pattern common in ASP.NET Core.
-        public static IServiceCollection AddQuerySemantics(this IServiceCollection services, Action<SemanticsRegistrationBuilder>? configure = null)
+        public static IServiceCollection AddQuerySemantics(this IServiceCollection services, Action<SemanticsRegistrationsBuilder>? configure = null)
         {
-            var builder = new SemanticsRegistrationBuilder();
+            var builder = new SemanticsRegistrationsBuilder();
             configure?.Invoke(builder);
             return services;
         }
