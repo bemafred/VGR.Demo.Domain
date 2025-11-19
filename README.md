@@ -14,7 +14,7 @@ Målet är att visa hur domänens språk kan vara första klass genom hela stack
 
 **Epistemic Clean** är ett sätt att tänka arkitektur där fokus ligger på:
 
-- **Kunskap före teknik** – domänen uttrycks som begrepp, regler och relationer, inte som tabeller eller controllers.
+- **Kunskap före teknik** – domänen uttrycks som begrepp, regler och relationer, inte som tabeller eller controllers och interactors.
 - **Språk som gränssnitt** – kod ska kunna läsas som domänprosa: `person.SkapaVårdval()`, `tidsrymd.Överlappar(annan)`.
 - **Förklarbarhet** – beslut och regler ska kunna förklaras i efterhand (”varför blev utfallet så här?”).
 - **Strukturerad komplexitet** – vi tar inte bort komplexitet, vi placerar den där den hör hemma (domän, semantik, infrastruktur).
