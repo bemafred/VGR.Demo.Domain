@@ -74,7 +74,7 @@ Solution-folderstrukturen speglar ansvarsområden:
   - `VGR.Tests` – E2E-/integrationstester mot interaktorer/webb (SQLite in-memory).
 
 - **Technical Kernel**
-  - `VGR.Technical` – tekniska byggblock (`Outcome`, `Dq`, `IClock`, m.m.).
+  - `VGR.Technical` – tekniska byggblock (`Utfall`, `IClock`, m.m.).
 
 - **Quality & Guardrails**
   - `VGR.Analyzers` – Roslyn-regler för domänen (t.ex. inga `public set`, inga publika `List<>`).
