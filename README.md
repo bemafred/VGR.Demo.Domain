@@ -33,9 +33,8 @@ Principerna finns destillerade i:
 
 Nyckelidé:
 
-> Vi vill kunna skriva queries i domänspråk (t.ex. `tidsrymd.Innehåller(tidpunkt)`)
-> samt kunna garantera domänens integritet och ändå få effektiv SQL, 
-> utan att duplicera regler i råa LINQ-uttryck.
+> Vi vill kunna garantera domänens integritet samt skriva queries i domänspråk (t.ex. `tidsrymd.Innehåller(tidpunkt)`)
+> och ändå få effektiv SQL, utan att duplicera regler i råa LINQ-uttryck eller komplicerande lagerkonstruktioner.
 
 Det löses genom:
 
