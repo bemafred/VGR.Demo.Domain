@@ -103,7 +103,7 @@ Några av de viktigaste principerna som demonstreras:
 
 - **Felhantering med `Throw` och `Outcome`**  
   - `Throw` för invariants och fel som ska bryta exekveringen.
-  - `Outcome<T>` för icke-exceptionella misslyckanden och tydliga resultat i interaktorer.
+  - `Utfall<T>` för icke-exceptionella misslyckanden och tydliga resultat i interaktorer.
 
 - **Guardrails via analyzers**  
   Roslyn-regler säkerställer att domänen inte smittas av infrastrukturnära kod (t.ex. publika set, muterbara samlingar).
