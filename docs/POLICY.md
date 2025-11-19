@@ -1,7 +1,3 @@
-—
-
-## ⚙️ **docs/POLICY.md**
-```markdown
 # VGR Arkitektur — POLICY
 
 ## Felhantering och kontrollflöde
@@ -9,14 +5,14 @@
 Systemet använder två kompletterande mekanismer:
 
 - **Throw**: används i domänen för att signalera regelbrott (invariants, argumentfel, concurrency-konflikter).
-- **Outcome**: används i interaktorer och queries för att returnera lyckade eller misslyckade resultat utan att kasta.
+- **Utfall**: används i interaktorer och queries för att returnera lyckade eller misslyckade resultat utan att kasta.
 
 ### Policy
 
-| Typ | Mönster | Hantering |
-|——|————|————|
-| **Command** | Kastar `DomainException` via `Throw` | Controller fångar och mappar till HTTP-svar |
-| **Query** | Returnerar `Outcome<T>` | Controller returnerar resultat direkt |
+| ***Typ***   | ***Mönster***                                                                 | ***Hantering***                             |
+|-------------|-------------------------------------------------------------------------------|---------------------------------------------|
+| **Command** | Kastar `DomainException` via `Throw` eller `Utfall<T>` vid effektivitetsbehov | Controller fångar och mappar till HTTP-svar |
+| **Query**   | Returnerar `Utfall<T>`                                                        | Controller returnerar resultat direkt       |
 
 Detta möjliggör maximal prestanda och tydlighet: interaktorer kan välja den modell som passar bäst.
 
@@ -32,5 +28,5 @@ Detta ger “CQRS-light” utan ceremoni – enkelt, testbart och mycket snabbt.
 ## Domänens ansvar
 
 - **Domänen kastar** när regler bryts.  
-- **Interaktorn fångar** och mappar till Outcome eller HTTP-respons.  
-- **Kontroller** ansvarar endast för mappning av request/
+- **Interaktorn** fångar vid särskilda eller mappar till `Utfall<T>`.  
+- **Kontroller** ansvarar för mappning av request/ och kan fånga och mappa `Throw`

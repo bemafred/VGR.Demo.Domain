@@ -1,4 +1,4 @@
-# Epistemic Clean — Arkitekturkanon (1 sida)
+# Epistemic Clean — Arkitekturkanon
 
 **Tagline:** *Language is the interface. Semantics execute.*  
 **Kort:** Clean/Hexagonal + domän→SQL semantisk översättar-adapter + domänkatalog (C#→RDF) + visuellt syskon till Swagger.
@@ -25,6 +25,16 @@
                                      + [ Domain Catalog (RDF export) + /domain UI ]
 ```
 *Domänen känner inte till EF/SQL. Infrastruktur lär sig domänens språk.*
+
+**Konkreta projekt per lager/folder**
+
+- **Core Domain** → `VGR.Domain`, `VGR.Domain.Queries`, `VGR.Domain.Tests`
+- **Application (UseCases)** → `VGR.Application`
+- **Semantic Platform** → `VGR.Semantics.Abstractions`, `VGR.Semantics.Queries`, `VGR.Semantics.Generator`, `VGR.Semantics.Queries.Tests`
+- **Infrastructure (Persistence & IO)** → `VGR.Infrastructure.EF`
+- **Delivery (API & Hosting)** → `VGR.Web`, `VGR.Tests`
+- **Technical Kernel** → `VGR.Technical`
+- **Quality & Guardrails** → `VGR.Analyzers`, `docs/*`
 
 ## Do / Don’t
 **Do**
