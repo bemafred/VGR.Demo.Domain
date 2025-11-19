@@ -1,10 +1,13 @@
-﻿namespace VGR.Domain.Queries
+﻿
+
+
+namespace VGR.Domain.Queries;
+
+public static class VårdvalQueries // TODO: Experimentella vyer och projektioner för att eventuellt etablera nya mönster
 {
-    public static class VårdvalQueries
+    extension(Vårdval self)
     {
-        extension(Vårdval method VårdvalQuery VårdvalQuery.CreateVårdvalQuery()
-        {
-            return new VårdvalQuery();
-        }
+        public string ExperimentalProperty => $"{self.PersonId.ToString()} {self.Id.ToString()}";
     }
 }
+
