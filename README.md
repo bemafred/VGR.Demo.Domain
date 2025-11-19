@@ -126,7 +126,7 @@ Några av de viktigaste principerna som demonstreras:
 | **Infrastructure (Persistence & IO)** | `VGR.Infrastructure.EF`         | Entity Framework-konfiguration och `DbContext` (Read/Write, pushdown-strategi).                   |
 | **Delivery (API & Hosting)**     | `VGR.Web`                           | ASP.NET Core-API, controllers, hosting.                                                           |
 |                                  | `VGR.Tests`                         | End-to-end/integrationstester mot interaktorer och webb (SQLite in-memory).                       |
-| **Technical Kernel**             | `VGR.Technical`                     | Teknisk domän: `Outcome`, `Map`, `IClock`, intern infrastruktur för interaktorer.                 |
+| **Technical Kernel**             | `VGR.Technical`                     | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer.                  |
 | **Quality & Guardrails**         | `VGR.Analyzers`                     | Roslyn-analyzers som upprätthåller domänregler.                                                   |
 | **Architecture & Docs**          | `docs/*`                            | Arkitektur- och policy-dokumentation (`ANALYS`, `PLACERING`, `POLICY`, `KODERGONOMI`, m.fl.).     |
 
@@ -136,10 +136,10 @@ Några av de viktigaste principerna som demonstreras:
 - **Semantic Platform** är den enda platsen där domänens språk översätts till EF-vänliga uttryck:
   - domänmetoder/predikat annoteras via `SemanticQueryAttribute`/`ExpansionForAttribute`,
   - `VGR.Semantics.Queries` och `VGR.Semantics.Generator` bygger upp ett centralt semantik-register.
-- **Felhantering sker med `Throw` eller `Outcome`.**  
+- **Felhantering sker med `Throw` eller `Utfall`.**  
   - `Throw` används för invariants och fel som *ska* bryta exekveringen – både i domän och applikationslager.  
-  - `Outcome` kan användas när det finns skäl att undvika undantag, t.ex. av prestandaskäl eller för att uttrycka icke-exceptionella misslyckanden i interaktorer.
-- **Application** implementerar interaktorer som anropar domänen, utnyttjar Semantic Platform för queries och returnerar `Outcome`/kastar vid behov.
+  - `Utfall` kan användas när det finns skäl att undvika undantag, t.ex. av prestandaskäl eller för att uttrycka icke-exceptionella misslyckanden i interaktorer.
+- **Application** implementerar interaktorer som anropar domänen, utnyttjar Semantic Platform för queries och returnerar `Utfall`/kastar vid behov.
 - **Infrastructure.EF** ansvarar för mappning, persistens och pushdown-konfiguration (Read/Write DbContexts).
 - **Delivery** (Web + E2E) exponerar användningsfall via HTTP och testar hela kedjan från API till DB.
 - **Analyzers** säkerställer att inga regler bryts i domänen (t.ex. public set, publika `List<>`).
@@ -169,7 +169,7 @@ Vertikal placering av projekt (inklusive testprojekt) följer dessa principer:
   - `VGR.Tests` – E2E-/integrations-tester (xUnit + SQLite in-memory) mot interaktorer/webb.
 
 - **Technical Kernel**
-  - `VGR.Technical` – tekniska byggblock (t.ex. `Utfall`, `Dq`, `IClock`).
+  - `VGR.Technical` – tekniska byggblock (t.ex. `Utfall`, `IClock`).
 
 - **Quality & Guardrails**
   - `VGR.Analyzers` – Roslyn-regler för domänen (`VGR001`, `VGR002`).
