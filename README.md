@@ -113,12 +113,6 @@ Några av de viktigaste principerna som demonstreras:
 
 ---
 
-## 5. Komma igång
-
-### Bygga
-
-Kräver .NET SDK som stöder `net10.0` (preview).
-
 | Solution folder                  | Projekt                              | Syfte |
 |----------------------------------|--------------------------------------|-------|
 | **Core Domain**                  | `VGR.Domain`                         | Verksamhetsdomän: aggregat, värdeobjekt, invariants, `Throw`. |
@@ -267,3 +261,21 @@ Projekt **VGR.Analyzers** innehåller Roslyn-regler som appliceras på `VGR.Doma
 - `VGR002` – förhindrar publika muterbara samlingar (ICollection/IList/List)
 
 Se `ANALYZER_REGLER.md`. Severity konfigureras i `.editorconfig` (default = error).
+
+## 6. Var ska jag läsa mer?
+
+- **Övergripande analys** – `docs/ANALYS.md`  
+  Hur arkitekturen bedöms (styrkor/svagheter, mätpunkter).
+
+- **Principer och namn** –
+    - `docs/ARCHITECTURE-CANON.md`
+    - `docs/ARCHITECTURE-NAME.md`
+    - `docs/EpistemicClean-VarförDetKännsBekvämt.md`
+
+- **Projektplacering och ansvar** – `docs/PLACERING.md`
+
+- **Policyer (Throw/Outcome, CQRS-light)** – `docs/POLICY.md`
+
+- **Kodergonomi** – `docs/KODERGONOMI.md`
+
+Den här README:n är “portalen” – för detaljerad arkitektur och motivation, gå vidare in i `docs/`.
