@@ -23,7 +23,7 @@ Principerna finns destillerade i:
 
 - `docs/ARCHITECTURE-CANON.md`
 - `docs/ARCHITECTURE-NAME.md`
-- `docs/EpistemicClean-VarförDetKännsBekvämt.md`
+- `docs/ARCHITECTURE-WHY.md`
 
 ---
 
