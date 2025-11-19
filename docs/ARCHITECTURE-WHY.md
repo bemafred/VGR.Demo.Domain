@@ -1,6 +1,6 @@
-## Epistemic Clean – Varför den känns tyst
+## Epistemic Clean & Sementic Architecture – Varför det känns behagligt
 
-Vi har under arbetet med **Epistemic Clean** märkt något ovanligt:  
+Vi har under arbetet mot **Epistemic Clean** märkt något ovanligt:  
 ju mer vi förfinar arkitekturen, desto tystare blir den.  
 Det beror inte på att vi tagit bort komplexitet, utan att vi **strukturerat den**.  
 Här följer varför.
@@ -16,6 +16,7 @@ i C#, i databasen, i API:et och i dokumentationen.
 
 Det gör att vi inte längre behöver översätta mentalt mellan lager.  
 Vi tänker i begrepp, inte implementation.  
+
 Bruset dämpas när varje rad kod är semantiskt begriplig.
 
 ---
@@ -27,7 +28,7 @@ De flesta system blandar *vad vi vet* (domän) med *hur vi lagrar* (infrastruktu
 Vi har valt en annan väg.
 
 - Domänen är **ren** och uttrycker endast kunskap och regler.  
-- Infrastrukturen **översätter** domänens språk till SQL via EF-translators.  
+- Infrastrukturen **översätter** domänens språk till SQL via ett semantiskt lager.  
 - Domänkatalogen **binder samman** människor, maskiner och modeller.
 
 Vi kopplar alltså inte lager tekniskt – vi kopplar dem **genom mening**.  
@@ -62,4 +63,4 @@ Resultatet är en arkitektur där **språk är gränssnittet**
 och **semantiken exekverar**.
 
 Det är därför **Epistemic Clean** känns stilla, självklar och effektiv.  
-Den arbetar inte mot oss. Den **tänker med oss**.
+Den arbetar inte mot oss. Den **bäddar för oss**.

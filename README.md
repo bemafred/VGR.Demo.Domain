@@ -1,8 +1,123 @@
-# VGR Arkitektur — PLACERING
+# VGR Demo Domain – Epistemic Clean & Semantic Architecture (.NET / EF / CQRS-light)
 
-Detta dokument beskriver hur de olika projekten i lösningen är organiserade och vilken roll de spelar i helheten.
+Detta repo är en **referensarkitektur** för hur vi vill bygga domänstyrda system i .NET:
 
-## Struktur (per solution folder)
+- **Epistemic Clean (E-Clean)** – principerna:  
+  *språket är gränssnittet, semantiken exekverar*.
+- **Semantic Architecture** – den konkreta implementationen i C#, EF Core och tooling.
+
+Målet är att visa hur domänens språk kan vara första klass genom hela stacken – från C#-modeller till SQL, tester och dokumentation – utan att drunkna i lager-ceremoni.
+
+---
+
+## 1. Vad är Epistemic Clean?
+
+**Epistemic Clean** är ett sätt att tänka arkitektur där fokus ligger på:
+
+- **Kunskap före teknik** – domänen uttrycks som begrepp, regler och relationer, inte som tabeller eller controllers.
+- **Språk som gränssnitt** – kod ska kunna läsas som domänprosa: `person.SkapaVårdval()`, `tidsrymd.Överlappar(annan)`.
+- **Förklarbarhet** – beslut och regler ska kunna förklaras i efterhand (”varför blev utfallet så här?”).
+- **Strukturerad komplexitet** – vi tar inte bort komplexitet, vi placerar den där den hör hemma (domän, semantik, infrastruktur).
+
+Principerna finns destillerade i:
+
+- `docs/ARCHITECTURE-CANON.md`
+- `docs/ARCHITECTURE-NAME.md`
+- `docs/EpistemicClean-VarförDetKännsBekvämt.md`
+
+---
+
+## 2. Vad är Semantic Architecture?
+
+**Semantic Architecture** är *implementationen* av E-Clean i den här lösningen.
+
+Nyckelidé:
+
+> Vi vill kunna skriva queries i domänspråk (t.ex. `tidsrymd.Innehåller(tidpunkt)`)  
+> och ändå få effektiv SQL, utan att duplicera regler i råa LINQ-uttryck.
+
+Det löses genom:
+
+- En **ren domän** (`VGR.Domain`, `VGR.Domain.Queries`) utan EF/Expressions.
+- En **Semantic Platform**:
+  - attribut (`SemanticQueryAttribute`, `ExpansionForAttribute`) för att märka domänmetoder,
+  - ett semantik-register (`SemanticRegistry`) och query-provider (`WithSemantics`) som skriver om domänmetoder till EF-vänlig LINQ,
+  - en generator som bygger registret vid compile-time.
+- En **Infrastructure.EF** som fokuserar på pushdown, indexering och ren mapping.
+- En **Delivery-lina** (Web + E2E-tests) som visar hur allt binds samman.
+
+---
+
+## 3. Projekt och solution-folders (mental karta)
+
+Solution-folderstrukturen speglar ansvarsområden:
+
+- **Core Domain**
+  - `VGR.Domain` – aggregat, VO, invariants, `Throw`.
+  - `VGR.Domain.Queries` – domännära queries/predikat.
+  - `VGR.Domain.Tests` – tester av domän och domän-queries.
+
+- **Application (UseCases)**
+  - `VGR.Application` – interaktorer (kommandon/queries) som orkestrerar domän + infra.
+
+- **Semantic Platform**
+  - `VGR.Semantics.Abstractions` – attribut och kontrakt för semantiska queries.
+  - `VGR.Semantics.Queries` – query-provider + expression-rewriter (`WithSemantics`, semantik-register).
+  - `VGR.Semantics.Generator` – source generator som bygger registret.
+  - `VGR.Semantics.Queries.Tests` – tester av semantisk översättning.
+
+- **Infrastructure (Persistence & IO)**
+  - `VGR.Infrastructure.EF` – EF Core-konfiguration, `ReadDbContext`, `WriteDbContext` (CQRS-light, pushdown).
+
+- **Delivery (API & Hosting)**
+  - `VGR.Web` – ASP.NET Core-API, controllers, hosting.
+  - `VGR.Tests` – E2E-/integrationstester mot interaktorer/webb (SQLite in-memory).
+
+- **Technical Kernel**
+  - `VGR.Technical` – tekniska byggblock (`Outcome`, `Dq`, `IClock`, m.m.).
+
+- **Quality & Guardrails**
+  - `VGR.Analyzers` – Roslyn-regler för domänen (t.ex. inga `public set`, inga publika `List<>`).
+  - `docs/*` – arkitektur, policy, kodergonomi.
+
+Den här uppdelningen är **vertikal**: varje “världsdel” innehåller både kod och tester, snarare än en horisontell “alla tester här”-mapp.
+
+---
+
+## 4. Centrala principer i den här implementationen
+
+Några av de viktigaste principerna som demonstreras:
+
+- **Ren och synkron domän**  
+  Domänlagret har inga beroenden på EF, async, cancellation tokens eller `IQueryable`. Mutation sker via beteenden, inte via `set`.
+
+- **CQRS-light med pushdown**  
+  - `ReadDbContext` (NoTracking) för queries och projektioner.
+  - `WriteDbContext` för aggregerad persistens vid kommandon.
+  - Läsningar pushas ner till SQL; skrivningar laddar minsta nödvändiga data för att skydda invariants.
+
+- **Semantisk persistens**  
+  - Domänmetoder som `Tidsrymd.Innehåller`, `Överlappar` uttrycks en gång i domän/semantik.
+  - Semantic Platform översätter dessa till EF-kompatibla uttryck.
+  - Vi undviker duplicerad logik som `Start <= t && (Slut == null || t < Slut)` spridd i LINQ.
+
+- **Felhantering med `Throw` och `Outcome`**  
+  - `Throw` för invariants och fel som ska bryta exekveringen.
+  - `Outcome<T>` för icke-exceptionella misslyckanden och tydliga resultat i interaktorer.
+
+- **Guardrails via analyzers**  
+  Roslyn-regler säkerställer att domänen inte smittas av infrastrukturnära kod (t.ex. publika set, muterbara samlingar).
+
+- **Kodergonomi**  
+  Kod ska kännas som domänprosa, inte som ramverkskonfiguration. Se `docs/KODERGONOMI.md`.
+
+---
+
+## 5. Komma igång
+
+### Bygga
+
+Kräver .NET SDK som stöder `net10.0` (preview).
 
 | Solution folder                  | Projekt                              | Syfte |
 |----------------------------------|--------------------------------------|-------|
