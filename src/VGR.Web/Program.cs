@@ -5,7 +5,7 @@ using VGR.Infrastructure.EF;
 using VGR.Technical;
 using VGR.Domain;
 using VGR.Domain.SharedKernel;
-using VGR.Semantics.Queries;
+using VGR.Semantics.Linq;
 
 
 var builder = WebApplication.CreateBuilder(args);

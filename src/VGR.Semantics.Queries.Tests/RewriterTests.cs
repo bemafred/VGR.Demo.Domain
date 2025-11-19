@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using FluentAssertions;
 using Xunit;
 
-using VGR.Semantics.Queries;
+using VGR.Semantics.Linq;
 
 namespace VGR.Semantics.Queries.Tests;
 

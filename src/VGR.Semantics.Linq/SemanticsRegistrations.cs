@@ -2,7 +2,7 @@ using System;
 using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace VGR.Semantics.Queries
+namespace VGR.Semantics.Linq
 {
     // Fluent builder that forwards registrations to the internal SemanticRegistry.
     public sealed class SemanticsRegistrationsBuilder

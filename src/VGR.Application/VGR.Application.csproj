@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VGR.Semantics.Queries\VGR.Semantics.Queries.csproj" />
+    <ProjectReference Include="..\VGR.Semantics.Linq\VGR.Semantics.Linq.csproj" />
     <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj" />
     <ProjectReference Include="..\VGR.Infrastructure.EF\VGR.Infrastructure.EF.csproj" />
   </ItemGroup>

@@ -1,287 +1,197 @@
-**Denna fil innehåller felaktigheter gällande vissa begrepp och särskilt så saknas information om expansioner, som ligger och ska ligga i infrastruktur lagret.**
-**Det går att härleda korrekt information genom detaljerad analys av filerna i lösningen.**
-**Detta kommer att åtgärdas genom manuell insats av arkitekten bakom det hela, men AI förslag välkomnas.**
+# ONBOARDING.md
 
+## VGR --- E-Clean & Semantic Architecture
 
-# ONBOARDING till E-Clean & Semantic Architecture
+Välkommen in i VGR:s Semantic Architecture.\
+Det här dokumentet hjälper dig att förstå hur lösningen hänger ihop och
+var du som utvecklare normalt arbetar.
 
-Välkommen! 🎉  
-Den här koden kan se avancerad ut vid första anblicken – men syftet är det motsatta:  
-att göra **din vardag enklare, tryggare och mer ergonomisk**.
+Fokusera gärna på följande fyra saker:
 
-Den här guiden förklarar:
+1.  **Domänen är sanningen.**\
+2.  **Domain.Queries ger projektioner och vyer.**
+3.  **Semantics.Linq ger LINQ-förmåga för domänbegrepp.**
+4.  **Expansions i VGR.Infrastructure.EF talar om hur domänmetoder översätts till EF.**
 
-1. Hur lösningen är uppbyggd (E-Clean + Semantik)
-2. Vad du **vanligtvis behöver jobba med**
-3. Vad som är **avancerad infrastruktur** som du sällan (eller aldrig) behöver röra
-4. Hur du stegvis kan lära dig mer, t.ex. om `Expression`-träd
+När du ser flödet mellan de här delarna blir resten naturligt.
 
-Målet är att du ska känna:  
-> “Jag fattar var jag ska vara. Jag kan bygga ny funktionalitet utan att förstå all magi.”
+------------------------------------------------------------------------
 
----
+## 1. Domänen --- vad som är sant
 
-## 1. Den stora bilden
+I `VGR.Domain` definieras vår verkliga verksamhetsmodell:
 
-Lösningen följer en variant av Clean Architecture, kallad **E-Clean**, där E står för **Epistemic/Semantic**.  
-Grov struktur (förenklad, anpassa efter faktisk lösning):
+-   Aggregat\
+-   Värdeobjekt (t.ex. `Tidsrymd`)\
+-   Invariants\
+-   Domänspråk (metoder som `Innehåller`, `Överlappar`, `ÄrAktivt`)\
+-   Semantiska attribut (t.ex. `[SemanticQuery]`)
 
-```text
-src/
-├── VGR.Domain/              → Verksamhetsdomän: aggregat, VO:s, invariants, Throw
-├── VGR.Domain.Queries/      → Domännära projektioner och queries
-├── VGR.Technical/           → Teknisk domän: Outcome, tekniska abstraktioner
-├── VGR.Application/         → Interaktorer (kommandon och queries)
-├── VGR.Infrastructure.EF/   → Entity Framework konfiguration och DbContexts
-├── VGR.Semantics...         → Attribut + semantik-lager för queries
-├── VGR.Semantics.Generator/ → Source generator som producerar expansionskod
-├── VGR.Tests/               → End-to-end tester (ofta SQLite in-memory)
-└── VGR.Domain.Tests/        → Enhetstester av domänen
+All affärslogik bor här.\
+Om ett begrepp saknas i domänen är det **domänen** som ska utökas --
+inte queries, expansions eller EF.
+
+------------------------------------------------------------------------
+
+## 2. Semantics.Linq --- möjligheten att använda LINQ för domänbegrepp
+
+`VGR.Semantics.Linq` är ett **expression-rewriter-lager** som gör att
+du kan skriva LINQ med domänmetoder och ändå få korrekt SQL.
+
+Exempel i domänen:
+
+``` csharp
+public sealed record Tidsrymd(DateTimeOffset Start, DateTimeOffset? Slut)
+{
+    public bool Innehåller(DateTimeOffset t) => /* domänlogik */;
+    public bool Överlappar(Tidsrymd annan)   => /* domänlogik */;
+    public bool ÄrTillsvidare                => Slut is null;
+}
 ```
 
-**Justera projektnamn och struktur i listan ovan** så att den exakt matchar aktuell lösning.
+Exempel i en query:
 
-Grov ansvarsfördelning:
+``` csharp
+var aktiva = db.Vårdval
+    .WithSemantics()
+    .Where(v => v.Period.Innehåller(clock.UtcNow));
+```
 
-- **Domänen** (t.ex. `VGR.Domain`, `VGR.Domain.Queries`)  
-  Här bor verksamhetens begrepp: aggregat, värdeobjekt, regler, invariants och domännära queries.
+Detta ser naturligt ut i domänspråket -- men EF förstår inte
+`Innehåller` av sig självt.
 
-- **Applikation** (t.ex. `VGR.Application`)  
-  Use-cases: kommandon och queries som använder domänen.
+------------------------------------------------------------------------
 
-- **Semantik** (t.ex. `VGR.Semantics.*`)  
-  - Attribut som markerar semantiska queries/expansioner.  
-  - Semantiskt lager för queries över domänen (expansioner, registry).  
-  - Source generator som kan generera delar av semantiken.
+## 3. Expansions i `VGR.Infrastructure.EF` --- hur domänmetoder översätts till EF
 
-- **Infrastruktur** (t.ex. `VGR.Infrastructure.EF`)  
-  EF, DbContext, migrations, tekniska integrationer.
+I `VGR.Infrastructure.EF/Expansions` definieras expansionsmetoder för
+domänmetoder. De är markerade med `[ExpansionFor]` och returnerar
+EF-vänliga `Expression<Func<...>>`.
 
-Poängen: domänen är **rik men ren** – den blandas inte ihop med EF-detaljer.  
-Semantiklagret står **ovanpå** domänen och hjälper EF/infrastruktur att förstå den.
+Exempel -- `Tidsrymd`:
 
----
+``` csharp
+[ExpansionFor(typeof(Tidsrymd), nameof(Tidsrymd.Innehåller))]
+public static Expression<Func<Tidsrymd, DateTimeOffset, bool>> Innehåller_Expansion()
+    => (r, t) => r.Start <= t && (r.Slut == null || t < r.Slut);
+```
 
-## 2. Vad du oftast behöver jobba med
+Exempel -- `Vårdval`:
 
-I en vanlig arbetsdag, när du implementerar ny funktionalitet, är det framför allt:
+``` csharp
+[ExpansionFor(typeof(Vårdval), nameof(Vårdval.ÄrAktivt))]
+public static Expression<Func<Vårdval, bool>> ÄrAktivt_Expansion()
+    => v => v.Period.ÄrTillsvidare;
+```
 
-1. **Domänen** (t.ex. `VGR.Domain`)
-   - Skapa/ändra aggregat.
-   - Skapa/ändra värdeobjekt (t.ex. tidsrelaterade VO, id-typer, etc.).
-   - Införa/justera invariants och domänlogik.
-   - Läsa domännära metoder som t.ex. ”ÄrAktivt(...)” på rätt typ.
+Dessa expansions används av `SemanticRegistry` för att översätta
+domänmetoder till rena LINQ-uttryck som EF kan förstå och översätta till
+SQL.
 
-2. **Domännära queries** (t.ex. `VGR.Domain.Queries`)
-   - Bygga projektioner och queries som är naturliga för domänen.  
-   - Exempel: ”Alla aktiva vårdval för ett visst datumintervall”.  
-   - Dessa går att förstå även utan EF-kunskap.
+De flesta utvecklare behöver aldrig röra expansionsfilerna --- de är en
+del av den tekniska infrastrukturen.
 
-3. **Applikationslagret** (t.ex. `VGR.Application`)
-   - Implementera interaktorer (CQRS): kommandon och queries.
-   - Anropa domänen och/eller domänqueries.
-   - Hantera `Outcome`/resultat och översätta till t.ex. HTTP-svar.
+------------------------------------------------------------------------
 
-4. **Tester** (`VGR.Tests`, `VGR.Domain.Tests`)
-   - Säkerställa att domänen beter sig korrekt.
-   - Köra end-to-end flöden med test-databas (ofta SQLite in-memory).
+## 4. Hur Semantics.Linq + Expansions fungerar i en query
 
-Du kan komma långt bara genom att:
+När du skriver:
 
-- Följa befintliga mönster i domänen och domänqueries.
-- Kika på hur interaktorer i applikationslagret är uppbyggda.
-- Köra testerna och se hur flödet ser ut från ”ytterkant” till domän.
+``` csharp
+db.Vårdval
+  .WithSemantics()
+  .Where(v => v.Period.Innehåller(clock.UtcNow));
+```
 
----
+sker följande:
 
-## 3. Vad som är ”avancerat” (och oftast kan lämnas ifred)
+1.  `WithSemantics()` byter ut query-provider till
+    `SemanticQueryProvider`.
+2.  Provider skickar uttrycksträdet till
+    `SemanticRegistry.Rewrite(...)`.
+3.  Rewrite ersätter domänmetoden med expansionens EF-vänliga uttryck.
+4.  EF får ett rent uttryck (`<=`, `<`, `&&`) och genererar SQL.
 
-Följande kod är mer ramverks- och infrastruktur-nära. Du behöver inte förstå allt från start.
+Resultat:
 
-### 3.1 Semantiska attribut (t.ex. `VGR.Semantics` / `VGR.Semantics.Abstractions`)
+-   du skriver i domänspråk
+-   domänen behåller sin sanning
+-   EF får standardiserade uttryck
 
-Här finns attribut och kontrakt för semantiken, t.ex.:
+Semantics.Linq implementerar LINQ-förmågan --- expansions visar
+vägen.
 
-- `SemanticQueryAttribute`
-- `ExpansionForAttribute`
+------------------------------------------------------------------------
 
-Du kan tänka på dem som domänetiketter som:
+## 5. Domain.Queries --- projektioner och vyer
 
-- Markerar att en metod/projektion är semantiskt viktig.
-- Används av generatorn och semantiklagret för att forma ett mer ergonomiskt API.
+`Domain.Queries` används för:
 
-Du kommer ibland att **använda attributen i domänen**, t.ex. genom att dekorera en metod.  
-Själva implementationen av attributen behöver du normalt inte röra.
+-   DTO:er
+-   read-models
+-   projektioner
+-   vyer för API/UI
 
-### 3.2 Semantiskt lager för queries (t.ex. `VGR.Semantics.Queries`)
+Det är inte logik och inte semantik --- bara output.
 
-Typiskt innehåll:
+En projection uttrycker:
 
-- Ett ”semantic registry” där expansioner registreras.
-- Extension-metoder som kopplar domännära begrepp till EF-vänliga `Expression<Func<...>>`.
-- Kod som generatorn skriver ut.
+> "Så här vill vi presentera domänens sanningsmodell i detta
+> sammanhang."
 
-Detta lager fungerar som ett **semantiskt adapterlager** ovanpå EF:
+------------------------------------------------------------------------
 
-- EF får uttryck den kan översätta till SQL.
-- Domän och applikation får ett språkligt, ergonomiskt API med Intellisense-stöd.
+## 6. Application & Infrastructure -- var du arbetar
 
-Ditt fokus här, när du väl rör detta lager, är att:
+-   I `Application` skapar du interaktorer som:
+    -   använder domänen
+    -   uttrycker frågor via Semantics.Queries
+    -   formar utdata via Domain.Queries
+-   I `Infrastructure.EF` finns:
+    -   DbContext
+    -   EF-konfiguration
+    -   expansions (avancerad del, sällan ändrad)
 
-- Följa befintliga mönster när du lägger till ny semantik.
-- Inte skapa alternativa, parallella semantik-vägar – håll dig till registry/generator-spåret.
+I normal vardag:
 
-### 3.3 Source generator (t.ex. `VGR.Semantics.Generator`)
+-   nytt begrepp → domänen
+-   ny fråga i LINQ → expansions + Semantics.Queries
+-   ny projektion → Domain.Queries
+-   nytt use case → Application
 
-Source generatorn:
+------------------------------------------------------------------------
 
-- Läser attribut i domänen.
-- Producerar kod till semantik-projektet (expansioner, registreringar).
-- Hjälper till att undvika manuell copy/paste.
+## 7. Vanliga misstag
 
-De flesta utvecklare kan behandla generatorn som ett ramverk:
+❌ Skriva EF-logik i interaktorer
+✔ Använd Semantics.Queries
 
-- Du behöver veta *att* den finns och vad den ungefär gör.
-- Du behöver sällan ändra dess internlogik.
-- Vid förändringar följer du existerande mönster och gör det gärna tillsammans med en mer erfaren kollega.
+❌ Blanda semantik med affärslogik
+✔ Domänen först
 
----
+❌ Skapa projections i EF-lagret
+✔ Domain.Queries är rätt plats
 
-## 4. Exempelidé: tidsrelaterade värdeobjekt och semantiska queries
+❌ Lägga EF-specifik logik i domänen
+✔ Håll det i expansions + Infrastructure
 
-Ett typiskt exempel i den här arkitekturen:
+------------------------------------------------------------------------
 
-- Domänen har ett värdeobjekt för tidsintervall (t.ex. en `Tidsrymd`/”TimeRange”).
-- Aggregat har metoder med tydliga namn, t.ex. ”ÄrAktivt(Tidsrymd)”.
-- Domännära queries använder dessa typer/metoder direkt.
+## 8. Du behöver inte förstå allt dag ett
 
-Problemet i EF-världen är ibland att:
+Du behöver inte:
 
-- EF inte förstår komplexa värdeobjekt och deras metoder direkt.
-- Då behöver vi semantiska expansioner där semantiklagret:
-  - Plockar isär VO:t (start, slut, inkl/exkl logik, etc.).
-  - Skapar en EF-vänlig `Expression<Func<TEntity, bool>>`.
-  - Registrerar det i semantic-registry.
+-   kunna expression visitors
+-   skriva expansions
+-   hantera rewriters
 
-För dig som utvecklare innebär det:
+Det viktiga är:
 
-- I domänen använder du värdeobjekt och metoder på ett naturligt, verksamhetsnära sätt.
-- I applikationslagret använder du semantiska extension-metoder som dyker upp i Intellisense.
-- Semantiklagret ser till att EF får en korrekt översättning utan att du behöver skriva SQL-liknande kod.
+1.  Domänen uttrycker sanning
+2.  Semantiken gör domänen querybar
+3.  Expansions översätter domänens språk till EF
+4.  Projektioner format anpassat för konsumenter
 
----
+Resten kommer med tiden.
 
-## 5. Tips om `Expression`-träd (för den som vill fördjupa sig)
-
-En del kod – framför allt i semantiklagret – använder `Expression<Func<...>>`.  
-Det är ett sätt att beskriva kod som data, så att EF kan översätta den till SQL.
-
-Du *måste inte* kunna detta på djupet för att vara effektiv i vardagen, men om du vill lära dig:
-
-1. Leta upp befintliga exempel i semantiklagret och följ mönstret:
-   - Hur skapas `Expression<Func<TEntity, bool>>`?
-   - Hur kombineras expressions (t.ex. med `Expression.AndAlso`)?
-
-2. Testa i en ”sandlåda”:
-   - Skriv små metoder som bygger expression-träd.
-   - Inspektera `.ToString()` och se hur uttrycken ser ut.
-
-3. Håll isär begreppen:
-   - **Domänmetoder** – vanliga C#-metoder som körs direkt.
-   - **Expressions** – beskrivningar av logik som EF ska översätta.
-
-Målet med semantiklagret är att *du* ska kunna tänka i domänspråk, medan ramverket sköter översättningen.
-
----
-
-## 6. Riktlinjer för juniora utvecklare
-
-Om du är ny i koden:
-
-1. **Börja i domänen**
-   - Läs aggregat och värdeobjekt.
-   - Identifiera vad som är viktigt för verksamheten.
-   - Ignorera expressions & generatorer tills vidare.
-
-2. **Läs domännära queries**
-   - Fokusera på metoderna och deras intention: *vad* hämtas/beräknas?
-   - Följ existerande mönster när du lägger till en ny query.
-
-3. **Gå vidare till applikationslagret**
-   - Se hur interaktorer använder domänen.
-   - Bygg en ny use-case genom att följa en befintlig.
-
-4. **När du behöver EF**
-   - Använd befintliga mapping-konfigurationer som mall.
-   - Fråga innan du introducerar helt nya mönster.
-
-5. **Lämna semantiklagret ifred i början**
-   - Om något ser ut som ”Expression magic” – betrakta det som ramverk.
-   - Fråga en mer erfaren kollega om du är osäker.
-
----
-
-## 7. Riktlinjer för seniora utvecklare
-
-Om du är mer erfaren och vill arbeta med arkitektur/semantik:
-
-1. Din spelplan är större:
-   - Domän + domänqueries.
-   - Applikationslager.
-   - Semantik-attribut och semantiklager.
-   - I vissa fall även source generatorn.
-
-2. När du inför nya värdeobjekt:
-   - Håll API:t tydligt och minimalt.
-   - Avgör vilka metoder som ska vara semantiskt synliga (och annotera v.b.).
-
-3. När EF inte kan översätta din domänlogik:
-   - Lös det i semantiklagret, inte genom att duplicera EF-specifika metoder i domänen.
-   - Registrera semantiken i registry och/eller via generatorn.
-   - Håll applikationslagret rent från EF-workarounds.
-
-4. Håll fast vid principen:
-   > ”Applikationslagret ska använda domänen – inte EF-tricks.”
-
-5. Tillämpa **Simplicity First**:
-   - Om ett mönster kan förenklas utan att förlora semantisk styrka, förenkla.
-   - Undvik onödiga abstraktioner; de flesta ska kunna följa koden utan att läsa tre lager helpers.
-
----
-
-## 8. Testning
-
-Vi har två huvudsakliga testnivåer (anpassa till faktisk lösning):
-
-1. **Domäntester** (t.ex. `VGR.Domain.Tests`)
-   - Verifierar regler, invariants och värdeobjekt.
-   - Snabba, oberoende av databaser.
-
-2. **End-to-end tester** (t.ex. `VGR.Tests`)
-   - Kör applikationsflöden mot test-databas.
-   - Verifierar att domän + semantik + EF + applikation samarbetar korrekt.
-
-När du ändrar semantik, EF-mapping eller expression-träd, se till att:
-
-- Befintliga tester fortsätter att gå igenom.
-- Du kompletterar med nya tester där det är motiverat.
-
----
-
-## 9. Frågor & vidare läsning
-
-Om något känns oklart:
-
-- Börja med att hitta ett liknande exempel i koden och följ mönstret.
-- Prata med teamet – arkitekturen är byggd för att vara **diskuterbar**, inte mystisk.
-- När du vill fördjupa dig:
-  - Titta i semantiklagret och hur registry/generator används.
-  - Läs på om `Expression<Func<T, bool>>` och hur EF översätter LINQ till SQL.
-
-Målet är att alla i teamet – juniora som seniora – ska kunna:
-
-- Jobba tryggt i domänen.
-- Uppleva att semantiklagret **hjälper** snarare än stjälper.
-- Veta att den avancerade koden finns där för att göra vardagen enklare.
-
-Välkommen in i E-Clean & Semantic Architecture. 💙
+Välkommen --- arkitekturen är byggd för att bära dig.

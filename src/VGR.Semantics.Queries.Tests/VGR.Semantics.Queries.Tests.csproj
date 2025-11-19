@@ -15,6 +15,6 @@
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VGR.Semantics.Queries\VGR.Semantics.Queries.csproj" />
+    <ProjectReference Include="..\VGR.Semantics.Linq\VGR.Semantics.Linq.csproj" />
   </ItemGroup>
 </Project>

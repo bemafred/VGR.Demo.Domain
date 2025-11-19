@@ -75,7 +75,7 @@ public sealed class SemanticGenerator : IIncrementalGenerator
         sb.AppendLine("using System.Reflection;");
         sb.AppendLine("using System.Diagnostics.CodeAnalysis;");
         sb.AppendLine();
-        sb.AppendLine("namespace VGR.Semantics.Queries;");
+        sb.AppendLine("namespace VGR.Semantics.Linq;");
         sb.AppendLine();
         sb.AppendLine("internal static partial class SemanticRegistry");
         sb.AppendLine("{");

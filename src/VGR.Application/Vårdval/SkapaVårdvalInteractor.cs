@@ -4,7 +4,7 @@ using VGR.Infrastructure.EF;
 using VGR.Technical;
 using Microsoft.EntityFrameworkCore;
 using VGR.Domain.SharedKernel.Exceptions;
-using VGR.Semantics.Queries;
+using VGR.Semantics.Linq;
 
 namespace VGR.Application.Vårdval;
 

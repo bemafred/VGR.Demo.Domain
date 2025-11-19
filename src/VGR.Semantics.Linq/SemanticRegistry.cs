@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace VGR.Semantics.Queries;
+namespace VGR.Semantics.Linq;
 
 /// <summary>
 /// Central registry of domain-method → EF-friendly expression rewrites.

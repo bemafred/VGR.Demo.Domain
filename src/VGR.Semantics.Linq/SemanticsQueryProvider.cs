@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace VGR.Semantics.Queries;
+namespace VGR.Semantics.Linq;
 
 internal sealed class SemanticQueryProvider(IQueryProvider inner) : IQueryProvider
 {

@@ -11,7 +11,7 @@ using VGR.Technical;
 using Xunit;
 
 using VGR.Domain.SharedKernel.Exceptions;
-using VGR.Semantics.Queries;
+using VGR.Semantics.Linq;
 
 namespace VGR.Tests;
 
