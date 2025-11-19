@@ -101,7 +101,7 @@ Några av de viktigaste principerna som demonstreras:
   - Semantic Platform översätter dessa till EF-kompatibla uttryck.
   - Vi undviker duplicerad logik som `Start <= t && (Slut == null || t < Slut)` spridd i LINQ.
 
-- **Felhantering med `Throw` och `Outcome`**  
+- **Felhantering med `Throw` och `Utfall`**  
   - `Throw` för invariants och fel som ska bryta exekveringen.
   - `Utfall<T>` för icke-exceptionella misslyckanden och tydliga resultat i interaktorer.
 
