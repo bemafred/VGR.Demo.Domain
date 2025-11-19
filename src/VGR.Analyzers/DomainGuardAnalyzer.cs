@@ -61,9 +61,9 @@ public sealed class DomainGuardAnalyzer : DiagnosticAnalyzer
         {
             foreach (var a in acc.Accessors)
             {
-                if (a.Kind() == SyntaxKind.SetAccessorDeclaration)
+                if (a.IsKind(SyntaxKind.SetAccessorDeclaration))
                 {
-                    var hasPublicSet = !a.Modifiers.Any() || a.Modifiers.Any(m => m.Kind() == SyntaxKind.PublicKeyword);
+                    var hasPublicSet = !a.Modifiers.Any() || a.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword));
                     if (hasPublicSet)
                     {
                         var diag = Diagnostic.Create(NoPublicSetterRule, a.GetLocation(), prop.Identifier.Text);

@@ -91,6 +91,7 @@ public readonly record struct Tidsrymd
     public bool Innehåller(DateTimeOffset? t) => t is { } v && Innehåller(v);
 
     /// <summary>Sant om två halvöppna intervall överlappar varandra.</summary>
+    [SemanticQuery]
     public bool Överlappar(in Tidsrymd annan)
         => (annan.Slut is null || Start < annan.Slut.Value)
            && (Slut is null || annan.Start < Slut.Value);

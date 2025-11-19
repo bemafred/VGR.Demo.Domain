@@ -17,4 +17,8 @@ public static class TidsrymdExpansions
         => (a, b) =>
             a.Start < (b.Slut ?? DateTimeOffset.MaxValue) &&
             b.Start < (a.Slut ?? DateTimeOffset.MaxValue);
+
+    [ExpansionFor(typeof(Tidsrymd), nameof(Tidsrymd.ÄrTillsvidare))]
+    public static Expression<Func<Tidsrymd, bool>> ÄrTillsvidare_Expansion()
+        => (a) => a.Slut == null;
 }

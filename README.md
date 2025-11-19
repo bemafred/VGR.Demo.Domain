@@ -11,8 +11,12 @@ src/
   VGR.Domain/
     SharedKernel/ (VO + exceptions + Throw)
     Region.cs, Person.cs, Vardval.cs
+  VGR.Semantics.Abstractions/
+  VGR.Semantics.Generator/
+  VGR.Sementics.Queries/
+  VGR.Sementics.Queries.Tests/
   VGR.Technical/
-    Outcome.cs, Dq.cs
+    Utfall.cs, Dq.cs
   VGR.Infrastructure.EF/
     Configs/ (PersonConfig, VardvalConfig, RegionConfig)
     ReadDbContext.cs, WriteDbContext.cs
@@ -25,7 +29,7 @@ src/
 - Pushdown först: läsningar som projektion/Any; skrivningar laddar minsta nödvändiga.
 
 ## Bygg
-Kräver .NET 8 SDK.
+Kräver .NET 10 SDK.
 ```bash
 dotnet build src/VGR.Infrastructure.EF/VGR.Infrastructure.EF.csproj -c Release
 ```

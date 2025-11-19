@@ -23,5 +23,5 @@ public static class VårdvalExpansions
     /// </returns>
     [ExpansionFor(typeof(Vårdval), nameof(Vårdval.ÄrAktivt))]
     public static Expression<Func<Vårdval, bool>> ÄrAktivt_Expansion()
-        => v => v.Period.Slut == null;
+        => v => v.Period.ÄrTillsvidare;
 }

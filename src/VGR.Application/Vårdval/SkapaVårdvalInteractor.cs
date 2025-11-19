@@ -10,7 +10,7 @@ namespace VGR.Application.Vårdval;
 
 public sealed record SkapaVårdvalCmd(PersonId PersonId, string EnhetsHsaId, DateOnly Start, DateOnly? Slut);
 
-public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext write, IClock clock)
+public sealed class SkapaVårdvalInteractor(WriteDbContext write, IClock clock)
 {
     public async Task<Utfall<VårdvalId>> ProcessAsync(SkapaVårdvalCmd cmd, CancellationToken ct)
     {
@@ -33,8 +33,6 @@ public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext w
 
         // 4) Skapa vårdvalet via domänen (stänger gällande, öppet vårdval)
         var vårdval = person.SkapaVårdval(enhet, giltighet, clock.UtcNow);
-
-        //messageBus.EnqueueEvents(person.DequeueEvents());
 
         // 5) Uppdatera datalagrets tillstånd
         await write.SaveChangesAsync(ct);
