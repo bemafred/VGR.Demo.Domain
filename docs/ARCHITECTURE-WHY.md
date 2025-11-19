@@ -27,7 +27,7 @@ Brus uppstår i gränssnitt.
 De flesta system blandar *vad vi vet* (domän) med *hur vi lagrar* (infrastruktur).  
 Vi har valt en annan väg.
 
-- Domänen är **ren** och uttrycker endast kunskap och regler.  
+- Domänen är helt **ren** och uttrycker endast kunskap och regler.  
 - Infrastrukturen **översätter** domänens språk till SQL via ett semantiskt lager.  
 - Domänkatalogen **binder samman** människor, maskiner och modeller.
 
