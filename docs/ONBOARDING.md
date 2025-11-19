@@ -1,3 +1,8 @@
+**Denna fil innehåller felaktigheter gällande vissa begrepp och särskilt så saknas information om expansioner, som ligger och ska ligga i infrastruktur lagret.**
+**Det går att härleda korrekt information genom detaljerad analys av filerna i lösningen.**
+**Detta kommer att åtgärdas genom manuell insats av arkitekten bakom det hela, men AI förslag välkomnas.**
+
+
 # ONBOARDING till E-Clean & Semantic Architecture
 
 Välkommen! 🎉  

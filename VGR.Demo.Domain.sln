@@ -38,7 +38,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Architecture & Docs", "Arch
 		docs\POLICY.md = docs\POLICY.md
 		docs\ARCHITECTURE-CANON.md = docs\ARCHITECTURE-CANON.md
 		docs\ARCHITECTURE-NAME.md = docs\ARCHITECTURE-NAME.md
-		docs\EpistemicClean-VarförDetKännsBekvämt.md = docs\EpistemicClean-VarförDetKännsBekvämt.md
+		docs\ARCHITECTURE-WHY.md = docs\ARCHITECTURE-WHY.md
+		docs\ONBOARDING.md = docs\ONBOARDING.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core Domain", "Core Domain", "{1C14E1A2-3FBB-41EC-A68E-FB11627458F5}"
