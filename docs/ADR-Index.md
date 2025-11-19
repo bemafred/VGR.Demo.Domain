@@ -14,10 +14,10 @@ Målet är att varje `Domain Query (DQ)` som når databasen ska ha motsvarande i
 
 ## Exempel på DQ → Index
 
-| Domain Query | Föreslaget index                                                                             |
-|--------|----------------------------------------------------------------------------------------------|
-| `AllaVårdval(personId)` | `CREATE INDEX IX_Vardval_PersonId ON Vardval(PersonId)`                                      |
-| `GällandeVårdval(personId, date)` | `CREATE INDEX IX_Vardval_PersonId_Start_Slut ON Vardval(PersonId, StartDatum, SlutDatum)`    |
+| Domain Query                 | Föreslaget index                                                                             |
+|------------------------------|----------------------------------------------------------------------------------------------|
+| `person.AllaVårdval()`       | `CREATE INDEX IX_Vardval_PersonId ON Vardval(PersonId)`                                      |
+| `person.AktivtVårdval(date)` | `CREATE INDEX IX_Vardval_PersonId_Start_Slut ON Vardval(PersonId, StartDatum, SlutDatum)`    |
 
 ## Observability
 
