@@ -11,10 +11,10 @@ Detta dokument beskriver hur de olika projekten i lösningen är organiserade oc
 |                                  | `VGR.Domain.Tests`                  | Enhetstester av domänen och domän-queries (utan infrastruktur).                                   |
 | **Application (UseCases)**       | `VGR.Application`                   | Interaktorer (kommandon och queries) som orkestrerar domän + infrastruktur.                       |
 | **Semantic Platform**            | `VGR.Semantics.Abstractions`        | Attribut och kontrakt för semantiska queries (`SemanticQueryAttribute`, `ExpansionForAttribute`). |
-|                                  | `VGR.Semantics.Queries`             | Query-provider + expression-rewriter (`WithSemantics`, `SemanticRegistry`) för domän→EF-LINQ.     |
+|                                  | `VGR.Semantics.Linq`                | Query-provider + expression-rewriter (`WithSemantics`, `SemanticRegistry`) för domän→EF-LINQ.     |
 |                                  | `VGR.Semantics.Generator`           | Source generator som bygger upp semantik-registret vid compile-time.                              |
-|                                  | `VGR.Semantics.Queries.Tests`       | Tester av semantisk översättning och query-beteende.                                              |
-| **Infrastructure (Persistence & IO)** | `VGR.Infrastructure.EF`         | Entity Framework-konfiguration och `DbContext` (Read/Write, pushdown-strategi).                   |
+|                                  | `VGR.Semantics.Linq.Tests`          | Tester av semantisk översättning och query-beteende.                                              |
+| **Infrastructure (Persistence & IO)** | `VGR.Infrastructure.EF`        | Entity Framework-konfiguration och `DbContext` (Read/Write, pushdown-strategi).                   |
 | **Delivery (API & Hosting)**     | `VGR.Web`                           | ASP.NET Core-API, controllers, hosting.                                                           |
 |                                  | `VGR.Tests`                         | End-to-end/integrationstester mot interaktorer och webb (SQLite in-memory).                       |
 | **Technical Kernel**             | `VGR.Technical`                     | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer.                  |
@@ -26,7 +26,7 @@ Detta dokument beskriver hur de olika projekten i lösningen är organiserade oc
 - **Domänen är suverän** – inga beroenden till EF, applikation eller infrastruktur.
 - **Semantic Platform** är den enda platsen där domänens språk översätts till EF-vänliga uttryck:
     - domänmetoder/predikat annoteras via `SemanticQueryAttribute`/`ExpansionForAttribute`,
-    - `VGR.Semantics.Queries` och `VGR.Semantics.Generator` bygger upp ett centralt semantik-register.
+    - `VGR.Semantics.Linq` och `VGR.Semantics.Generator` bygger upp ett centralt semantik-register.
 - **Felhantering sker med `Throw` eller `Utfall`.**
     - `Throw` används för invariants och fel som *ska* bryta exekveringen – både i domän och applikationslager.
     - `Utfall` kan användas när det finns skäl att undvika undantag, t.ex. av prestandaskäl eller för att uttrycka icke-exceptionella misslyckanden i interaktorer.

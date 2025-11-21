@@ -270,7 +270,7 @@ Se `ANALYZER_REGLER.md`. Severity konfigureras i `.editorconfig` (default = erro
 - **Principer och namn** –
     - `docs/ARCHITECTURE-CANON.md`
     - `docs/ARCHITECTURE-NAME.md`
-    - `docs/EpistemicClean-VarförDetKännsBekvämt.md`
+    - `docs/ARCHITECTURE-WHY.md`
 
 - **Projektplacering och ansvar** – `docs/PLACERING.md`
 

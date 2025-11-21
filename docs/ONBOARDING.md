@@ -145,7 +145,7 @@ En projection uttrycker:
 
 -   I `Application` skapar du interaktorer som:
     -   använder domänen
-    -   uttrycker frågor via Semantics.Queries
+    -   uttrycker frågor via Semantics.Linq
     -   formar utdata via Domain.Queries
 -   I `Infrastructure.EF` finns:
     -   DbContext
@@ -155,7 +155,7 @@ En projection uttrycker:
 I normal vardag:
 
 -   nytt begrepp → domänen
--   ny fråga i LINQ → expansions + Semantics.Queries
+-   ny fråga i LINQ → expansions + Semantics.Linq
 -   ny projektion → Domain.Queries
 -   nytt use case → Application
 
@@ -164,7 +164,7 @@ I normal vardag:
 ## 7. Vanliga misstag
 
 ❌ Skriva EF-logik i interaktorer
-✔ Använd Semantics.Queries
+✔ Använd Semantics.Linq
 
 ❌ Blanda semantik med affärslogik
 ✔ Domänen först

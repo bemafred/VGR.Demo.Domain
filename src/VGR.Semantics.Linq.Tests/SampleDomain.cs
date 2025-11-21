@@ -1,4 +1,4 @@
-namespace VGR.Semantics.Queries.Tests;
+namespace VGR.Semantics.Linq.Tests;
 
 public sealed record SamplePeriod(DateTimeOffset Start, DateTimeOffset? End)
 {

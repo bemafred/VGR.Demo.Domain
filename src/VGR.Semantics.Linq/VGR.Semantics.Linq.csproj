@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="VGR.Semantics.Queries.Tests" />
+        <InternalsVisibleTo Include="VGR.Semantics.Linq.Tests" />
         <InternalsVisibleTo Include="VGR.Tests" />
     </ItemGroup>
 
