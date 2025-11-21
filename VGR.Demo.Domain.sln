@@ -57,6 +57,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Quality & Guardrails", "Qua
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Linq.Tests", "src\VGR.Semantics.Linq.Tests\VGR.Semantics.Linq.Tests.csproj", "{6D3EAF20-B81B-D31C-08E1-7CC117E8B768}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Linq.CorrelationTests", "src\VGR.Semantics.Linq.CorrelationTests\VGR.Semantics.Linq.CorrelationTests.csproj", "{619B779B-0267-4453-9B76-76E902A0D3F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +117,10 @@ Global
 		{6D3EAF20-B81B-D31C-08E1-7CC117E8B768}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D3EAF20-B81B-D31C-08E1-7CC117E8B768}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D3EAF20-B81B-D31C-08E1-7CC117E8B768}.Release|Any CPU.Build.0 = Release|Any CPU
+		{619B779B-0267-4453-9B76-76E902A0D3F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{619B779B-0267-4453-9B76-76E902A0D3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{619B779B-0267-4453-9B76-76E902A0D3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{619B779B-0267-4453-9B76-76E902A0D3F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -133,6 +139,7 @@ Global
 		{4B312835-1865-FE83-02CB-E28875549063} = {4EEE13C3-B553-4FF3-9445-4578005F4806}
 		{F59A7C5C-5B1F-4B45-AE74-5E4375E7F93B} = {1C14E1A2-3FBB-41EC-A68E-FB11627458F5}
 		{6D3EAF20-B81B-D31C-08E1-7CC117E8B768} = {4EEE13C3-B553-4FF3-9445-4578005F4806}
+		{619B779B-0267-4453-9B76-76E902A0D3F6} = {4EEE13C3-B553-4FF3-9445-4578005F4806}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {45DD1AC5-527E-44F0-81ED-7B5905114203}
