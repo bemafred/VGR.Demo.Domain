@@ -1,7 +1,7 @@
-## Epistemic Clean & Sementic Architecture – Varför det känns behagligt
+## Epistemic Clean & Sementic Architecture – Varför det känns bekvämt
 
 Vi har under arbetet mot **Epistemic Clean** märkt något ovanligt:  
-ju mer vi förfinar arkitekturen, desto tystare blir den.  
+ju mer vi förfinar arkitekturen och mönstret, desto mer lågmäld blir den.  
 Det beror inte på att vi tagit bort komplexitet, utan att vi **strukturerat den**.  
 Här följer varför.
 

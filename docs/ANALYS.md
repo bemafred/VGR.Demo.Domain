@@ -28,7 +28,7 @@ Lösningen är organiserad i solution-folders som speglar ansvarsområden:
 
 1. **Fler projekt och koncept** (Semantic Platform, generators, analyzers) → kräver struktur, dokumentation och introduktion (definierad i ÒNBOARDING.md`)
 2. **Shadow properties** kräver tydlig EF-konfiguration.
-3. **Två felvägar (Throw/Outcome)** → kräver tydlig policy (definierad i `POLICY.md`).
+3. **Två felvägar (Throw/Outcome)** → tydlig policy (definierad i `POLICY.md`).
 4. **EF-beroende** – medvetet accepterat för enkelhetens skull.
 
 ## Arkitektur-nivå

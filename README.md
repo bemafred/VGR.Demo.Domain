@@ -62,9 +62,9 @@ Solution-folderstrukturen speglar ansvarsområden:
 
 - **Semantic Platform**
   - `VGR.Semantics.Abstractions` – attribut och kontrakt för semantiska queries.
-  - `VGR.Semantics.Queries` – query-provider + expression-rewriter (`WithSemantics`, semantik-register).
+  - `VGR.Semantics.Linq` – query-provider + expression-rewriter (`WithSemantics`, semantik-register).
   - `VGR.Semantics.Generator` – source generator som bygger registret.
-  - `VGR.Semantics.Queries.Tests` – tester av semantisk översättning.
+  - `VGR.Semantics.Linq.Tests` – tester av semantisk översättning.
 
 - **Infrastructure (Persistence & IO)**
   - `VGR.Infrastructure.EF` – EF Core-konfiguration, `ReadDbContext`, `WriteDbContext` (CQRS-light, pushdown).
@@ -100,6 +100,7 @@ Några av de viktigaste principerna som demonstreras:
   - Domänmetoder som `Tidsrymd.Innehåller`, `Överlappar` uttrycks en gång i domän/semantik.
   - Semantic Platform översätter dessa till EF-kompatibla uttryck.
   - Vi undviker duplicerad logik som `Start <= t && (Slut == null || t < Slut)` spridd i LINQ.
+  - Semantisk persistens är avancerat men behöver normalt inte hanteras av utvecklare.
 
 - **Felhantering med `Throw` och `Utfall`**  
   - `Throw` för invariants och fel som ska bryta exekveringen.
@@ -113,22 +114,22 @@ Några av de viktigaste principerna som demonstreras:
 
 ---
 
-| Solution folder                  | Projekt                              | Syfte                                                                                             |
-|----------------------------------|--------------------------------------|---------------------------------------------------------------------------------------------------|
-| **Core Domain**                  | `VGR.Domain`                         | Verksamhetsdomän: aggregat, värdeobjekt, invariants, `Throw`.                                     |
-|                                  | `VGR.Domain.Queries`                | Domännära queries/predikat (utan EF-beroende).                                                    |
-|                                  | `VGR.Domain.Tests`                  | Enhetstester av domänen och domän-queries (utan infrastruktur).                                   |
-| **Application (UseCases)**       | `VGR.Application`                   | Interaktorer (kommandon och queries) som orkestrerar domän + infrastruktur.                       |
-| **Semantic Platform**            | `VGR.Semantics.Abstractions`        | Attribut och kontrakt för semantiska queries (`SemanticQueryAttribute`, `ExpansionForAttribute`). |
-|                                  | `VGR.Semantics.Queries`             | Query-provider + expression-rewriter (`WithSemantics()`, `SemanticRegistry`) för domän→EF-LINQ.   |
-|                                  | `VGR.Semantics.Generator`           | Source generator som bygger upp semantik-registret vid compile-time.                              |
-|                                  | `VGR.Semantics.Queries.Tests`       | Tester av semantisk översättning och query-beteende.                                              |
-| **Infrastructure (Persistence & IO)** | `VGR.Infrastructure.EF`         | Entity Framework-konfiguration och `DbContext` (Read/Write, pushdown-strategi).                   |
-| **Delivery (API & Hosting)**     | `VGR.Web`                           | ASP.NET Core-API, controllers, hosting.                                                           |
-|                                  | `VGR.Tests`                         | End-to-end/integrationstester mot interaktorer och webb (SQLite in-memory).                       |
-| **Technical Kernel**             | `VGR.Technical`                     | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer.                  |
-| **Quality & Guardrails**         | `VGR.Analyzers`                     | Roslyn-analyzers som upprätthåller domänregler.                                                   |
-| **Architecture & Docs**          | `docs/*`                            | Arkitektur- och policy-dokumentation (`ANALYS`, `PLACERING`, `POLICY`, `KODERGONOMI`, m.fl.).     |
+| Solution folder                       | Projekt                      | Syfte                                                                                             |
+|---------------------------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| **Core Domain**                       | `VGR.Domain`                 | Verksamhetsdomän: aggregat, värdeobjekt, invariants, `Throw`.                                     |
+|                                       | `VGR.Domain.Queries`         | Domännära queries/predikat (utan EF-beroende).                                                    |
+|                                       | `VGR.Domain.Tests`           | Enhetstester av domänen och domän-queries (utan infrastruktur).                                   |
+| **Application (UseCases)**            | `VGR.Application`            | Interaktorer (kommandon och queries) som orkestrerar domän + infrastruktur.                       |
+| **Semantic Platform**                 | `VGR.Semantics.Abstractions` | Attribut och kontrakt för semantiska queries (`SemanticQueryAttribute`, `ExpansionForAttribute`). |
+|                                       | `VGR.Semantics.Linq`         | Query-provider + expression-rewriter (`WithSemantics()`, `SemanticRegistry`) för domän→EF-LINQ.   |
+|                                       | `VGR.Semantics.Generator`    | Source generator som bygger upp semantik-registret vid compile-time.                              |
+|                                       | `VGR.Semantics.Linq.Tests`   | Tester av semantisk översättning och query-beteende.                                              |
+| **Infrastructure (Persistence & IO)** | `VGR.Infrastructure.EF`      | Entity Framework-konfiguration och `DbContext` (Read/Write, pushdown-strategi).                   |
+| **Delivery (API & Hosting)**          | `VGR.Web`                    | ASP.NET Core-API, controllers, hosting.                                                           |
+|                                       | `VGR.Tests`                  | End-to-end/integrationstester mot interaktorer och webb (SQLite in-memory).                       |
+| **Technical Kernel**                  | `VGR.Technical`              | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer.                  |
+| **Quality & Guardrails**              | `VGR.Analyzers`              | Roslyn-analyzers som upprätthåller domänregler.                                                   |
+| **Architecture & Docs**               | `docs/*`                     | Arkitektur- och policy-dokumentation (`ANALYS`, `PLACERING`, `POLICY`, `KODERGONOMI`, m.fl.).     |
 
 ## Principer
 
@@ -157,9 +158,10 @@ Vertikal placering av projekt (inklusive testprojekt) följer dessa principer:
 
 - **Semantic Platform**
   - `VGR.Semantics.Abstractions` – attribut och kontrakt för semantiska queries (t.ex. `SemanticQueryAttribute`, `ExpansionForAttribute`).
-  - `VGR.Semantics.Queries` – query-provider + expression-rewriter (`WithSemantics`, `SemanticRegistry`) som översätter domänmetoder till EF-vänlig LINQ.
+  - `VGR.Semantics.Linq` – query-provider + expression-rewriter (`WithSemantics`, `SemanticRegistry`) som översätter domänmetoder till EF-vänlig LINQ.
   - `VGR.Semantics.Generator` – source generator som bygger upp semantik-registret.
-  - `VGR.Semantics.Queries.Tests` – tester av den semantiska plattformen.
+  - `VGR.Semantics.Linq.Tests` – tester av den semantiska plattformen.
+  - `VGR.Semantics.CorrelationTests` - tester av expansioner för korrekt översättning till SQL ([SemanticQueryAttribute] [ExpansionForAttribute])
 
 - **Infrastructure (Persistence & IO)**
   - `VGR.Infrastructure.EF` – EF Core-konfigurationer, `ReadDbContext`, `WriteDbContext`, pushdown-strategi.
@@ -185,12 +187,14 @@ src/
     Region.cs, Person.cs, Vardval.cs
   VGR.Semantics.Abstractions/
   VGR.Semantics.Generator/
-  VGR.Sementics.Queries/
-  VGR.Sementics.Queries.Tests/
+  VGR.Sementics.Linq/
+  VGR.Sementics.Linq.Tests/
+  VGR.Semantics.CorrelationTests/
   VGR.Technical/
-    Utfall.cs, Dq.cs
+    Utfall.cs, IClock.cs
   VGR.Infrastructure.EF/
     Configs/ (PersonConfig, VardvalConfig, RegionConfig)
+    Expansions/ (VardvalExpansion, TidsrymdExpansion)
     ReadDbContext.cs, WriteDbContext.cs
 ```
 
@@ -229,6 +233,7 @@ dotnet run --project src/VGR.Web/VGR.Web.csproj
 ## Tester (xUnit + SQLite in-memory)
 
 Projekt **VGR.Tests** använder SQLite in-memory (relations-likt) och kör end-to-end mot interaktorerna.
+Projekt **VGR.Semantics.Linq.CorrelationTests** använder SQLite in-memory (relations-likt) och kör expansionstester mot SQL.
 
 Kör tester:
 ```bash
