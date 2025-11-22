@@ -4,7 +4,7 @@ using Xunit;
 using FluentAssertions;
 using VGR.Domain.SharedKernel.Exceptions;
 
-namespace VGR.Domain.Tests;
+namespace VGR.Domain.Verifications;
 
 public class ValueObjectTests
 {

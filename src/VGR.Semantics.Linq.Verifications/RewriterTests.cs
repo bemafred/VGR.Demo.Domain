@@ -4,7 +4,7 @@ using Xunit;
 
 using VGR.Semantics.Linq;
 
-namespace VGR.Semantics.Linq.Tests;
+namespace VGR.Semantics.Linq.Verifications;
 
 public class RewriterTests
 {

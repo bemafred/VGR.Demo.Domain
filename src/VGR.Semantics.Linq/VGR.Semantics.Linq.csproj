@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     
     <ItemGroup>
-        <InternalsVisibleTo Include="VGR.Semantics.Linq.Tests"/>
-        <InternalsVisibleTo Include="VGR.Tests"/>
+        <InternalsVisibleTo Include="VGR.Semantics.Linq.Verifications"/>
+        <InternalsVisibleTo Include="VGR.Web.Verifications"/>
     </ItemGroup>
 
     <ItemGroup>

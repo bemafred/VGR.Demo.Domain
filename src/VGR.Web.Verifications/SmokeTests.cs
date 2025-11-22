@@ -14,7 +14,7 @@ using Xunit;
 using VGR.Domain.SharedKernel.Exceptions;
 using VGR.Semantics.Linq;
 
-namespace VGR.Tests;
+namespace VGR.Web.Verifications;
 
 public class SmokeTests
 {

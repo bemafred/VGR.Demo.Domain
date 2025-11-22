@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <IncludeBuildOutput>false</IncludeBuildOutput>
-        <!--<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>-->
+        <TargetFramework>netstandard2.0</TargetFramework> <!-- required override -->
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <AnalyzerLanguage>CS</AnalyzerLanguage>
         <NoWarn>$(NoWarn);RS2008</NoWarn>
     </PropertyGroup>

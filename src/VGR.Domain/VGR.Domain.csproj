@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="VGR.Infrastructure.EF"/>
-        <InternalsVisibleTo Include="VGR.Domain.Tests"/>
+        <InternalsVisibleTo Include="VGR.Domain.Verifications"/>
         <InternalsVisibleTo Include="VGR.Semantics.Linq.Correlations"/>
     </ItemGroup>
 
