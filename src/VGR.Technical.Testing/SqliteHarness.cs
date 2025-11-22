@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using VGR.Infrastructure.EF;
 using Microsoft.EntityFrameworkCore.Sqlite;
 
-namespace VGR.Semantics.Linq.CorrelationTests.Tests;
+namespace VGR.Technical.Testing;
 
 public sealed class SqliteHarness : IAsyncDisposable
 {

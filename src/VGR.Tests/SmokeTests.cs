@@ -8,6 +8,7 @@ using VGR.Domain;
 using VGR.Domain.SharedKernel;
 using VGR.Infrastructure.EF;
 using VGR.Technical;
+using VGR.Technical.Testing;
 using Xunit;
 
 using VGR.Domain.SharedKernel.Exceptions;

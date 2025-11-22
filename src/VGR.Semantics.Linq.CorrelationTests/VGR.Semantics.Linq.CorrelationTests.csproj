@@ -21,5 +21,6 @@
     <ProjectReference Include="..\VGR.Domain\VGR.Domain.csproj" />
     <ProjectReference Include="..\VGR.Infrastructure.EF\VGR.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\VGR.Semantics.Linq\VGR.Semantics.Linq.csproj" />
+    <ProjectReference Include="..\VGR.Technical.Testing\VGR.Technical.Testing.csproj" />
   </ItemGroup>
 </Project>
