@@ -194,4 +194,18 @@ Det viktiga är:
 
 Resten kommer med tiden.
 
+------------------------------------------------------------------------
+
+## 9. Testning — SqliteHarness och in-memory DB
+
+VGR använder **SQLite in-memory** för nästan all testning. Denna strategi
+unifieras via `VGR.Technical.Testing.SqliteHarness`.
+
+### Varför SQLite in-memory?
+
+- **Verklig relationell semantik** – inte bara mock-objekt
+- **SQL-validering** – säkerställ att domänmetoder översätts korrekt till SQL
+- **Snabb** – i-minne ⟹ ingen disk-IO
+- **Deterministisk** – repeterbar testning
+
 Välkommen --- arkitekturen är byggd för att bära dig.

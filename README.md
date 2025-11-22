@@ -192,6 +192,8 @@ src/
   VGR.Semantics.CorrelationTests/
   VGR.Technical/
     Utfall.cs, IClock.cs
+  VGR.Technical.Testing/
+    SqliteHarness.cs
   VGR.Infrastructure.EF/
     Configs/ (PersonConfig, VardvalConfig, RegionConfig)
     Expansions/ (VardvalExpansion, TidsrymdExpansion)

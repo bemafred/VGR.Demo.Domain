@@ -166,4 +166,56 @@ Guessing and placing logic in the wrong layer increases entropy and violates E-C
 
 ---
 
+## 10. Testning — SqliteHarness unified
+
+Testinfrastrukturen är centraliserad i `VGR.Technical.Testing.SqliteHarness`.
+
+**AI MUST:**
+
+- Use `SqliteHarness` for any test needing DB access (semantic correlation, E2E).
+- NOT duplicate SqliteHarness logic across projects.
+- Place domain unit tests (`VGR.Domain.Tests`) WITHOUT SqliteHarness (pure aggregats).
+- Place semantic correlation tests (`VGR.Semantics.Linq.CorrelationTests`) WITH SqliteHarness.
+- Place E2E tests (`VGR.Tests`) WITH SqliteHarness.
+
+**Example: Semantic correlation test**
+
+```csharp
+[Fact]
+public async Task MySemanticMethod_MatchesSql()
+{
+    await using var h = new SqliteHarness();
+    
+    // Domain: in-memory
+    var result = myObject.SemanticMethod();
+    
+    // SQL: via WithSemantics() rewriting
+    var sqlResult = await h.Read.MyDbSet
+        .WithSemantics()
+        .Where(x => x.SemanticMethod())
+        .AnyAsync();
+    
+    Assert.Equal(result, sqlResult);
+}
+```
+
+**Example: E2E test**
+
+```csharp
+[Fact]
+public async Task CreatePerson_End2End()
+{
+    await using var h = new SqliteHarness();
+    var interactor = new SkapaPersonInteractor(h.Read, h.Write, clock);
+    
+    var result = await interactor.ProcessAsync(cmd, ct);
+    
+    // Verify persistence
+    var saved = await h.Read.Persons.FirstOrDefaultAsync(p => p.Id == result.Value);
+    Assert.NotNull(saved);
+}
+```
+
+
+
 By following these guidelines, AI assistants will reinforce – not erode – the principles behind **E-Clean** and **Semantic Architecture** in this solution.
