@@ -40,6 +40,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Architecture & Docs", "A
 		docs\PLACERING.md = docs\PLACERING.md
 		docs\POLICY.md = docs\POLICY.md
 		README.md = README.md
+		docs\ADR-Index.md = docs\ADR-Index.md
+		docs\solution-vertical-order.svg = docs\solution-vertical-order.svg
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Core Domain", "Core Domain", "{1C14E1A2-3FBB-41EC-A68E-FB11627458F5}"

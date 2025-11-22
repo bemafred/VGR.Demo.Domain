@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="700" viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Background -->
+    <rect x="0" y="0" width="900" height="700" fill="#ffffff"/>
+
+    <!-- Title -->
+    <text x="450" y="40" text-anchor="middle"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="22"
+          font-weight="600"
+          fill="#222222">
+        Vertical Solution Structure – E-Clean &amp; Semantic Architecture
+    </text>
+
+    <!-- Side label -->
+    <text x="40" y="100" text-anchor="middle"
+          transform="rotate(-90 40 100)"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="14"
+          fill="#555555">
+        Conceptual &amp; Dependency Flow (top → bottom)
+    </text>
+
+    <!-- Common box style via grouping is not supported in raw SVG, so we repeat attributes -->
+
+    <!-- 1. Architecture & Docs -->
+    <rect x="120" y="80" width="680" height="55" rx="8" ry="8"
+          fill="#f3f4ff" stroke="#4f46e5" stroke-width="1.5"/>
+    <text x="160" y="113"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#111827">
+        1. Architecture &amp; Docs
+    </text>
+    <text x="160" y="132"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="12"
+          fill="#4b5563">
+        Vision, canonical documents, developer onboarding, architecture canon
+    </text>
+
+    <!-- 2. Quality & Guardrails -->
+    <rect x="120" y="155" width="680" height="55" rx="8" ry="8"
+          fill="#ecfdf3" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="160" y="188"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#111827">
+        2. Quality &amp; Guardrails
+    </text>
+    <text x="160" y="207"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="12"
+          fill="#4b5563">
+        Analyzers, coding rules, conventions, test strategy, guardrails
+    </text>
+
+    <!-- 3. Technical Domain -->
+    <rect x="120" y="230" width="680" height="55" rx="8" ry="8"
+          fill="#f9fafb" stroke="#6b7280" stroke-width="1.5"/>
+    <text x="160" y="263"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#111827">
+        3. Technical Domain
+    </text>
+    <text x="160" y="282"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="12"
+          fill="#4b5563">
+        Outcome/Utfall, clocks, technical primitives, shared building blocks
+    </text>
+
+    <!-- 4. Semantic Core -->
+    <rect x="120" y="305" width="680" height="55" rx="8" ry="8"
+          fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="160" y="338"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#111827">
+        4. Semantic Core
+    </text>
+    <text x="160" y="357"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="12"
+          fill="#4b5563">
+        Semantic attributes, generator, registry, LINQ rewrite, correlations
+    </text>
+
+    <!-- 5. Core Domain -->
+    <rect x="120" y="380" width="680" height="55" rx="8" ry="8"
+          fill="#fefce8" stroke="#ca8a04" stroke-width="1.5"/>
+    <text x="160" y="413"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#111827">
+        5. Core Domain
+    </text>
+    <text x="160" y="432"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="12"
+          fill="#4b5563">
+        Aggregates, value objects, invariants, domain language &amp; rules
+    </text>
+
+    <!-- 6. Application (UseCases) -->
+    <rect x="120" y="455" width="680" height="55" rx="8" ry="8"
+          fill="#ecfeff" stroke="#0891b2" stroke-width="1.5"/>
+    <text x="160" y="488"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#111827">
+        6. Application (UseCases)
+    </text>
+    <text x="160" y="507"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="12"
+          fill="#4b5563">
+        Interactors, orchestration, domain-centric application stories
+    </text>
+
+    <!-- 7. Infrastructure (Persistence & IO) -->
+    <rect x="120" y="530" width="680" height="55" rx="8" ry="8"
+          fill="#fef2f2" stroke="#b91c1c" stroke-width="1.5"/>
+    <text x="160" y="563"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#111827">
+        7. Infrastructure (Persistence &amp; IO)
+    </text>
+    <text x="160" y="582"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="12"
+          fill="#4b5563">
+        EF mappings, DbContexts, expansions, external IO, adapters
+    </text>
+
+    <!-- 8. Delivery (API & Hosting) -->
+    <rect x="120" y="605" width="680" height="55" rx="8" ry="8"
+          fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="160" y="638"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="16"
+          font-weight="600"
+          fill="#111827">
+        8. Delivery (API &amp; Hosting)
+    </text>
+    <text x="160" y="657"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="12"
+          fill="#4b5563">
+        HTTP API, controllers, DTO mapping, hosting, edge concerns
+    </text>
+
+    <!-- Arrow on the right: from fundamentals to edge delivery -->
+    <line x1="830" y1="90" x2="830" y2="660"
+          stroke="#9ca3af" stroke-width="2" stroke-dasharray="4 4"/>
+    <polygon points="830,80 824,92 836,92"
+             fill="#9ca3af"/>
+    <polygon points="830,670 824,658 836,658"
+             fill="#9ca3af"/>
+
+    <text x="820" y="360" text-anchor="middle"
+          transform="rotate(-90 820 360)"
+          font-family="Segoe UI, system-ui, sans-serif"
+          font-size="13"
+          fill="#6b7280">
+        From architectural intent to external delivery
+    </text>
+
+</svg>
