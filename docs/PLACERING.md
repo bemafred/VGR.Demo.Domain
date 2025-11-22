@@ -10,7 +10,7 @@ Detta dokument beskriver hur de olika projekten i lösningen är organiserade oc
 |                                       | `VGR.Domain.Queries`             | Domännära queries/predikat (utan EF-beroende).                                                    |
 |                                       | `VGR.Domain.Tests`               | Enhetstester av domänen och domän-queries (utan infrastruktur).                                   |
 | **Application (UseCases)**            | `VGR.Application`                | Interaktorer (kommandon och queries) som orkestrerar domän + infrastruktur.                       |
-| **Semantic Platform**                 | `VGR.Semantics.Abstractions`     | Attribut och kontrakt för semantiska queries (`SemanticQueryAttribute`, `ExpansionForAttribute`). |
+| **Semantic Core**                 | `VGR.Semantics.Abstractions`     | Attribut och kontrakt för semantiska queries (`SemanticQueryAttribute`, `ExpansionForAttribute`). |
 |                                       | `VGR.Semantics.Linq`             | Query-provider + expression-rewriter (`WithSemantics`, `SemanticRegistry`) för domän→EF-LINQ.     |
 |                                       | `VGR.Semantics.Generator`        | Source generator som bygger upp semantik-registret vid compile-time.                              |
 |                                       | `VGR.Semantics.Linq.Tests`       | Tester av semantisk översättning och query-beteende.                                              |
@@ -26,7 +26,7 @@ Detta dokument beskriver hur de olika projekten i lösningen är organiserade oc
 ## Principer
 
 - **Domänen är suverän** – inga beroenden till EF, applikation eller infrastruktur.
-- **Semantic Platform** är den enda platsen där domänens språk översätts till EF-vänliga uttryck:
+- **Semantic Core** är den enda platsen där domänens språk översätts till EF-vänliga uttryck:
     - domänmetoder/predikat annoteras via `SemanticQueryAttribute`/`ExpansionForAttribute`,
     - `VGR.Semantics.Linq` och `VGR.Semantics.Generator` bygger upp ett centralt semantik-register.
 - **Felhantering sker med `Throw` eller `Utfall`.**
@@ -37,11 +37,11 @@ Detta dokument beskriver hur de olika projekten i lösningen är organiserade oc
     - Designbeslut (t.ex. `Utfall<T>` för resultat-hantering)
     - Infrastruktur-stöd (t.ex. `SqliteHarness` för testning)
     - **Princip**: Minimalt men nödvändigt. Ingen "utility-bibliotek"-fälla.
-- **Application** implementerar interaktorer som anropar domänen, utnyttjar Semantic Platform för queries och returnerar `Utfall` eller kastar med `Throw` vid behov.
+- **Application** implementerar interaktorer som anropar domänen, utnyttjar Semantic Core för queries och returnerar `Utfall` eller kastar med `Throw` vid behov.
 - **Infrastructure.EF** ansvarar för mappning, persistens och pushdown-konfiguration (Read/Write DbContexts).
 - **Delivery** (Web + E2E) exponerar användningsfall via HTTP och testar hela kedjan från API till DB.
 - **Analyzers** säkerställer att inga regler bryts i domänen (t.ex. public set, publika `List<>`).
 - **CQRS-light** används för att separera kommandon (skrivoperationer) från queries (läsoperationer), utan att införa onödig ceremoni.
 
 Vertikal placering av projekt (inklusive testprojekt) följer dessa principer:  
-*varje “världsdels-mapp” (Core Domain, Semantic Platform, Delivery, …) innehåller både kod och dess verifiering.*
+*varje “världsdels-mapp” (Core Domain, Semantic Core, Delivery, …) innehåller både kod och dess verifiering.*

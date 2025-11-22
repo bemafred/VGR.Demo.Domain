@@ -46,7 +46,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core Domain", "Core Domain"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application (UseCases)", "Application (UseCases)", "{C2C0B544-789A-474C-8729-66942C95A1B9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Semantic Platform", "Semantic Platform", "{4EEE13C3-B553-4FF3-9445-4578005F4806}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Semantic Core", "Semantic Core", "{4EEE13C3-B553-4FF3-9445-4578005F4806}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure (Persistence & IO)", "Infrastructure (Persistence & IO)", "{1DF9F149-3978-4E34-BF6C-08C0BB8F7192}"
 EndProject

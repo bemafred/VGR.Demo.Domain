@@ -8,7 +8,7 @@ Fokus ligger på läsbarhet, prestanda, testbarhet och kontrollerad evolution.
 Lösningen är organiserad i solution-folders som speglar ansvarsområden:
 - **Core Domain** (domän + domän-queries + domän-tester)
 - **Application (UseCases)**
-- **Semantic Platform** (semantiska attribut, translators, generator, tester)
+- **Semantic Core** (semantiska attribut, translators, generator, tester)
 - **Infrastructure (Persistence & IO)**
 - **Delivery (API & Hosting)**
 - **Technical Domain (teknisk domän)** `VGR.Technical`, `VGR.Technical.Testing`
@@ -26,7 +26,7 @@ Lösningen är organiserad i solution-folders som speglar ansvarsområden:
 
 ## Svagheter (Cons)
 
-1. **Fler projekt och koncept** (Semantic Platform, generators, analyzers) → kräver struktur, dokumentation och introduktion (definierad i ÒNBOARDING.md`)
+1. **Fler projekt och koncept** (Semantic Core, generators, analyzers) → kräver struktur, dokumentation och introduktion (definierad i ÒNBOARDING.md`)
 2. **Shadow properties** kräver tydlig EF-konfiguration.
 3. **Två felvägar (Throw/Outcome)** → tydlig policy (definierad i `POLICY.md`).
 4. **EF-beroende** – medvetet accepterat för enkelhetens skull.
@@ -37,7 +37,7 @@ Lösningen är organiserad i solution-folders som speglar ansvarsområden:
 |------------------------|-----------------|
 | **Taktisk DDD**    | Hög – starka aggregat och VO:s |
 | **Strategisk DDD** | Medel/hög – redo för BC-split och event-integration |
-| **Clean/Hex-nivå** | “Hex-light” – enkel men funktionell separation (Core Domain / Application / Semantic Platform / Infra / Delivery) |
+| **Clean/Hex-nivå** | “Hex-light” – enkel men funktionell separation (Core Domain / Application / Semantic Core / Infra / Delivery) |
 | **Operativ kvalitet** | Mycket god – testbar, snabb, mätbar |
 
 ...

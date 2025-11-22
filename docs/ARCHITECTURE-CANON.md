@@ -30,7 +30,7 @@
 
 - **Core Domain** → `VGR.Domain`, `VGR.Domain.Queries`, `VGR.Domain.Tests`
 - **Application (UseCases)** → `VGR.Application`
-- **Semantic Platform** → `VGR.Semantics.Abstractions`, `VGR.Semantics.Linq`, `VGR.Semantics.Generator`, `VGR.Semantics.Queries.Tests`
+- **Semantic Core** → `VGR.Semantics.Abstractions`, `VGR.Semantics.Linq`, `VGR.Semantics.Generator`, `VGR.Semantics.Queries.Tests`
 - **Infrastructure (Persistence & IO)** → `VGR.Infrastructure.EF`
 - **Delivery (API & Hosting)** → `VGR.Web`, `VGR.Tests`
 - **Technical Domain** → `VGR.Technical`, `VGR.Technical.Testing`

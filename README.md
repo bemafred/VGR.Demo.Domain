@@ -39,7 +39,7 @@ Nyckelidé:
 Det löses genom:
 
 - En **ren domän** (`VGR.Domain`, `VGR.Domain.Queries`) utan EF/Expressions.
-- En **Semantic Platform**:
+- En **Semantic Core**:
   - attribut (`SemanticQueryAttribute`, `ExpansionForAttribute`) för att märka domänmetoder,
   - ett semantik-register (`SemanticRegistry`) och query-provider (`WithSemantics`) som skriver om domänmetoder till EF-vänlig LINQ,
   - en generator som bygger registret vid compile-time.
@@ -60,7 +60,7 @@ Solution-folderstrukturen speglar ansvarsområden:
 - **Application (UseCases)**
   - `VGR.Application` – interaktorer (kommandon/queries) som orkestrerar domän + infra.
 
-- **Semantic Platform**
+- **Semantic Core**
   - `VGR.Semantics.Abstractions` – attribut och kontrakt för semantiska queries.
   - `VGR.Semantics.Linq` – query-provider + expression-rewriter (`WithSemantics`, semantik-register).
   - `VGR.Semantics.Generator` – source generator som bygger registret.
@@ -99,7 +99,7 @@ Några av de viktigaste principerna som demonstreras:
 
 - **Semantisk persistens**  
   - Domänmetoder som `Tidsrymd.Innehåller`, `Överlappar` uttrycks en gång i domän/semantik.
-  - Semantic Platform översätter dessa till EF-kompatibla uttryck.
+  - Semantic Core översätter dessa till EF-kompatibla uttryck.
   - Vi undviker duplicerad logik som `Start <= t && (Slut == null || t < Slut)` spridd i LINQ.
   - Semantisk persistens är avancerat men behöver normalt inte hanteras av utvecklare.
 
@@ -121,7 +121,7 @@ Några av de viktigaste principerna som demonstreras:
 |                                       | `VGR.Domain.Queries`         | Domännära queries/predikat (utan EF-beroende).                                                    |
 |                                       | `VGR.Domain.Tests`           | Enhetstester av domänen och domän-queries (utan infrastruktur).                                   |
 | **Application (UseCases)**            | `VGR.Application`            | Interaktorer (kommandon och queries) som orkestrerar domän + infrastruktur.                       |
-| **Semantic Platform**                 | `VGR.Semantics.Abstractions` | Attribut och kontrakt för semantiska queries (`SemanticQueryAttribute`, `ExpansionForAttribute`). |
+| **Semantic Core**                 | `VGR.Semantics.Abstractions` | Attribut och kontrakt för semantiska queries (`SemanticQueryAttribute`, `ExpansionForAttribute`). |
 |                                       | `VGR.Semantics.Linq`         | Query-provider + expression-rewriter (`WithSemantics()`, `SemanticRegistry`) för domän→EF-LINQ.   |
 |                                       | `VGR.Semantics.Generator`    | Source generator som bygger upp semantik-registret vid compile-time.                              |
 |                                       | `VGR.Semantics.Linq.Tests`   | Tester av semantisk översättning och query-beteende.                                              |
@@ -136,20 +136,20 @@ Några av de viktigaste principerna som demonstreras:
 ## Principer
 
 - **Domänen är suverän** – inga beroenden till EF, applikation eller infrastruktur.
-- **Semantic Platform** är den enda platsen där domänens språk översätts till EF-vänliga uttryck:
+- **Semantic Core** är den enda platsen där domänens språk översätts till EF-vänliga uttryck:
   - domänmetoder/predikat annoteras via `SemanticQueryAttribute`/`ExpansionForAttribute`,
   - `VGR.Semantics.Queries` och `VGR.Semantics.Generator` bygger upp ett centralt semantik-register.
 - **Felhantering sker med `Throw` eller `Utfall`.**  
   - `Throw` används för invariants och fel som *ska* bryta exekveringen – både i domän och applikationslager.  
   - `Utfall` kan användas när det finns skäl att undvika undantag, t.ex. av prestandaskäl eller för att uttrycka icke-exceptionella misslyckanden i interaktorer.
-- **Application** implementerar interaktorer som anropar domänen, utnyttjar Semantic Platform för queries och returnerar `Utfall`/kastar vid behov.
+- **Application** implementerar interaktorer som anropar domänen, utnyttjar Semantic Core för queries och returnerar `Utfall`/kastar vid behov.
 - **Infrastructure.EF** ansvarar för mappning, persistens och pushdown-konfiguration (Read/Write DbContexts).
 - **Delivery** (Web + E2E) exponerar användningsfall via HTTP och testar hela kedjan från API till DB.
 - **Analyzers** säkerställer att inga regler bryts i domänen (t.ex. public set, publika `List<>`).
 - **CQRS-light** används för att separera kommandon (skrivoperationer) från queries (läsoperationer), utan att införa onödig ceremoni.
 
 Vertikal placering av projekt (inklusive testprojekt) följer dessa principer:  
-*varje “världsdels-mapp” (Core Domain, Semantic Platform, Delivery, …) innehåller både kod och dess verifiering.*
+*varje “världsdels-mapp” (Core Domain, Semantic Core, Delivery, …) innehåller både kod och dess verifiering.*
 
 - **Core Domain**
   - `VGR.Domain` – rika aggregat (Region, Person, Vårdval), VO:s, invariants, Domain Events.
@@ -158,7 +158,7 @@ Vertikal placering av projekt (inklusive testprojekt) följer dessa principer:
 - **Application (UseCases)**
   - `VGR.Application` – interaktorer (kommandon/queries) som orkestrerar domänen och infrastrukturen.
 
-- **Semantic Platform**
+- **Semantic Core**
   - `VGR.Semantics.Abstractions` – attribut och kontrakt för semantiska queries (t.ex. `SemanticQueryAttribute`, `ExpansionForAttribute`).
   - `VGR.Semantics.Linq` – query-provider + expression-rewriter (`WithSemantics`, `SemanticRegistry`) som översätter domänmetoder till EF-vänlig LINQ.
   - `VGR.Semantics.Generator` – source generator som bygger upp semantik-registret.
@@ -208,7 +208,7 @@ src/
 - Barnmängder: **privat List<T>** + **publik IReadOnlyList<T>**.
 - CQRS-light: **ReadDbContext** (NoTracking), **WriteDbContext** (tracking).
 - Pushdown först: läsningar som projektion/Any; skrivningar laddar minsta nödvändiga.
-- Semantisk persistens: domänmetoder (t.ex. `Tidsrymd.Överlappar`, `Innehåller`) översätts centralt via Semantic Platform till SQL-vänliga uttryck.
+- Semantisk persistens: domänmetoder (t.ex. `Tidsrymd.Överlappar`, `Innehåller`) översätts centralt via Semantic Core till SQL-vänliga uttryck.
 
 ## Bygg
 Kräver .NET SDK som stöder `net10.0`
