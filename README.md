@@ -6,7 +6,7 @@ Detta repo är en **referensarkitektur** för hur vi vill bygga domänstyrda sys
   *språket är gränssnittet, semantiken exekverar*.
 - **Semantic Architecture** – den konkreta implementationen i C#, EF Core och tooling.
 
-Målet är att visa hur domänens språk kan vara första klass genom hela stacken – från C#-modeller till SQL, tester och dokumentation – utan att drunkna i lager-ceremoni.
+Målet är att visa hur domänens språk kan vara första klassens medborgare genom hela stacken – från C#-modeller till SQL, tester och dokumentation – utan att drunkna i lager-ceremoni.
 
 ---
 
