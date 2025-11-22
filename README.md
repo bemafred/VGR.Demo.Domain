@@ -73,8 +73,9 @@ Solution-folderstrukturen speglar ansvarsområden:
   - `VGR.Web` – ASP.NET Core-API, controllers, hosting.
   - `VGR.Tests` – E2E-/integrationstester mot interaktorer/webb (SQLite in-memory).
 
-- **Technical Kernel**
+- **Technical Domain**
   - `VGR.Technical` – tekniska byggblock (`Utfall`, `IClock`, m.m.).
+  - `VGR.Technical.Testing` - stödfunktioner för tester (`SqliteHarness`, m.m.)..
 
 - **Quality & Guardrails**
   - `VGR.Analyzers` – Roslyn-regler för domänen (t.ex. inga `public set`, inga publika `List<>`).
@@ -127,7 +128,8 @@ Några av de viktigaste principerna som demonstreras:
 | **Infrastructure (Persistence & IO)** | `VGR.Infrastructure.EF`      | Entity Framework-konfiguration och `DbContext` (Read/Write, pushdown-strategi).                   |
 | **Delivery (API & Hosting)**          | `VGR.Web`                    | ASP.NET Core-API, controllers, hosting.                                                           |
 |                                       | `VGR.Tests`                  | End-to-end/integrationstester mot interaktorer och webb (SQLite in-memory).                       |
-| **Technical Kernel**                  | `VGR.Technical`              | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer.                  |
+| **Technical Domain**                  | `VGR.Technical`              | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer & controllers.    |
+|                                       | `VGR.Technical.Testing`      | Stödfunktioner för testning.                                                                      |
 | **Quality & Guardrails**              | `VGR.Analyzers`              | Roslyn-analyzers som upprätthåller domänregler.                                                   |
 | **Architecture & Docs**               | `docs/*`                     | Arkitektur- och policy-dokumentation (`ANALYS`, `PLACERING`, `POLICY`, `KODERGONOMI`, m.fl.).     |
 
@@ -170,8 +172,9 @@ Vertikal placering av projekt (inklusive testprojekt) följer dessa principer:
   - `VGR.Web` – ASP.NET Core API, controllers, HTTP-mappning.
   - `VGR.Tests` – E2E-/integrations-tester (xUnit + SQLite in-memory) mot interaktorer/webb.
 
-- **Technical Kernel**
+- **Technical Domain**
   - `VGR.Technical` – tekniska byggblock (t.ex. `Utfall`, `IClock`).
+  - `VGR.Technical.Testing` - stödfunktioner för testning (t.ex `SqliteHarness`).
 
 - **Quality & Guardrails**
   - `VGR.Analyzers` – Roslyn-regler för domänen (`VGR001`, `VGR002`).

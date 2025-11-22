@@ -2,115 +2,344 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using VGR.Domain;
 using VGR.Domain.SharedKernel;
-using VGR.Infrastructure.EF;
 using VGR.Semantics.Linq;
+using VGR.Technical.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace VGR.Semantics.Linq.CorrelationTests;
 
-public sealed class TestTidsrymdEntity
-{
-    public int Id { get; set; }
-    public Tidsrymd Period { get; set; }
-}
-
 /// <summary>
-/// Korrelationstest för Tidsrymd - verifierar att Domain ≡ SQL.
-/// Fokuserar på SQL-specifika översättningsscenarier.
+/// Korrelationstest för Tidsrymd – verifierar att domänmetoder och SQL är ekvivalenta.
+/// Använder SqliteHarness för unified in-memory testning.
 /// </summary>
-public sealed class TidsrymdCorrelationTests : IAsyncDisposable
+public sealed class TidsrymdCorrelationTests
 {
-    private readonly SqliteConnection _conn;
-    private readonly CorrelationDbContext _db;
     private readonly ITestOutputHelper _output;
 
     public TidsrymdCorrelationTests(ITestOutputHelper output)
     {
         _output = output;
-        _conn = new SqliteConnection("DataSource=:memory:");
-        _conn.Open();
-
-        var opts = new DbContextOptionsBuilder<CorrelationDbContext>()
-            .UseSqlite(_conn)
-            .Options;
-
-        _db = new CorrelationDbContext(opts);
-        _db.Database.EnsureCreated();
     }
 
-    #region Innehåller - kritiska SQL-översättningsfall
+    #region Innehåller – Kritiska SQL-översättningsfall
 
-    public static IEnumerable<object[]> InnehållerSqlScenarier()
+    public static IEnumerable<object[]> InnehållerScenarier()
     {
         var reftid = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
-        yield return new object[] { Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)), reftid, true, "NULL-hantering (tillsvidare)" };
-        yield return new object[] { Tidsrymd.Skapa(reftid, reftid.AddDays(30)), reftid, true, "Start inkluderad (<=)" };
-        yield return new object[] { Tidsrymd.Skapa(reftid.AddDays(-30), reftid), reftid, false, "Slut exkluderad (<)" };
-        yield return new object[] { Tidsrymd.Skapa(reftid.AddDays(-30), reftid.AddDays(30)), reftid, true, "AND-operator" };
+        yield return new object[]
+        {
+            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
+            reftid,
+            true,
+            "NULL-hantering (tillsvidare)"
+        };
+        yield return new object[]
+        {
+            Tidsrymd.Skapa(reftid, reftid.AddDays(30)),
+            reftid,
+            true,
+            "Start inkluderad (<=)"
+        };
+        yield return new object[]
+        {
+            Tidsrymd.Skapa(reftid.AddDays(-30), reftid),
+            reftid,
+            false,
+            "Slut exkluderad (<)"
+        };
+        yield return new object[]
+        {
+            Tidsrymd.Skapa(reftid.AddDays(-30), reftid.AddDays(30)),
+            reftid,
+            true,
+            "AND-operator"
+        };
     }
 
     [Theory]
-    [MemberData(nameof(InnehållerSqlScenarier))]
-    public async Task Innehåller_Korrelation_SqlOversättning(Tidsrymd period, DateTimeOffset tidpunkt, bool förväntat, string scenario)
+    [MemberData(nameof(InnehållerScenarier))]
+    public async Task Innehåller_Korrelation_DomainEkvivalentSql(
+        Tidsrymd period,
+        DateTimeOffset tidpunkt,
+        bool förväntat,
+        string scenario)
     {
-        // Arrange: spara testdata
-        var entity = new TestTidsrymdEntity { Period = period };
-        _db.TestEntities.Add(entity);
-        await _db.SaveChangesAsync();
+        // Arrange
+        await using var h = new SqliteHarness();
+        
+        var vårdval = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-1"), period, DateTimeOffset.UtcNow);
+        h.Write.Vardval.Add(vårdval);
+        await h.Write.SaveChangesAsync();
 
         // Act 1: Domänlogik (in-memory)
         var domainResult = period.Innehåller(tidpunkt);
 
         // Act 2: EF-översättning (SQL via WithSemantics)
-        var sqlResult = await _db.TestEntities
+        var sqlResult = await h.Read.Vårdval
             .WithSemantics()
-            .Where(e => e.Period.Innehåller(tidpunkt))
+            .Where(v => v.Period.Innehåller(tidpunkt))
             .AnyAsync();
 
-        // Log SQL för debugging
-        var query = _db.TestEntities
+        // Debug: Visa SQL för inspektionen
+        var query = h.Read.Vårdval
             .WithSemantics()
-            .Where(e => e.Period.Innehåller(tidpunkt));
-        _output.WriteLine($"SQL för '{scenario}':");
+            .Where(v => v.Period.Innehåller(tidpunkt));
+        _output.WriteLine($"Scenario: {scenario}");
+        _output.WriteLine("SQL:");
         _output.WriteLine(query.ToQueryString());
+        _output.WriteLine("");
 
-        // Assert: båda ger samma resultat
-        Assert.Equal(domainResult, sqlResult);
+        // Assert: Domain och SQL måste ge samma resultat
         Assert.Equal(förväntat, domainResult);
+        Assert.Equal(domainResult, sqlResult);
     }
 
     #endregion
 
-    public async ValueTask DisposeAsync()
+    #region Överlappar – Overlap-semantik
+
+    public static IEnumerable<object[]> ÖverlapparScenarier()
     {
-        await _db.DisposeAsync();
-        await _conn.DisposeAsync();
-    }
+        var p1Start = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var p1End = new DateTimeOffset(2024, 6, 30, 0, 0, 0, TimeSpan.Zero);
+        
+        var periode1 = Tidsrymd.Skapa(p1Start, p1End);
 
-    // Minimal DbContext för korrelationstester
-    private sealed class CorrelationDbContext : DbContext
-    {
-        public DbSet<TestTidsrymdEntity> TestEntities => Set<TestTidsrymdEntity>();
-
-        public CorrelationDbContext(DbContextOptions<CorrelationDbContext> options) : base(options) { }
-
-        protected override void OnModelCreating(ModelBuilder mb)
+        // Helt skilda intervall
+        yield return new object[]
         {
-            mb.Entity<TestTidsrymdEntity>(b =>
-            {
-                b.HasKey(e => e.Id);
-                b.ComplexProperty(e => e.Period, p =>
-                {
-                    p.Property(t => t.Start).HasColumnName("Start").IsRequired();
-                    p.Property(t => t.Slut).HasColumnName("Slut");
-                });
-            });
-        }
-    }
-}
+            periode1,
+            Tidsrymd.Skapa(
+                new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)
+            ),
+            false,
+            "Helt skilda intervall"
+        };
 
+        // Helt överlappande
+        yield return new object[]
+        {
+            periode1,
+            Tidsrymd.Skapa(
+                new DateTimeOffset(2024, 3, 1, 0, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2024, 4, 30, 0, 0, 0, TimeSpan.Zero)
+            ),
+            true,
+            "Helt överlappande"
+        };
+
+        // Delvis överlappande
+        yield return new object[]
+        {
+            periode1,
+            Tidsrymd.Skapa(
+                new DateTimeOffset(2024, 5, 1, 0, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2024, 7, 31, 0, 0, 0, TimeSpan.Zero)
+            ),
+            true,
+            "Delvis överlappande"
+        };
+
+        // Angränsande (inte överlappande enligt halvöppen semantik)
+        yield return new object[]
+        {
+            periode1,
+            Tidsrymd.Skapa(
+                new DateTimeOffset(2024, 6, 30, 0, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)
+            ),
+            false,
+            "Angränsande – inte överlappande"
+        };
+
+        // Med NULL (tillsvidare möter begränsad)
+        yield return new object[]
+        {
+            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
+            periode1,
+            true,
+            "Tillsvidare möter begränsad"
+        };
+
+        // Båda tillsvidare
+        yield return new object[]
+        {
+            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
+            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 6, 1, 0, 0, 0, TimeSpan.Zero)),
+            true,
+            "Båda tillsvidare"
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(ÖverlapparScenarier))]
+    public async Task Överlappar_Korrelation_DomainEkvivalentSql(
+        Tidsrymd p1,
+        Tidsrymd p2,
+        bool förväntat,
+        string scenario)
+    {
+        // Arrange
+        await using var h = new SqliteHarness();
+
+        var vv1 = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-1"), p1, DateTimeOffset.UtcNow);
+        var vv2 = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-2"), p2, DateTimeOffset.UtcNow);
+
+        h.Write.Vardval.Add(vv1);
+        h.Write.Vardval.Add(vv2);
+        await h.Write.SaveChangesAsync();
+
+        // Act 1: Domänlogik (in-memory)
+        var domainResult = p1.Överlappar(p2);
+
+        // Act 2: EF-översättning (SQL via WithSemantics)
+        var sqlResult = await h.Read.Vårdval
+            .WithSemantics()
+            .Where(v1 => h.Read.Vårdval
+                .Any(v2 => v1.Period.Överlappar(v2.Period)))
+            .AnyAsync();
+
+        // Debug: Visa SQL
+        var query = h.Read.Vårdval
+            .WithSemantics()
+            .Where(v1 => h.Read.Vårdval
+                .Any(v2 => v1.Period.Överlappar(v2.Period)));
+        _output.WriteLine($"Scenario: {scenario}");
+        _output.WriteLine("SQL:");
+        _output.WriteLine(query.ToQueryString());
+        _output.WriteLine("");
+
+        // Assert
+        Assert.Equal(förväntat, domainResult);
+        Assert.Equal(domainResult, sqlResult);
+    }
+
+    #endregion
+
+    #region ÄrTillsvidare – NULL-hantering
+
+    public static IEnumerable<object[]> ÄrTillsvidareScenarier()
+    {
+        yield return new object[]
+        {
+            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
+            true,
+            "Slut är null"
+        };
+        yield return new object[]
+        {
+            Tidsrymd.Skapa(
+                new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)
+            ),
+            false,
+            "Slut är satt"
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(ÄrTillsvidareScenarier))]
+    public async Task ÄrTillsvidare_Korrelation_DomainEkvivalentSql(
+        Tidsrymd period,
+        bool förväntat,
+        string scenario)
+    {
+        // Arrange
+        await using var h = new SqliteHarness();
+
+        var vårdval = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-1"), period, DateTimeOffset.UtcNow);
+        h.Write.Vardval.Add(vårdval);
+        await h.Write.SaveChangesAsync();
+
+        // Act 1: Domänlogik (in-memory)
+        var domainResult = period.ÄrTillsvidare;
+
+        // Act 2: EF-översättning (SQL via WithSemantics)
+        var sqlResult = await h.Read.Vårdval
+            .WithSemantics()
+            .Where(v => v.Period.ÄrTillsvidare)
+            .AnyAsync();
+
+        // Debug
+        var query = h.Read.Vårdval
+            .WithSemantics()
+            .Where(v => v.Period.ÄrTillsvidare);
+        _output.WriteLine($"Scenario: {scenario}");
+        _output.WriteLine("SQL:");
+        _output.WriteLine(query.ToQueryString());
+        _output.WriteLine("");
+
+        // Assert
+        Assert.Equal(förväntat, domainResult);
+        Assert.Equal(domainResult, sqlResult);
+    }
+
+    #endregion
+
+    #region ÄrAktivt (Vårdval) – Aggregat-expansion
+
+    public static IEnumerable<object[]> VårdvalÄrAktivtScenarier()
+    {
+        yield return new object[]
+        {
+            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
+            true,
+            "Vårdval är aktivt (tillsvidare)"
+        };
+        yield return new object[]
+        {
+            Tidsrymd.Skapa(
+                new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)
+            ),
+            false,
+            "Vårdval är avslutat"
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(VårdvalÄrAktivtScenarier))]
+    public async Task VårdvalÄrAktivt_Korrelation_DomainEkvivalentSql(
+        Tidsrymd period,
+        bool förväntat,
+        string scenario)
+    {
+        // Arrange
+        await using var h = new SqliteHarness();
+
+        var vårdval = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-1"), period, DateTimeOffset.UtcNow);
+        h.Write.Vardval.Add(vårdval);
+        await h.Write.SaveChangesAsync();
+
+        // Act 1: Domänlogik (in-memory)
+        var domainResult = vårdval.ÄrAktivt;
+
+        // Act 2: EF-översättning (SQL via WithSemantics)
+        // Vårdval.ÄrAktivt expansion delegerar till Tidsrymd.ÄrTillsvidare
+        var sqlResult = await h.Read.Vårdval
+            .WithSemantics()
+            .Where(v => v.ÄrAktivt)
+            .AnyAsync();
+
+        // Debug
+        var query = h.Read.Vårdval
+            .WithSemantics()
+            .Where(v => v.ÄrAktivt);
+        _output.WriteLine($"Scenario: {scenario}");
+        _output.WriteLine("SQL (delegerad expansion):");
+        _output.WriteLine(query.ToQueryString());
+        _output.WriteLine("");
+
+        // Assert
+        Assert.Equal(förväntat, domainResult);
+        Assert.Equal(domainResult, sqlResult);
+    }
+
+    #endregion
+}

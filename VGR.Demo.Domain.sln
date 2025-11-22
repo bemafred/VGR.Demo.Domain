@@ -52,7 +52,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure (Persistence
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Delivery (API & Hosting)", "Delivery (API & Hosting)", "{CC9CB29E-40C1-4725-B193-441F1326A416}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Technical Kernel", "Technical Kernel", "{D615825D-7FF5-4A09-A018-B208063C9555}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Technical Domain", "Technical Domain", "{D615825D-7FF5-4A09-A018-B208063C9555}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Quality & Guardrails", "Quality & Guardrails", "{FBDC5DCC-AF27-4E3F-AD39-CD5D97793F2F}"
 EndProject

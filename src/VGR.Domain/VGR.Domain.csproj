@@ -1,19 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
     
-  <ItemGroup>
-    <ProjectReference Include="..\VGR.Analyzers\VGR.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\VGR.Semantics.Abstractions\VGR.Semantics.Abstractions.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-      <InternalsVisibleTo Include="VGR.Infrastructure.EF" />
-    <InternalsVisibleTo Include="VGR.Domain.Tests" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\VGR.Analyzers\VGR.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <ProjectReference Include="..\VGR.Semantics.Abstractions\VGR.Semantics.Abstractions.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="VGR.Infrastructure.EF"/>
+        <InternalsVisibleTo Include="VGR.Domain.Tests"/>
+        <InternalsVisibleTo Include="VGR.Semantics.Linq.CorrelationTests"/>
+    </ItemGroup>
 
 </Project>

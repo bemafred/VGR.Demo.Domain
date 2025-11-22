@@ -216,6 +216,30 @@ public async Task CreatePerson_End2End()
 }
 ```
 
+## 11. Technical Domain — technical concepts and abstractions
 
+`VGR.Technical` and `VGR.Technical.Testing` constitute the **Technical Domain** — a dedicated layer for technical domain concepts that are **orthogonal** to the business domain.
 
+### What belongs here
+
+- **`Utfall<T>`** – result type for non-exceptional failures
+- **`IClock`** – time abstraction for testability
+- **`Map<T>`** – domain mapping (DTO ↔ API)
+- **`SqliteHarness`** – unified test infrastructure
+
+### What does NOT belong here
+
+- Business concepts (Vårdval, Person, Region) → `VGR.Domain`
+- Query semantics (Contains, Overlaps) → `VGR.Semantics.Linq`
+- Infrastructure details (EF, SQL) → `VGR.Infrastructure.EF`
+
+### Principles
+
+**AI MUST:**
+
+- Introduce new technical concepts here **only** when they are orthogonal to the business domain
+- Never mix business logic into the Technical Domain
+- Keep the Technical Domain **minimal** — avoid the “utility-library” trap
+
+Example: `IClock` is orthogonal (time applies everywhere), while `Utfall<T>` is a **design decision**, not a technical requirement.
 By following these guidelines, AI assistants will reinforce – not erode – the principles behind **E-Clean** and **Semantic Architecture** in this solution.

@@ -164,16 +164,16 @@ I normal vardag:
 ## 7. Vanliga misstag
 
 ❌ Skriva EF-logik i interaktorer
-✔ Använd Semantics.Linq
+✅ Använd Semantics.Linq
 
 ❌ Blanda semantik med affärslogik
-✔ Domänen först
+✅ Domänen först
 
 ❌ Skapa projections i EF-lagret
-✔ Domain.Queries är rätt plats
+✅ Domain.Queries är rätt plats
 
 ❌ Lägga EF-specifik logik i domänen
-✔ Håll det i expansions + Infrastructure
+✅ Håll det i expansions + Infrastructure
 
 ------------------------------------------------------------------------
 
@@ -207,5 +207,35 @@ unifieras via `VGR.Technical.Testing.SqliteHarness`.
 - **SQL-validering** – säkerställ att domänmetoder översätts korrekt till SQL
 - **Snabb** – i-minne ⟹ ingen disk-IO
 - **Deterministisk** – repeterbar testning
+
+-------------------------------------------------------------------------
+
+## 10. Technical Domain — tekniska byggblock och orthogonalitet
+
+`VGR.Technical` och `VGR.Technical.Testing` m.m. utgör **Technical Domain**.
+
+Det är en speciell domän för tekniska begrepp som är ortogonala till affärsdomänen:
+
+- **`Utfall<T>`** – designbeslut för resultat-hantering (icke-exceptionella misslyckanden)
+- **`IClock`** – tid-abstraktion (testbarhet, deterministism)
+- **`SqliteHarness`** – unified testinfrastruktur
+
+### Varför separat domän?
+
+Dessa begrepp behövs från **flera håll** — Application, Infrastructure, Tests — men de är inte del av affärsspråket.
+
+En utvecklare behöver inte tänka på `IClock` när hen modellerar Vårdval, men interaktorer använder det för att injicera tid.
+
+### Vad gör jag här?
+
+Normalt: ingenting. Technical Domain är stabil.
+
+Om du behöver ett nytt tekniskt begrepp:
+1. Fråga: "Är detta ortogonalt?" (kan det användas överallt utan affärskontext?)
+2. Om ja: lägg det i `VGR.Technical`
+3. Om nej: det hör hemma i någon annan domän
+
+------------------------------------------------------------------------
+
 
 Välkommen --- arkitekturen är byggd för att bära dig.

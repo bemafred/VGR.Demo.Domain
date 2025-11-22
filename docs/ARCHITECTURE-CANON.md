@@ -33,7 +33,7 @@
 - **Semantic Platform** → `VGR.Semantics.Abstractions`, `VGR.Semantics.Linq`, `VGR.Semantics.Generator`, `VGR.Semantics.Queries.Tests`
 - **Infrastructure (Persistence & IO)** → `VGR.Infrastructure.EF`
 - **Delivery (API & Hosting)** → `VGR.Web`, `VGR.Tests`
-- **Technical Kernel** → `VGR.Technical`
+- **Technical Domain** → `VGR.Technical`, `VGR.Technical.Testing`
 - **Quality & Guardrails** → `VGR.Analyzers`, `docs/*`
 
 ## Do / Don’t

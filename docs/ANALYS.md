@@ -11,7 +11,7 @@ Lösningen är organiserad i solution-folders som speglar ansvarsområden:
 - **Semantic Platform** (semantiska attribut, translators, generator, tester)
 - **Infrastructure (Persistence & IO)**
 - **Delivery (API & Hosting)**
-- **Technical Kernel**
+- **Technical Domain (teknisk domän)** `VGR.Technical`, `VGR.Technical.Testing`
 - **Quality & Guardrails** (analyzers + docs)
 
 ## Styrkor (Pros)

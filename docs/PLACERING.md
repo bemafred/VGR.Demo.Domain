@@ -18,7 +18,7 @@ Detta dokument beskriver hur de olika projekten i lösningen är organiserade oc
 | **Infrastructure (Persistence & IO)** | `VGR.Infrastructure.EF`          | Entity Framework-konfiguration och `DbContext` (Read/Write, pushdown-strategi).                   |
 | **Delivery (API & Hosting)**          | `VGR.Web`                        | ASP.NET Core-API, controllers, hosting.                                                           |
 |                                       | `VGR.Tests`                      | End-to-end/integrationstester mot interaktorer och webb (SQLite in-memory).                       |
-| **Technical Kernel**                  | `VGR.Technical`                  | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer.                  |
+| **Technical Domain**                  | `VGR.Technical`                  | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer.                  |
 |                                       | `VGR.Technical.Testing`          | **Testinfrastruktur**: `SqliteHarness` för unified in-memory EF-testning (Read/Write DbContexts).  |
 | **Quality & Guardrails**              | `VGR.Analyzers`                  | Roslyn-analyzers som upprätthåller domänregler.                                                   |
 | **Architecture & Docs**               | `docs/*`                         | Arkitektur- och policy-dokumentation (`ANALYS`, `PLACERING`, `POLICY`, `KODERGONOMI`, m.fl.).     |
@@ -32,6 +32,11 @@ Detta dokument beskriver hur de olika projekten i lösningen är organiserade oc
 - **Felhantering sker med `Throw` eller `Utfall`.**
     - `Throw` används för invariants och fel som *ska* bryta exekveringen – både i domän och applikationslager.
     - `Utfall` kan användas när det finns skäl att undvika undantag, t.ex. av prestandaskäl eller för att uttrycka icke-exceptionella misslyckanden i interaktorer.
+- **Technical Domain** (`VGR.Technical`, `VGR.Technical.Testing`) innehåller tekniska begrepp som är:
+    - Ortogonala till affärsdomänen (kan användas från flera håll)
+    - Designbeslut (t.ex. `Utfall<T>` för resultat-hantering)
+    - Infrastruktur-stöd (t.ex. `SqliteHarness` för testning)
+    - **Princip**: Minimalt men nödvändigt. Ingen "utility-bibliotek"-fälla.
 - **Application** implementerar interaktorer som anropar domänen, utnyttjar Semantic Platform för queries och returnerar `Utfall` eller kastar med `Throw` vid behov.
 - **Infrastructure.EF** ansvarar för mappning, persistens och pushdown-konfiguration (Read/Write DbContexts).
 - **Delivery** (Web + E2E) exponerar användningsfall via HTTP och testar hela kedjan från API till DB.
