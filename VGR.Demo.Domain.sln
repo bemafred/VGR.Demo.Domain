@@ -55,13 +55,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Technical Domain", "Technical Domain", "{D615825D-7FF5-4A09-A018-B208063C9555}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		Directory.Packages.props = Directory.Packages.props
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Quality & Guardrails", "Quality & Guardrails", "{FBDC5DCC-AF27-4E3F-AD39-CD5D97793F2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Linq.Tests", "src\VGR.Semantics.Linq.Tests\VGR.Semantics.Linq.Tests.csproj", "{6D3EAF20-B81B-D31C-08E1-7CC117E8B768}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Linq.CorrelationTests", "src\VGR.Semantics.Linq.CorrelationTests\VGR.Semantics.Linq.CorrelationTests.csproj", "{619B779B-0267-4453-9B76-76E902A0D3F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Linq.Correlations", "src\VGR.Semantics.Linq.Correlations\VGR.Semantics.Linq.Correlations.csproj", "{619B779B-0267-4453-9B76-76E902A0D3F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Technical.Testing", "src\VGR.Technical.Testing\VGR.Technical.Testing.csproj", "{90EB1A73-4890-473F-9BCA-8E79D930C291}"
 EndProject

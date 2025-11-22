@@ -175,7 +175,7 @@ Testinfrastrukturen är centraliserad i `VGR.Technical.Testing.SqliteHarness`.
 - Use `SqliteHarness` for any test needing DB access (semantic correlation, E2E).
 - NOT duplicate SqliteHarness logic across projects.
 - Place domain unit tests (`VGR.Domain.Tests`) WITHOUT SqliteHarness (pure aggregats).
-- Place semantic correlation tests (`VGR.Semantics.Linq.CorrelationTests`) WITH SqliteHarness.
+- Place semantic correlation tests (`VGR.Semantics.Linq.Correlations`) WITH SqliteHarness.
 - Place E2E tests (`VGR.Tests`) WITH SqliteHarness.
 
 **Example: Semantic correlation test**

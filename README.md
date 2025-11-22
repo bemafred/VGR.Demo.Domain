@@ -163,7 +163,7 @@ Vertikal placering av projekt (inklusive testprojekt) följer dessa principer:
   - `VGR.Semantics.Linq` – query-provider + expression-rewriter (`WithSemantics`, `SemanticRegistry`) som översätter domänmetoder till EF-vänlig LINQ.
   - `VGR.Semantics.Generator` – source generator som bygger upp semantik-registret.
   - `VGR.Semantics.Linq.Tests` – tester av den semantiska plattformen.
-  - `VGR.Semantics.CorrelationTests` - tester av expansioner för korrekt översättning till SQL ([SemanticQueryAttribute] [ExpansionForAttribute])
+  - `VGR.Semantics.Correlations` - tester av expansioner för korrekt översättning till SQL ([SemanticQueryAttribute] [ExpansionForAttribute])
 
 - **Infrastructure (Persistence & IO)**
   - `VGR.Infrastructure.EF` – EF Core-konfigurationer, `ReadDbContext`, `WriteDbContext`, pushdown-strategi.
@@ -192,7 +192,7 @@ src/
   VGR.Semantics.Generator/
   VGR.Sementics.Linq/
   VGR.Sementics.Linq.Tests/
-  VGR.Semantics.CorrelationTests/
+  VGR.Semantics.Correlations/
   VGR.Technical/
     Utfall.cs, IClock.cs
   VGR.Technical.Testing/
@@ -238,7 +238,7 @@ dotnet run --project src/VGR.Web/VGR.Web.csproj
 ## Tester (xUnit + SQLite in-memory)
 
 Projekt **VGR.Tests** använder SQLite in-memory (relations-likt) och kör end-to-end mot interaktorerna.
-Projekt **VGR.Semantics.Linq.CorrelationTests** använder SQLite in-memory (relations-likt) och kör expansionstester mot SQL.
+Projekt **VGR.Semantics.Linq.Correlations** använder SQLite in-memory (relations-likt) och kör expansionstester mot SQL.
 
 Kör tester:
 ```bash

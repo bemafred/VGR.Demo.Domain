@@ -51,5 +51,5 @@ unifieras genom `VGR.Technical.Testing.SqliteHarness`.
 | Lager | Projekt | Fokus | Harness |
 |-------|---------|-------|---------|
 | **Domain** | `VGR.Domain.Tests` | Aggregat, VO, invariants | Nej – pure C# |
-| **Semantic** | `VGR.Semantics.Linq.CorrelationTests` | Domänmetoder → SQL-korrekthet | **Ja** – SqliteHarness |
+| **Semantic** | `VGR.Semantics.Linq.Correlations` | Domänmetoder → SQL-korrekthet | **Ja** – SqliteHarness |
 | **E2E/Integration** | `VGR.Tests` | Interaktorer, web, end-to-end | **Ja** – SqliteHarness |

@@ -10,17 +10,17 @@ using VGR.Technical.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace VGR.Semantics.Linq.CorrelationTests;
+namespace VGR.Semantics.Linq.Correlations;
 
 /// <summary>
 /// Korrelationstest för Tidsrymd – verifierar att domänmetoder och SQL är ekvivalenta.
 /// Använder SqliteHarness för unified in-memory testning.
 /// </summary>
-public sealed class TidsrymdCorrelationTests
+public sealed class TidsrymdCorrelations
 {
     private readonly ITestOutputHelper _output;
 
-    public TidsrymdCorrelationTests(ITestOutputHelper output)
+    public TidsrymdCorrelations(ITestOutputHelper output)
     {
         _output = output;
     }
