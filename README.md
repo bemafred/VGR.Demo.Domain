@@ -1,4 +1,4 @@
-# VGR Demo Domain – Epistemic Clean & Semantic Architecture (.NET / EF / CQRS-light)
+# VGR Demo Domain – Epistemic Clean & Semantic Architecture (.NET / DDD / EF / CQRS-light)
 
 Detta repo är en **referensarkitektur** för hur vi vill bygga domänstyrda system i .NET:
 
