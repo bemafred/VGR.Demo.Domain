@@ -6,269 +6,281 @@
 
 ## Metadata
 
-| Field                  | Value                                     |
-|------------------------|-------------------------------------------|
-| **Status**             | Proposed                                  |
-| **Version**            | 1.0.0                                     |
-| **Date**               | 2025-01-24                                |
-| **Decision Makers**    | VGR Architecture Team                     |
-| **Supersedes**         | None (foundational)                       |
-| **Related ADRs**       | ADR-001 (Index), ADR-002 (Semantic Names) |
+| Fält                    | Värde                                     |
+|-------------------------|--------------------------------------------|
+| **Status**              | Föreslagen                                 |
+| **Version**             | 1.0.0                                      |
+| **Datum**               | 2025-01-24                                 |
+| **Beslutsfattare**      | VGR Architecture Team                      |
+| **Ersätter**            | Ingen (grundläggande)                      |
+| **Relaterade ADR:er**   | ADR-001 (Index), ADR-002 (Semantiska namn) |
 
 ---
 
-## Context
+## Kontext
 
-Traditional .NET architectures struggle with several fundamental problems:
+Traditionella .NET-arkitekturer brottas med flera grundläggande problem:
 
-1. **Semantic drift** – domain knowledge disperses across layers (controllers, services, repositories, database)
-2. **Epistemic fragmentation** – "truth" exists in multiple forms (C# models, SQL schemas, API contracts, documentation)
-3. **Translation overhead** – constant mental context-switching between domain language and technical artifacts
-4. **AI incompatibility** – codebases lack machine-readable semantic structure
-5. **Refactoring brittleness** – domain changes ripple unpredictably through infrastructure
-6. **Performance vs clarity trade-off** – optimized queries often sacrifice domain expressiveness
+1. **Semantisk drift** – domänkunskap sprids över lager (controllers, services, repositories, databas)
+2. **Epistemisk fragmentering** – ”sanningen” finns i flera former (C#-modeller, SQL-scheman, API-kontrakt, dokumentation)
+3. **Översättningskostnad** – konstant mentalt kontextbyte mellan domänspråk och tekniska artefakter
+4. **AI-inkompatibilitet** – kodbaser saknar maskinläsbar semantisk struktur
+5. **Skör refaktorering** – domänförändringar sprider sig oförutsägbart genom infrastrukturen
+6. **Prestanda vs tydlighet** – optimerade frågor offrar ofta domänuttryckskraft
 
-Existing approaches (Clean Architecture, DDD, CQRS) address some concerns but:
-- Do not solve the **semantic translation problem** (domain → database)
-- Do not provide **machine-readable domain catalogs**
-- Do not optimize for **code ergonomics** as a first-class concern
-- Do not integrate **AI-assisted development** as a core architectural principle
+Existerande angreppssätt (Clean Architecture, DDD, CQRS) adresserar vissa av dessa, men:
 
-We needed an architecture that:
-- Keeps domain knowledge **pure and central**
-- Makes semantics **executable** via systematic translation
-- Treats **language as the primary interface**
-- Enables **both humans and AI** to reason about the system
-- Maintains **production-grade performance** despite abstraction layers
+- De löser inte **det semantiska översättningsproblemet** (domän → databas)
+- De tillhandahåller inte **maskinläsbara domänkataloger**
+- De optimerar inte för **kodergonomi** som förstaklassmedborgare
+- De integrerar inte **AI-assisterad utveckling** som en grundprincip
+
+Vi behövde en arkitektur som:
+
+- Håller domänkunskap **ren och central**
+- Gör semantik **exekverbar** genom systematisk översättning
+- Ser **språk som primärt gränssnitt**
+- Möjliggör resonemang för **både människor och AI**
+- Bibehåller **produktionsmässig prestanda** trots abstraktioner
 
 ---
 
-## Decision
+## Beslut
 
-We adopt **Epistemic Clean Architecture (E-Clean)** as our architectural pattern and **Semantic Architecture** as its concrete implementation.
+Vi antar **Epistemic Clean Architecture (E-Clean)** som vårt arkitekturmönster och **Semantic Architecture** som dess konkreta implementation.
 
-### What is E-Clean?
+### Vad är E-Clean?
 
-**Epistemic Clean Architecture (E-Clean)** is an architectural pattern that:
-- Builds on a **pure, rich domain** expressing knowledge and invariants
-- Maintains **strict separation** between domain (epistemic) and infrastructure (technical)
-- Achieves **code ergonomics** through linguistic expressions rather than technical artifacts
-- Uses **systematic semantic translation** from domain language to executable queries
+**Epistemic Clean Architecture (E-Clean)** är ett arkitekturmönster som:
+
+- Bygger på en **ren, rik domän** som uttrycker kunskap och domäninvarianter
+- Upprätthåller **strikt separering** mellan domän (epistemisk) och infrastruktur (teknisk)
+- Uppnår **kodergonomi** genom språkliga uttryck snarare än tekniska artefakter
+- Använder **systematisk semantisk översättning** från domänspråk till exekverbara frågor
 
 **Tagline:** *Language is the interface. Semantics execute.*
 
-### What is Semantic Architecture?
+### Vad är Semantic Architecture?
 
-**Semantic Architecture** is the concrete implementation of E-Clean principles through:
+**Semantic Architecture** är den konkreta implementationen av E-Clean-principerna genom:
 
-1. **Semantic Registry** – machine-readable catalog of domain concepts, queries, projections, and relationships
-2. **Semantic Queries** – expression-based domain knowledge accessors (APPENDIX H)
-3. **Semantic Expansions** – declarative cross-component enrichment rules (APPENDIX I)
-4. **Expression Tree Rewriting** – translation of domain methods to EF-compatible SQL
-5. **Projection-Driven Execution** – typed read models preserving semantic meaning
-6. **Domain Catalog** – RDF/Turtle export of domain structure for visualization and AI reasoning
+1. **Semantic Registry** – maskinläsbar katalog över domänbegrepp, queries, projektioner och relationer
+2. **Semantic Queries** – uttrycksbaserade domänåtkomstmönster (APPENDIX H)
+3. **Semantic Expansions** – deklarativa berikningsregler över komponentgränser (APPENDIX I)
+4. **Expression Tree Rewriting** – översättning av domänmetoder till EF-kompatibel SQL
+5. **Projektionstyrd exekvering** – typade read-modeller som bevarar semantisk innebörd
+6. **Domain Catalog** – RDF/Turtle-export av domänstruktur för visualisering och AI-resonemang
 
-**Key distinction:**
-> **E-Clean defines *how* we build. Semantic Architecture defines *what* we build.**
+**Central skillnad:**
+> **E-Clean definierar *hur* vi bygger. Semantic Architecture definierar *vad* vi bygger.**
 
-Just as MVC is a pattern and ASP.NET MVC is an implementation.
+Precis som MVC är ett mönster, och ASP.NET MVC är implementationen.
 
 ---
 
-## Architectural Principles
+## Arkitekturprinciper
 
-### 1. Pure Domain
-Aggregates and value objects express semantics and invariants.  
-**No** `IQueryable`, `Expression`, or EF in the domain layer.
+### 1. Ren domän
+Aggregat och värdeobjekt uttrycker semantik och invarianter.  
+**Ingen** `IQueryable`, `Expression` eller EF i domänlagret.
 
-### 2. Semantic Persistence
-EF translators convert domain APIs (e.g., `Tidsrymd.Överlappar`) to SQL.  
-One source of truth for business rules.
+### 2. Semantisk persistens
+EF-översättare omvandlar domän-API:er (t.ex. `Tidsrymd.Överlappar`) till SQL.  
+En källa till sanning för verksamhetsregler.
 
-### 3. Application as Prose
-Interactors express use cases in domain vocabulary, not infrastructure terms.
+### 3. Applikationen som prosa
+Interaktorer uttrycker use cases med domänspråk, inte infrastrukturtermer.
 
 ### 4. Ports & Adapters
-Readers/Writers as application abstractions.  
-EF/Dapper/views behind ports.
+Readers/Writers som applikationsabstraktioner.  
+EF/Dapper/views bakom portar.
 
-### 5. Domain Catalog
-Concepts/Relations/Rules as C# attributes, exported to Turtle.  
-`/domain` endpoint visualizes in runtime.
+### 5. Domänkatalog
+Begrepp/Relationer/Regler som C#-attribut, exporterbara till Turtle.  
+`/domain` endpoint visualiserar vid runtime.
 
-### 6. Explainability-First
-Every decision must be traceable: log rules, inputs, intermediate results.
+### 6. Förklarbarhet först
+Varje beslut ska vara spårbart: logga regler, input, mellanresultat.
 
 ### 7. Simplicity First
-Minimal necessary layers.  
-Introduce Specification/CQRS only when clearly beneficial.
+Minimalt antal lager.  
+Introducera Specification/CQRS endast vid tydlig nytta.
 
-### 8. Verifiability
-Correlation tests between domain predicates (in-memory) and generated SQL (`ToQueryString()`).
+### 8. Verifierbarhet
+Korrelations­tester mellan domänpredikat (in-memory) och genererad SQL (`ToQueryString()`).
 
-### 9. Provider Portability
-Translators have provider-specific branches (SqlServer/Npgsql/Sqlite) when needed.
+### 9. Leverantörsoberoende
+Översättare har providerspecifika grenar (SqlServer/Npgsql/Sqlite) vid behov.
 
-### 10. Observability-Ready
-OpenTelemetry (traces/metrics/logs) with semantic tags: `ruleset`, `period`, `job_id`.
-
----
-
-## Architectural Layers
-
-[ UI / API ]↓ [ Application / Interactors ] —— calls ——> [ Ports (Readers/Writers) ] ↑ ↓ [ Domain (DDD) ] [ Infrastructure (EF + Translators, Dapper, Views) ] + [ Domain Catalog (RDF export) + /domain UI ]
-
-**Key principle:** *Domain knows nothing about EF/SQL. Infrastructure learns domain language.*
+### 10. Observability-ready
+OpenTelemetry (traces/metrics/logs) med semantiska taggar: `ruleset`, `period`, `job_id`.
 
 ---
 
-## Project Structure
+## Arkitekturlager
 
-| Layer                    | Projects                                                                              |
-|--------------------------|---------------------------------------------------------------------------------------|
-| **Core Domain**          | `VGR.Domain`, `VGR.Domain.Queries`, `VGR.Domain.Verifications`                        |
-| **Application**          | `VGR.Application`                                                                     |
-| **Semantic Core**        | `VGR.Semantics.Abstractions`, `VGR.Semantics.Linq`, `VGR.Semantics.Generator`        |
-| **Infrastructure**       | `VGR.Infrastructure.EF`                                                               |
-| **Delivery**             | `VGR.Web`, `VGR.Tests`                                                                |
-| **Technical Domain**     | `VGR.Technical`, `VGR.Technical.Testing`                                              |
-| **Quality & Guardrails** | `VGR.Analyzers`, `docs/*`                                                             |
+[ UI / API ]↓  
+[ Application / Interactors ] —— anropar ——>  
+[ Ports (Readers/Writers) ]  
+↑ ↓  
+[ Domain (DDD) ]  
+[ Infrastructure (EF + Translators, Dapper, Views) ]
++ [ Domain Catalog (RDF-export) + /domain UI ]
 
----
-
-## Consequences
-
-### Positive
-
-✅ **Epistemic clarity** – domain knowledge in one place, expressed in domain language  
-✅ **Refactor-safety** – typed projections and semantic queries survive renames and restructures  
-✅ **AI-native** – machine-readable semantics enable AI-assisted development (APPENDIX F)  
-✅ **Performance maintained** – pushdown strategy guarantees database-level optimization (APPENDIX J)  
-✅ **Code ergonomics** – developers navigate via IntelliSense in domain vocabulary  
-✅ **Testability** – SqliteHarness enables fast, deterministic correlation tests  
-✅ **Explainability** – semantic traces make decisions auditable  
-✅ **Evolvability** – modular semantic components grow independently
-
-### Negative
-
-⚠️ **Learning curve** – developers must understand expression trees, semantic rewriting, and expansion rules  
-⚠️ **Tooling requirements** – requires Roslyn analyzers, source generators, and semantic registry  
-⚠️ **Convention strictness** – deviations from semantic patterns break translation guarantees  
-⚠️ **Initial setup cost** – establishing semantic infrastructure requires upfront investment
-
-### Mitigations
-
-- **Comprehensive onboarding** (ONBOARDING.md)
-- **AI guidance** (AI-GUIDANCE.md) for automated code generation
-- **Analyzers** enforce architectural rules at compile-time
-- **Correlation tests** validate semantic correctness automatically
-- **Documentation-first** approach (this ADR index + appendices)
+**Nyckelprincip:** *Domänen vet inget om EF/SQL. Infrastruktur lär sig domänspråket.*
 
 ---
 
-## Scope
+## Projektstruktur
 
-### In Scope
-
-This ADR applies to:
-- All new development in VGR domain projects
-- Application layer use cases
-- Infrastructure query translation
-- Domain modeling and semantic registration
-- AI-assisted code generation
-
-### Out of Scope
-
-This ADR does **not** mandate:
-- UI framework choices (React, Blazor, etc.)
-- External service integration patterns (covered separately)
-- Deployment infrastructure (Kubernetes, Docker, etc.)
-- Specific CI/CD tooling
+| Lager                   | Projekt                                                                              |
+|-------------------------|---------------------------------------------------------------------------------------|
+| **Core Domain**         | `VGR.Domain`, `VGR.Domain.Queries`, `VGR.Domain.Verifications`                        |
+| **Application**         | `VGR.Application`                                                                     |
+| **Semantic Core**       | `VGR.Semantics.Abstractions`, `VGR.Semantics.Linq`, `VGR.Semantics.Generator`        |
+| **Infrastructure**      | `VGR.Infrastructure.EF`                                                               |
+| **Delivery**            | `VGR.Web`, `VGR.Tests`                                                                |
+| **Technical Domain**    | `VGR.Technical`, `VGR.Technical.Testing`                                             |
+| **Quality & Guardrails**| `VGR.Analyzers`, `docs/*`                                                             |
 
 ---
 
-## Validation Criteria
+## Konsekvenser
 
-This architectural decision is successful when:
+### Positiva
 
-1. ✅ New developers can navigate the codebase via domain vocabulary within 1 week
-2. ✅ 95%+ of queries push down to SQL (measured via telemetry)
-3. ✅ AI tools generate semantically correct code without manual correction
-4. ✅ Domain changes propagate safely via refactoring tools
-5. ✅ Correlation tests achieve 100% pass rate in CI/CD
-6. ✅ p95 query latency remains < 50ms for indexed semantic queries
+✅ **Epistemisk klarhet** – domänkunskap samlad på ett ställe, uttryckt i domänspråk  
+✅ **Refaktorsäkerhet** – typade projektioner och semantiska queries överlever renames och omstruktureringar  
+✅ **AI-native** – maskinläsbar semantik möjliggör AI-assisterad utveckling (APPENDIX F)  
+✅ **Bibehållen prestanda** – pushdown-strategi säkerställer databasoptimering (APPENDIX J)  
+✅ **Kodergonomi** – utvecklare navigerar via IntelliSense i domänens vokabulär  
+✅ **Testbarhet** – SqliteHarness möjliggör snabba, deterministiska korrelationstester  
+✅ **Förklarbarhet** – semantiska traces gör beslut auditbara  
+✅ **Evolvbarhet** – modulära semantiska komponenter växer oberoende
 
----
+### Negativa
 
-## Compliance
+⚠️ **Inlärningskurva** – utvecklare måste förstå expression trees, semantisk rewriting och expansionsregler  
+⚠️ **Verktygskrav** – kräver Roslyn-analyzers, source generators och semantisk registry  
+⚠️ **Strikta konventioner** – avvikelser från semantiska mönster bryter översättningsgarantier  
+⚠️ **Initial investeringskostnad** – semantisk infrastruktur kräver uppsättning i början
 
-All code contributions must:
-- [ ] Place new domain concepts in `VGR.Domain`
-- [ ] Express queries via semantic patterns (APPENDIX H)
-- [ ] Provide expansions for new domain methods requiring EF translation
-- [ ] Include correlation tests validating SQL translation
-- [ ] Use typed projections in `Domain.Queries` (no anonymous types)
-- [ ] Document semantic attributes for registry discovery
-- [ ] Follow naming conventions (semantic, not technical suffixes)
+### Mitigeringar
 
-Violations are flagged by analyzers at compile-time.
-
----
-
-## References
-
-### Core Documents
-
-- **ARCHITECTURE-CANON.md** – Complete architectural specification
-- **ARCHITECTURE-NAME.md** – Naming rationale (E-Clean vs Semantic Architecture)
-- **ARCHITECTURE-WHY.md** – Philosophical foundation
-- **ONBOARDING.md** – Developer onboarding guide
-- **AI-GUIDANCE.md** – AI assistant instructions
-
-### Appendices
-
-- **APPENDIX B** – Design Principles of Semantic Architecture
-- **APPENDIX C** – Semantic Components
-- **APPENDIX D** – Tooling Integration & The Roslyn Semantic Model
-- **APPENDIX E** – Comparison with Clean Architecture & Domain-Driven Design
-- **APPENDIX F** – AI-Assisted Development with Semantic Architecture
-- **APPENDIX G** – Semantic Registry Specification
-- **APPENDIX H** – Semantic Query Patterns
-- **APPENDIX I** – Semantic Expansion Rules
-- **APPENDIX J** – Performance & Query Optimization
-
-### Related ADRs
-
-- **ADR-001** – Index Policy (database performance)
-- **ADR-002** – Semantic Names for Tests (code ergonomics)
+- **Omfattande onboarding** (ONBOARDING.md)
+- **AI-vägledning** (AI-GUIDANCE.md) för automatgenererad kod
+- **Analyzers** som upprätthåller regler vid kompilering
+- **Korrelationstester** som validerar semantisk korrekthet automatiskt
+- **Documentation-first** (ADR-index + bilagor)
 
 ---
 
-## Revision History
+## Omfång
 
-| Version | Date       | Changes                           | Author              |
-|---------|------------|-----------------------------------|---------------------|
-| 1.0.0   | 2025-01-24 | Initial formal declaration        | VGR Architecture    |
+### Ingår
+
+Detta ADR gäller för:
+
+- All ny utveckling inom VGR:s domänprojekt
+- Use cases i applikationslagret
+- Infrastrukturens frågeöversättning
+- Domänmodellering och semantisk registrering
+- AI-assisterad kodgenerering
+
+### Ingår inte
+
+Detta ADR reglerar **inte**:
+
+- UI-ramverk (React, Blazor, etc.)
+- Integrationsmönster för externa system
+- Deployments (Kubernetes, Docker, etc.)
+- Specifik CI/CD-miljö
 
 ---
 
-## Conclusion
+## Valideringskriterier
 
-Epistemic Clean Architecture with Semantic Architecture implementation represents a fundamental shift:
+Detta arkitekturbeslut är framgångsrikt när:
 
-**From:** Technical artifacts driving structure  
-**To:** Domain language driving structure
+1. ✅ Nya utvecklare kan navigera kodbasen via domänspråk inom 1 vecka
+2. ✅ 95%+ av queries pushas ned till SQL (telemetrimätt)
+3. ✅ AI-verktyg genererar semantiskt korrekt kod utan manuell korrigering
+4. ✅ Domänförändringar propagieras säkert via refaktoreringsverktyg
+5. ✅ Korrelationstester har 100% pass-rate i CI/CD
+6. ✅ p95-frågetid är < 50 ms för indexerade semantiska queries
 
-**From:** Scattered epistemic sources  
-**To:** Unified semantic truth
+---
 
-**From:** Manual translation overhead  
-**To:** Systematic semantic execution
+## Efterlevnad
 
-**From:** AI-opaque codebases  
-**To:** AI-native semantic systems
+Alla kodbidrag måste:
 
-This decision establishes the foundation for maintainable, evolvable, performant, and human-centric enterprise systems.
+- [ ] Placera nya domänbegrepp i `VGR.Domain`
+- [ ] Uttrycka queries via semantiska mönster (APPENDIX H)
+- [ ] Tillhandahålla expansions för nya domänmetoder som kräver EF-översättning
+- [ ] Inkludera korrelationstester som validerar SQL-översättning
+- [ ] Använda typade projektioner i `Domain.Queries` (inga anonyma typer)
+- [ ] Dokumentera semantiska attribut för registry-detektering
+- [ ] Följa namngivningskonventioner (semantiska, inte tekniska suffix)
+
+Avvikelser flaggas av analyzers vid kompilering.
+
+---
+
+## Referenser
+
+### Grunddokument
+
+- **ARCHITECTURE-CANON.md** – Fullständig arkitekturspecifikation
+- **ARCHITECTURE-NAME.md** – Namnlogik (E-Clean vs Semantic Architecture)
+- **ARCHITECTURE-WHY.md** – Filosofisk grund
+- **ONBOARDING.md** – Introduktion för utvecklare
+- **AI-GUIDANCE.md** – Instruktioner för AI-assistenter
+
+### Bilagor
+
+- **APPENDIX B** – Designprinciper för Semantic Architecture
+- **APPENDIX C** – Semantiska komponenter
+- **APPENDIX D** – Verktygsintegration & Roslyns semantiska modell
+- **APPENDIX E** – Jämförelse med Clean Architecture & DDD
+- **APPENDIX F** – AI-assisterad utveckling
+- **APPENDIX G** – Specifikation för Semantic Registry
+- **APPENDIX H** – Semantiska frågemönster
+- **APPENDIX I** – Regler för Semantic Expansion
+- **APPENDIX J** – Prestanda & frågeoptimering
+
+### Relaterade ADR:er
+
+- **ADR-001** – Indexpolicy (databasprestanda)
+- **ADR-002** – Semantiska namn för tester (kodergonomi)
+
+---
+
+## Versionshistorik
+
+| Version | Datum       | Förändringar                        | Författare            |
+|---------|-------------|--------------------------------------|------------------------|
+| 1.0.0   | 2025-01-24  | Första formella deklarationen        | VGR Architecture       |
+
+---
+
+## Slutsats
+
+Epistemic Clean Architecture med Semantic Architecture som implementation innebär ett grundläggande skifte:
+
+**Från:** Tekniska artefakter som styr strukturen  
+**Till:** Domänspråket som styr strukturen
+
+**Från:** Spridda epistemiska källor  
+**Till:** Enad semantisk sanning
+
+**Från:** Manuell översättningsbörda  
+**Till:** Systematisk semantisk exekvering
+
+**Från:** AI-opaka kodbaser  
+**Till:** AI-native semantiska system
+
+Detta beslut etablerar grunden för hållbara, evolverbara, högpresterande och mänskligt centrerade verksamhetssystem.
 
 > *Language is the interface. Semantics execute.*
 
