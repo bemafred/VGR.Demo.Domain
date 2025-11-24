@@ -6,14 +6,14 @@
 
 ## Metadata
 
-| Field                  | Value                                      |
-|------------------------|--------------------------------------------|
-| **Status**             | Accepted                                   |
-| **Version**            | 1.0.0                                      |
-| **Date**               | 2025-01-24                                 |
-| **Decision Makers**    | VGR Architecture Team                      |
-| **Supersedes**         | None (foundational)                        |
-| **Related ADRs**       | ADR-001 (Index), ADR-002 (Semantic Names)  |
+| Field                  | Value                                     |
+|------------------------|-------------------------------------------|
+| **Status**             | Proposed                                  |
+| **Version**            | 1.0.0                                     |
+| **Date**               | 2025-01-24                                |
+| **Decision Makers**    | VGR Architecture Team                     |
+| **Supersedes**         | None (foundational)                       |
+| **Related ADRs**       | ADR-001 (Index), ADR-002 (Semantic Names) |
 
 ---
 
