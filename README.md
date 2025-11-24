@@ -282,7 +282,8 @@ Se `ANALYZER_REGLER.md`. Severity konfigureras i `.editorconfig` (default = erro
     - `docs/ARCHITECTURE-NAME.md`
     - `docs/ARCHITECTURE-WHY.md`
 
-- **Projektplacering och ansvar** – `docs/PLACERING.md`
+- **Projektstruktur och ansvar** – `docs/PLACERING.md` (inkl. översikt över Appendix A–I)
+- **Övergripande analys** – `docs/ANALYS.md`
 
 - **Policyer (Throw/Outcome, CQRS-light)** – `docs/POLICY.md`
 

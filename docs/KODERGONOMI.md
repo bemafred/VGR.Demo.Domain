@@ -55,7 +55,50 @@ Ergonomin sitter lika mycket i miljön som i syntaxen.
 JetBrains Rider, Visual Studio och analyserna ska förstärka arkitekturen, inte styra den.  
 Koden är ett instrument – IDE:n är dess resonanslåda.
 
-—
+---
+
+## Semantiska namn – mening före teknik
+
+E-Clean strävar efter att **mening uttrycks i alla lager**, även i namngivning.  
+Därför använder vi **semantiska namn** som uttrycker *vad vi gör*, inte *hur vi kategoriserar*.
+
+### Testprojekt: Verifications & Correlations
+
+Traditionella .NET-projekt använder suffixet `.Tests` universellt.  
+Vi bryter med detta och använder **semantiskt meningsfulla suffix**:
+
+| Traditionellt namn         | Semantiskt namn                        | Vad det uttrycker                                                  |
+|----------------------------|----------------------------------------|--------------------------------------------------------------------|
+| `VGR.Domain.Tests`         | **`VGR.Domain.Verifications`**         | Vi *verifierar* att domänen uppfyller sina invarianter och regler. |
+| `VGR.Semantics.Linq.Tests` | **`VGR.Semantics.Linq.Verifications`** | Vi *verifierar* att semantisk översättning fungerar korrekt.       |
+| *(saknas traditionellt)*   | **`VGR.Semantics.Linq.Correlations`**  | Vi *korrelerar* domänmetoder (in-memory) med SQL-resultat (EF).    |
+| `VGR.Web.Tests`            | **`VGR.Web.Verifications`**            | Vi *verifierar* end-to-end-flöden från HTTP till databas.          |
+
+### Varför inte bara "Tests"?
+
+1. **Mening före teknik**  
+   "Tests" säger *hur* vi gör något (xUnit, NUnit, testramverk).  
+   "Verifications" och "Correlations" säger *vad* vi gör (verifiera invarianter, korrelera beteenden).
+
+2. **Navigerbarhet**  
+   När en utvecklare ser `*.Verifications` vet hen: *"Här verifieras något viktigt."*  
+   När hen ser `*.Correlations` vet hen: *"Här kollar vi att domän och SQL matchar."*
+
+3. **AI-förståelse**  
+   AI-verktyg (Sky, James, Copilot) kan **resonera om verifikationer** och **förstå korrelationer** – inte bara "köra tester".
+
+4. **Kodergonomi**  
+   Semantiska namn förstärker arkitekturens epistemiska natur – **kod som uttrycker kunskap**.
+
+### Konvention
+
+Vi använder:
+- **`.Verifications`** för projekt som verifierar beteende, invarianter eller integrationer
+- **`.Correlations`** för projekt som korrelerar domänsemantik mot SQL/EF-översättning
+
+Denna konvention är **inte teknik** – den är **mening**.
+
+---
 
 ## Kodergonomi i praktiken
 

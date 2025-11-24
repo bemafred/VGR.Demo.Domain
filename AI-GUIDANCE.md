@@ -123,6 +123,29 @@ When in doubt: prefer the **simpler**, more **explicit** solution.
 
 ---
 
+### Naming Convention: Semantic Names Over Technical Names
+
+This codebase uses **semantic suffixes** for test projects:
+
+| Traditional | Semantic                | Meaning                                                                      |
+|-------------|-------------------------|------------------------------------------------------------------------------|
+| `*.Tests`   | **`*.Verifications`**   | Projects that *verify* invariants, rules, or integrations.                   |
+| *(none)*    | **`*.Correlations`**    | Projects that *correlate* domain behavior (in-memory) with SQL results (EF). |
+
+**AI MUST:**
+
+- Name new test projects using `.Verifications` when verifying behavior
+- Name projects using `.Correlations` when correlating domain semantics with SQL translation
+- NEVER use generic `.Tests` suffix
+
+**Rationale:**
+
+"Tests" is a technical term describing *how* (xUnit framework).  
+"Verifications" and "Correlations" are **semantic terms** describing *what* (verify rules, correlate behaviors).
+
+This is **code ergonomics in practice** – names that carry meaning throughout the stack.
+
+---
 ## 7. Handling Value Objects and invariants
 
 For Value Objects:

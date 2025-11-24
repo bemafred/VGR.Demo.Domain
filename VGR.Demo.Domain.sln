@@ -40,7 +40,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Architecture & Docs", "1
 		docs\PLACERING.md = docs\PLACERING.md
 		docs\POLICY.md = docs\POLICY.md
 		README.md = README.md
-		docs\ADR-Index.md = docs\ADR-Index.md
+		docs\ADR-002 Semantic names for tests.md = docs\ADR-002 Semantic names for tests.md
+		docs\solution-vertical-order.svg = docs\solution-vertical-order.svg
+		docs\ADR-001 Index.md = docs\ADR-001 Index.md
+		docs\ADR-000 E-Clean & Semantic Architecture.md = docs\ADR-000 E-Clean & Semantic Architecture.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Core Domain", "5. Core Domain", "{1C14E1A2-3FBB-41EC-A68E-FB11627458F5}"
@@ -77,7 +80,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Appendices A-I", "Appendices A-I", "{04B02D02-2771-4AF2-BA3F-23B25358DA97}"
 	ProjectSection(SolutionItems) = preProject
 		docs\APPENDIX B – Design Principles of Semantic Architecture.md = docs\APPENDIX B – Design Principles of Semantic Architecture.md
-		docs\Appendix H - Semantic Query Patterns.md = docs\Appendix H - Semantic Query Patterns.md
 		docs\APPENDIX G – Semantic Registry Specification.md = docs\APPENDIX G – Semantic Registry Specification.md
 		docs\APPENDIX I – Semantic Expansion Rules.md = docs\APPENDIX I – Semantic Expansion Rules.md
 		docs\APPENDIX F – AI-Assisted Development with Semantic Architecture.md = docs\APPENDIX F – AI-Assisted Development with Semantic Architecture.md
@@ -85,6 +87,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Appendices A-I", "Appendice
 		docs\APPENDIX C – Semantic Components.md = docs\APPENDIX C – Semantic Components.md
 		docs\APPENDIX A – Platform Dependence.md = docs\APPENDIX A – Platform Dependence.md
 		docs\APPENDIX D – Tooling Integration & The Roslyn Semantic Model.md = docs\APPENDIX D – Tooling Integration & The Roslyn Semantic Model.md
+		docs\APPENDIX H - Semantic Query Patterns.md = docs\APPENDIX H - Semantic Query Patterns.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images & diagrams", "Images & diagrams", "{B6314D76-6A07-497E-983D-509CBEFF4AB6}"
