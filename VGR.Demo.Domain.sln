@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Linq", "src\V
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Domain.Queries", "src\VGR.Domain.Queries\VGR.Domain.Queries.csproj", "{F59A7C5C-5B1F-4B45-AE74-5E4375E7F93B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Architecture & Docs", "Architecture & Docs", "{8941DA92-7CD6-4266-9F91-58C61D5352E4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Architecture & Docs", "1. Architecture & Docs", "{8941DA92-7CD6-4266-9F91-58C61D5352E4}"
 	ProjectSection(SolutionItems) = preProject
 		AI-GUIDANCE.md = AI-GUIDANCE.md
 		docs\ANALYS.md = docs\ANALYS.md
@@ -41,27 +41,26 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Architecture & Docs", "A
 		docs\POLICY.md = docs\POLICY.md
 		README.md = README.md
 		docs\ADR-Index.md = docs\ADR-Index.md
-		docs\solution-vertical-order.svg = docs\solution-vertical-order.svg
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Core Domain", "Core Domain", "{1C14E1A2-3FBB-41EC-A68E-FB11627458F5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Core Domain", "5. Core Domain", "{1C14E1A2-3FBB-41EC-A68E-FB11627458F5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6. Application (UseCases)", "Application (UseCases)", "{C2C0B544-789A-474C-8729-66942C95A1B9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6. Application (UseCases)", "6. Application (UseCases)", "{C2C0B544-789A-474C-8729-66942C95A1B9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Semantic Core", "Semantic Core", "{4EEE13C3-B553-4FF3-9445-4578005F4806}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Semantic Core", "4. Semantic Core", "{4EEE13C3-B553-4FF3-9445-4578005F4806}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "7. Infrastructure (Persistence & IO)", "Infrastructure (Persistence & IO)", "{1DF9F149-3978-4E34-BF6C-08C0BB8F7192}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "7. Infrastructure (Persistence & IO)", "7. Infrastructure (Persistence & IO)", "{1DF9F149-3978-4E34-BF6C-08C0BB8F7192}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "8. Delivery (API & Hosting)", "Delivery (API & Hosting)", "{CC9CB29E-40C1-4725-B193-441F1326A416}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "8. Delivery (API & Hosting)", "8. Delivery (API & Hosting)", "{CC9CB29E-40C1-4725-B193-441F1326A416}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Technical Domain", "Technical Domain", "{D615825D-7FF5-4A09-A018-B208063C9555}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Technical Domain", "3. Technical Domain", "{D615825D-7FF5-4A09-A018-B208063C9555}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Directory.Packages.props = Directory.Packages.props
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Quality & Guardrails", "Quality & Guardrails", "{FBDC5DCC-AF27-4E3F-AD39-CD5D97793F2F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Quality & Guardrails", "2. Quality & Guardrails", "{FBDC5DCC-AF27-4E3F-AD39-CD5D97793F2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Semantics.Linq.Verifications", "src\VGR.Semantics.Linq.Verifications\VGR.Semantics.Linq.Verifications.csproj", "{6D3EAF20-B81B-D31C-08E1-7CC117E8B768}"
 EndProject
@@ -74,6 +73,24 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Application.Stories", "src\VGR.Application.Stories\VGR.Application.Stories.csproj", "{1887EADE-2555-4C43-A85E-F20EED96576A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Infrastructure.Diagnostics", "src\VGR.Infrastructure.Diagnostics\VGR.Infrastructure.Diagnostics.csproj", "{B3504F7A-5EDA-4FA2-ABA2-FBBDD3EC0AD5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Appendices A-I", "Appendices A-I", "{04B02D02-2771-4AF2-BA3F-23B25358DA97}"
+	ProjectSection(SolutionItems) = preProject
+		docs\APPENDIX B – Design Principles of Semantic Architecture.md = docs\APPENDIX B – Design Principles of Semantic Architecture.md
+		docs\Appendix H - Semantic Query Patterns.md = docs\Appendix H - Semantic Query Patterns.md
+		docs\APPENDIX G – Semantic Registry Specification.md = docs\APPENDIX G – Semantic Registry Specification.md
+		docs\APPENDIX I – Semantic Expansion Rules.md = docs\APPENDIX I – Semantic Expansion Rules.md
+		docs\APPENDIX F – AI-Assisted Development with Semantic Architecture.md = docs\APPENDIX F – AI-Assisted Development with Semantic Architecture.md
+		docs\APPENDIX E – Comparison with Clean Architecture & Domain-Driven Design.md = docs\APPENDIX E – Comparison with Clean Architecture & Domain-Driven Design.md
+		docs\APPENDIX C – Semantic Components.md = docs\APPENDIX C – Semantic Components.md
+		docs\APPENDIX A – Platform Dependence.md = docs\APPENDIX A – Platform Dependence.md
+		docs\APPENDIX D – Tooling Integration & The Roslyn Semantic Model.md = docs\APPENDIX D – Tooling Integration & The Roslyn Semantic Model.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images & diagrams", "Images & diagrams", "{B6314D76-6A07-497E-983D-509CBEFF4AB6}"
+	ProjectSection(SolutionItems) = preProject
+		docs\solution-vertical-order.svg = docs\solution-vertical-order.svg
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -176,6 +193,8 @@ Global
 		{095A7F3D-26D7-4196-A915-8634780EBAF7} = {D615825D-7FF5-4A09-A018-B208063C9555}
 		{1887EADE-2555-4C43-A85E-F20EED96576A} = {C2C0B544-789A-474C-8729-66942C95A1B9}
 		{B3504F7A-5EDA-4FA2-ABA2-FBBDD3EC0AD5} = {1DF9F149-3978-4E34-BF6C-08C0BB8F7192}
+		{04B02D02-2771-4AF2-BA3F-23B25358DA97} = {8941DA92-7CD6-4266-9F91-58C61D5352E4}
+		{B6314D76-6A07-497E-983D-509CBEFF4AB6} = {8941DA92-7CD6-4266-9F91-58C61D5352E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {45DD1AC5-527E-44F0-81ED-7B5905114203}
