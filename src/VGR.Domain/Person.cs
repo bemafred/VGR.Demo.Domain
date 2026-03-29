@@ -22,7 +22,7 @@ public sealed class Person
 
     private Person() { }
     internal static Person Skapa(RegionId regionId, Personnummer pnr, DateTimeOffset nu)
-        => new() { Id = new(), RegionId = regionId, Personnummer = pnr, SkapadTid = nu };
+        => new() { Id = PersonId.Nytt(), RegionId = regionId, Personnummer = pnr, SkapadTid = nu };
 
     public Vårdval AvslutaAktuelltVårdval(DateOnly slut)
     {

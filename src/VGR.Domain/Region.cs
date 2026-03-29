@@ -17,7 +17,7 @@ public sealed class Region
     public IReadOnlyList<IDomainEvent> DequeueEvents() { var c = _events.ToArray(); _events.Clear(); return c; }
 
     private Region() { }
-    public static Region Skapa(string kod) => new() { Id = new(), Kod = kod };
+    public static Region Skapa(string kod) => new() { Id = RegionId.Nytt(), Kod = kod };
 
     public Person SkapaPerson(Personnummer pnr, DateTimeOffset nu)
     {

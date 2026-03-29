@@ -71,9 +71,12 @@ public sealed class TidsrymdCorrelations
     {
         // Arrange
         await using var h = new SqliteHarness();
-        
-        var vårdval = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-1"), period, DateTimeOffset.UtcNow);
-        h.Write.Vardval.Add(vårdval);
+        var nu = DateTimeOffset.UtcNow;
+
+        var region = Region.Skapa("14");
+        var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        person.SkapaVårdval(HsaId.Tolka("HSA-1"), period, nu);
+        h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync();
 
         // Act 1: Domänlogik (in-memory)
@@ -107,7 +110,7 @@ public sealed class TidsrymdCorrelations
     {
         var p1Start = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
         var p1End = new DateTimeOffset(2024, 6, 30, 0, 0, 0, TimeSpan.Zero);
-        
+
         var periode1 = Tidsrymd.Skapa(p1Start, p1End);
 
         // Helt skilda intervall
@@ -185,31 +188,34 @@ public sealed class TidsrymdCorrelations
         bool förväntat,
         string scenario)
     {
-        // Arrange
+        // Arrange — två personer under samma region, olika enhet
         await using var h = new SqliteHarness();
+        var nu = DateTimeOffset.UtcNow;
 
-        var vv1 = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-1"), p1, DateTimeOffset.UtcNow);
-        var vv2 = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-2"), p2, DateTimeOffset.UtcNow);
-
-        h.Write.Vardval.Add(vv1);
-        h.Write.Vardval.Add(vv2);
+        var region = Region.Skapa("14");
+        var person1 = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        person1.SkapaVårdval(HsaId.Tolka("HSA-1"), p1, nu);
+        var person2 = region.SkapaPerson(Personnummer.Parse("19900202-5678"), nu);
+        person2.SkapaVårdval(HsaId.Tolka("HSA-2"), p2, nu);
+        h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync();
 
         // Act 1: Domänlogik (in-memory)
         var domainResult = p1.Överlappar(p2);
 
         // Act 2: EF-översättning (SQL via WithSemantics)
+        // Exkludera själv-matchning (v1 != v2) för korrekt överlappningskontroll
         var sqlResult = await h.Read.Vårdval
             .WithSemantics()
             .Where(v1 => h.Read.Vårdval
-                .Any(v2 => v1.Period.Överlappar(v2.Period)))
+                .Any(v2 => v2.Id != v1.Id && v1.Period.Överlappar(v2.Period)))
             .AnyAsync();
 
         // Debug: Visa SQL
         var query = h.Read.Vårdval
             .WithSemantics()
             .Where(v1 => h.Read.Vårdval
-                .Any(v2 => v1.Period.Överlappar(v2.Period)));
+                .Any(v2 => v2.Id != v1.Id && v1.Period.Överlappar(v2.Period)));
         _output.WriteLine($"Scenario: {scenario}");
         _output.WriteLine("SQL:");
         _output.WriteLine(query.ToQueryString());
@@ -252,9 +258,12 @@ public sealed class TidsrymdCorrelations
     {
         // Arrange
         await using var h = new SqliteHarness();
+        var nu = DateTimeOffset.UtcNow;
 
-        var vårdval = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-1"), period, DateTimeOffset.UtcNow);
-        h.Write.Vardval.Add(vårdval);
+        var region = Region.Skapa("14");
+        var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        person.SkapaVårdval(HsaId.Tolka("HSA-1"), period, nu);
+        h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync();
 
         // Act 1: Domänlogik (in-memory)
@@ -312,9 +321,12 @@ public sealed class TidsrymdCorrelations
     {
         // Arrange
         await using var h = new SqliteHarness();
+        var nu = DateTimeOffset.UtcNow;
 
-        var vårdval = Vårdval.Skapa(new PersonId(Guid.NewGuid()), HsaId.Tolka("HSA-1"), period, DateTimeOffset.UtcNow);
-        h.Write.Vardval.Add(vårdval);
+        var region = Region.Skapa("14");
+        var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        var vårdval = person.SkapaVårdval(HsaId.Tolka("HSA-1"), period, nu);
+        h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync();
 
         // Act 1: Domänlogik (in-memory)

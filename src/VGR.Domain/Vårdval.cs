@@ -20,7 +20,7 @@ public sealed class Vårdval
 
     private Vårdval() { }
     internal static Vårdval Skapa(PersonId personId, HsaId enhet, Tidsrymd giltighet, DateTimeOffset ts)
-        => new() { Id = new(), PersonId = personId, EnhetsHsaId = enhet, Period = giltighet, SkapadTid = ts };
+        => new() { Id = VårdvalId.Nytt(), PersonId = personId, EnhetsHsaId = enhet, Period = giltighet, SkapadTid = ts };
 
     public void Avsluta(DateTimeOffset slut)
     {
