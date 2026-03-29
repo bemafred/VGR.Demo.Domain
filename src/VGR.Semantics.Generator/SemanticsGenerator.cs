@@ -152,8 +152,8 @@ public sealed class SemanticGenerator : IIncrementalGenerator
             }
         }
 
-        // Generera registret (som tidigare)
-        GenerateRegistry(context, expansionPairs);
+        // Runtime reflection in SemanticRegistry handles the actual wiring.
+        // The generator's role is compile-time validation only (diagnostics above).
     }
 
     private static string GetMemberKey(ISymbol symbol)
