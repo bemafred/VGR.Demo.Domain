@@ -1,9 +1,14 @@
-# VGR Arkitektur — ADR-Index
+# ADR-001: Indexpolicy för semantiska frågor
 
-## Syfte
+## Status
+Föreslagen
 
-För att upprätthålla konsekvent prestanda och stödja pushdown-strategin används en explicit indexeringspolicy.
+## Kontext
+
+För att upprätthålla konsekvent prestanda och stödja pushdown-strategin behövs en explicit indexeringspolicy.
 Målet är att varje `Domain Query (DQ)` som når databasen ska ha motsvarande index.
+
+## Beslut
 
 ## Principer
 

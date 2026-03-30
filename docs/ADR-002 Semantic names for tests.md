@@ -1,5 +1,5 @@
 
-# ADR-003: Semantiska namn för testprojekt
+# ADR-002: Semantiska namn för testprojekt
 
 ## Status
 Accepterad

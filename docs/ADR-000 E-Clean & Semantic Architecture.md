@@ -13,7 +13,7 @@
 | **Datum**               | 2025-01-24                                 |
 | **Beslutsfattare**      | VGR Architecture Team                      |
 | **Ersätter**            | Ingen (grundläggande)                      |
-| **Relaterade ADR:er**   | ADR-001 (Index), ADR-002 (Semantiska namn) |
+| **Relaterade ADR:er**   | ADR-001 (Indexpolicy), ADR-002 (Semantiska namn), ADR-003 (Felvokabulär), ADR-004 (Semantisk precision), ADR-005 (Verifierbar felsemantik), ADR-006 (Transportöversättning), ADR-007 (Dubbel felkanal) |
 
 ---
 
@@ -136,11 +136,11 @@ OpenTelemetry (traces/metrics/logs) med semantiska taggar: `ruleset`, `period`, 
 | Lager                   | Projekt                                                                              |
 |-------------------------|---------------------------------------------------------------------------------------|
 | **Core Domain**         | `VGR.Domain`, `VGR.Domain.Queries`, `VGR.Domain.Verifications`                        |
-| **Application**         | `VGR.Application`                                                                     |
-| **Semantic Core**       | `VGR.Semantics.Abstractions`, `VGR.Semantics.Linq`, `VGR.Semantics.Generator`        |
-| **Infrastructure**      | `VGR.Infrastructure.EF`                                                               |
-| **Delivery**            | `VGR.Web`, `VGR.Tests`                                                                |
-| **Technical Domain**    | `VGR.Technical`, `VGR.Technical.Testing`                                             |
+| **Application**         | `VGR.Application`, `VGR.Application.Stories`                                           |
+| **Semantic Core**       | `VGR.Semantics.Abstractions`, `VGR.Semantics.Linq`, `VGR.Semantics.Generator`, `VGR.Semantics.Linq.Verifications`, `VGR.Semantics.Linq.Correlations` |
+| **Infrastructure**      | `VGR.Infrastructure.EF`, `VGR.Infrastructure.Diagnostics`                              |
+| **Delivery**            | `VGR.Web`, `VGR.Web.Verifications`                                                    |
+| **Technical Domain**    | `VGR.Technical`, `VGR.Technical.Testing`, `VGR.Technical.Verifications`               |
 | **Quality & Guardrails**| `VGR.Analyzers`, `docs/*`                                                             |
 
 ---
@@ -253,6 +253,11 @@ Avvikelser flaggas av analyzers vid kompilering.
 
 - **ADR-001** – Indexpolicy (databasprestanda)
 - **ADR-002** – Semantiska namn för tester (kodergonomi)
+- **ADR-003** – Domänens semantiska felvokabulär
+- **ADR-004** – Semantisk precision i undantagsfabriker
+- **ADR-005** – Felsemantik är verifierbar domänbeteende
+- **ADR-006** – Delivery översätter domänens felsemantik till transportsemantik
+- **ADR-007** – Dubbel felkanal: domänundantag och Utfall
 
 ---
 
