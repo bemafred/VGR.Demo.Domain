@@ -39,8 +39,8 @@ public sealed class DomainArgumentFormatException(string code, string message) :
 /// Samlad och IntelliSense-vänlig fabrik för domänundantag.
 /// Används för att kasta väl namngivna fel nära regeln som bryts.
 /// <code>
-/// if (slut < start) Throw.Vårdval.EndBeforeStart(start, slut);
-/// if (!Personnummer.TryCreate(raw, out _)) Throw.Person.InvalidPersonnummer(raw);
+/// if (slut &lt; start) Throw.Vårdval.SlutFöreStart(start, slut);
+/// if (!Personnummer.TryParse(raw, out _)) Throw.Personnummer.OgiltigtPersonnummer(raw);
 /// </code>
 /// </summary>
 [StackTraceHidden]
@@ -87,13 +87,6 @@ public static class Throw
     /// </summary>
     public static class Person
     {
-        /// <summary>Ogiltigt personnummer (format/semantik).</summary>
-        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-        public static void OgiltigtPersonnummer(string raw)
-            => throw new DomainValidationException(
-                $"{nameof(Person)}.{nameof(OgiltigtPersonnummer)}",
-                $"Ogiltigt personnummer: '{raw}'.");
-
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void Dubblett(string personnummmer)
             => throw new DomainInvariantViolationException(
@@ -101,10 +94,10 @@ public static class Throw
                 $"Personnummer '{personnummmer}' finns redan.");
 
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-        public static void Saknas(PersonId regionId)
+        public static void Saknas(PersonId personId)
             => throw new DomainAggregateNotFoundException(
                 $"{nameof(Person)}.{nameof(Saknas)}",
-                $"Person med Id {regionId} kan inte hittas."
+                $"Person med Id {personId} kan inte hittas."
             );
 
         /// <summary>Försök att avsluta vårdval när inget aktivt finns.</summary>
@@ -175,6 +168,13 @@ public static class Throw
             => throw new DomainInvariantViolationException(
                 $"{nameof(Vårdval)}.{nameof(VårdvalGällerIntePåHsaId)}",
                 $"Vårdvalet gäller inte på HSA-ID {hsaId} {meddelande}.");
+
+        /// <summary>Nytt vårdvals startdatum ligger före det aktiva vårdvalets start.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void StartFöreAktivtVårdval(DateTimeOffset aktivtStart, DateTimeOffset nyttStart)
+            => throw new DomainInvariantViolationException(
+                $"{nameof(Vårdval)}.{nameof(StartFöreAktivtVårdval)}",
+                $"Nytt vårdval med start {Format(nyttStart)} kan inte starta före det aktiva vårdvalets start {Format(aktivtStart)}.");
 
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void ÖverlappEjTillåtet(SharedKernel.HsaId enhetHsaId, Tidsrymd giltighet)

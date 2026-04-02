@@ -29,7 +29,7 @@ public sealed class Person
         var öppet = AktivtVårdval;
             
         if (öppet is null)
-            Throw.Vårdval.IngetAktivtVårdvalFinns();
+            Throw.Person.IngetAktivtVårdvalAttStänga();
 
         öppet.Avsluta(slut);
         return öppet;
@@ -45,7 +45,7 @@ public sealed class Person
         if (aktivt is not null)
         {
             if (giltighet.Start < aktivt.Period.Start)
-                Throw.Vårdval.SlutFöreStart(aktivt.Period.Start, giltighet.Start);
+                Throw.Vårdval.StartFöreAktivtVårdval(aktivt.Period.Start, giltighet.Start);
 
             AvslutaAktuelltVårdval(DateOnly.FromDateTime(giltighet.Start.DateTime));
         }
