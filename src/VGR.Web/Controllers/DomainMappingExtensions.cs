@@ -47,8 +47,24 @@ public static class DomainMappingExtensions
     private static IActionResult HandleExceptions(ControllerBase self, Exception ex)
         => ex switch
         {
-            DomainInvariantViolationException e => self.Problem(e.Message, statusCode: 409),
-            DomainArgumentFormatException e => self.Problem($"{e.Code}: {e.Message}", statusCode: 400),
+            DomainArgumentFormatException e        => DomainProblem(self, e, 400),
+            DomainValidationException e            => DomainProblem(self, e, 422),
+            DomainAggregateNotFoundException e     => DomainProblem(self, e, 404),
+            DomainInvariantViolationException e    => DomainProblem(self, e, 409),
+            DomainInvalidStateTransitionException e => DomainProblem(self, e, 409),
+            DomainConcurrencyConflictException e   => DomainProblem(self, e, 409),
+            DomainIdempotencyViolationException e  => DomainProblem(self, e, 409),
             _ => self.Problem("Internt fel", statusCode: 500)
         };
+
+    private static IActionResult DomainProblem(ControllerBase self, DomainException ex, int statusCode)
+    {
+        var problem = new ProblemDetails
+        {
+            Status = statusCode,
+            Detail = ex.Message,
+            Extensions = { ["code"] = ex.Code }
+        };
+        return new ObjectResult(problem) { StatusCode = statusCode };
+    }
 }
