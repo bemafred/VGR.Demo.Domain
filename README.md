@@ -107,15 +107,86 @@ Några av de viktigaste principerna som demonstreras:
   - Vi undviker duplicerad logik som `Start <= t && (Slut == null || t < Slut)` spridd i LINQ.
   - Semantisk persistens är avancerat men behöver normalt inte hanteras av utvecklare.
 
-- **Felhantering med `Throw` och `Utfall`**  
-  - `Throw` för invariants och fel som ska bryta exekveringen.
-  - `Utfall<T>` för icke-exceptionella misslyckanden och tydliga resultat i interaktorer.
+- **Felhantering med `Throw`, `Utfall` och centraliserad HTTP-mappning**  
+  - `Throw` – domänspråklig undantagsfabrik med semantisk hierarki.
+  - `Utfall<T>` – resultattyp för icke-exceptionella misslyckanden.
+  - `DomainMappingExtensions.Map()` – centraliserad översättning av domänfel till HTTP-statuskoder.
+  - Se **sektion 5** för fullständig beskrivning av hela pipelinen.
 
 - **Guardrails via analyzers**  
   Roslyn-regler säkerställer att domänen inte smittas av infrastrukturnära kod (t.ex. publika set, muterbara samlingar).
 
 - **Kodergonomi**  
   Kod ska kännas som domänprosa, inte som ramverkskonfiguration. Se `docs/KODERGONOMI.md`.
+
+---
+
+## 5. Felhantering – från domän till HTTP
+
+Arkitekturen har en genomtänkt pipeline för fel och undantag som sträcker sig från domänens invarianter hela vägen till HTTP-svar. Tre komponenter samverkar:
+
+### Throw – domänspråklig undantagsfabrik
+
+`Throw` är en statisk fasadklass med nestade domänklasser som kastar semantiskt namngivna undantag:
+
+```csharp
+Throw.Vårdval.ÖverlappEjTillåtet(enhetHsaId, giltighet);
+Throw.Person.Dubblett(personnummer);
+Throw.Region.Saknas(regionId);
+```
+
+Varje undantag har en **stabil maskinläsbar kod** (t.ex. `"Vårdval.ÖverlappEjTillåtet"`) och ärver från `DomainException`. Hierarkin klassificerar felet semantiskt:
+
+| Undantagstyp | Betydelse |
+|---|---|
+| `DomainInvariantViolationException` | En affärsregel har brutits |
+| `DomainInvalidStateTransitionException` | Otillåten tillståndsövergång |
+| `DomainValidationException` | Ogiltigt värde (format/semantik) |
+| `DomainAggregateNotFoundException` | Aggregat/objekt saknas |
+| `DomainConcurrencyConflictException` | Optimistisk samtidighetskonflikt |
+| `DomainIdempotencyViolationException` | Kommandot har redan utförts |
+| `DomainArgumentFormatException` | Felaktigt format på indata |
+
+Att hierarkin finns är inte ceremoni – den möjliggör den centraliserade HTTP-mappningen längre ut i stacken.
+
+### Utfall\<T\> – resultattyp utan undantag
+
+`Utfall<T>` kompletterar `Throw` för situationer där misslyckande är förväntat och inte bör bryta exekveringen:
+
+```csharp
+// Dubblettcheck i interaktor – förväntat utfall, inget undantag
+if (dubblett)
+    return Utfall<PersonId>.Fail("Personnummer redan registrerat");
+
+return Utfall<PersonId>.Ok(person.Id);
+```
+
+**Tumregel:** `Throw` för invarianter och strukturella fel. `Utfall.Fail()` för affärsmässigt rimliga nekanden.
+
+### DomainMappingExtensions.Map() – centraliserad HTTP-mappning
+
+I delivery-lagret binder `Map()`-extensionmetoden ihop allt. Varje controller-action delegerar till `Map()`, som:
+1. Exekverar interaktorn i en try/catch
+2. Översätter `Utfall` och domänundantag till HTTP-statuskoder
+
+```csharp
+// Controller – tunn, ingen egen felhantering
+[HttpPost]
+public async Task<IActionResult> Skapa(Guid personId, [FromBody] SkapaVårdvalDto body, CancellationToken ct)
+    => await this.Map(ct => interactor.ProcessAsync(command, ct), ct);
+```
+
+Mappningen:
+
+| Källa | HTTP-status | Betydelse |
+|---|---|---|
+| `Utfall.Ok(value)` | 200 OK | Lyckad operation |
+| `Utfall.Fail(error)` | 400 Bad Request | Förväntat affärsfel |
+| `DomainInvariantViolationException` | 409 Conflict | Tillståndskonflikt |
+| `DomainArgumentFormatException` | 400 Bad Request | Formatfel i indata |
+| Övriga undantag | 500 Internal Server Error | Oväntat fel |
+
+Genom att all översättning sker på **ett ställe** blir controllers tunna, felhanteringen konsekvent, och nya undantagstyper kan mappas centralt utan att ändra i varje endpoint.
 
 ---
 
@@ -147,9 +218,8 @@ Några av de viktigaste principerna som demonstreras:
 - **Semantic Core** är den enda platsen där domänens språk översätts till EF-vänliga uttryck:
   - domänmetoder/predikat annoteras via `SemanticQueryAttribute`/`ExpansionForAttribute`,
   - `VGR.Semantics.Linq` och `VGR.Semantics.Generator` bygger upp ett centralt semantik-register.
-- **Felhantering sker med `Throw` eller `Utfall`.**  
-  - `Throw` används för invariants och fel som *ska* bryta exekveringen – både i domän och applikationslager.  
-  - `Utfall` kan användas när det finns skäl att undvika undantag, t.ex. av prestandaskäl eller för att uttrycka icke-exceptionella misslyckanden i interaktorer.
+- **Felhantering sker med `Throw`, `Utfall` och centraliserad `Map()`.**  
+  Hela pipelinen – från domänens `Throw`-hierarki via `Utfall<T>` till HTTP-statuskoder – beskrivs i **sektion 5**.
 - **Application** implementerar interaktorer som anropar domänen, utnyttjar Semantic Core för queries och returnerar `Utfall`/kastar vid behov.
 - **Infrastructure.EF** ansvarar för mappning, persistens och pushdown-konfiguration (Read/Write DbContexts).
 - **Delivery** (Web + E2E) exponerar användningsfall via HTTP och testar hela kedjan från API till DB.
@@ -274,7 +344,7 @@ Projekt **VGR.Analyzers** innehåller Roslyn-regler som appliceras på `VGR.Doma
 
 Se `ANALYZER_REGLER.md`. Severity konfigureras i `.editorconfig` (default = error).
 
-## 6. Var ska jag läsa mer?
+## 7. Var ska jag läsa mer?
 
 - **Övergripande analys** – `docs/ANALYS.md`  
   Hur arkitekturen bedöms (styrkor/svagheter, mätpunkter).
