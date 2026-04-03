@@ -45,7 +45,7 @@ public class SmokeTests
         var personId = resP.Value!; // Behåll som PersonId
 
         // Skapa vårdval
-        var skapaVv = new SkapaVårdvalInteractor(write, clock);
+        var skapaVv = new SkapaVårdvalInteractor(read, write, clock);
         var cmdV = new SkapaVårdvalCmd(personId, "HSA-ENHET-1", new DateOnly(2024,1,1), null);
         var resV = await skapaVv.ProcessAsync(cmdV, ct);
         Assert.True(resV.IsSuccess);
@@ -71,7 +71,7 @@ public class SmokeTests
         write.Regioner.Add(region);
         await write.SaveChangesAsync(ct);
 
-        var interactor = new SkapaVårdvalInteractor(write, clock);
+        var interactor = new SkapaVårdvalInteractor(read, write, clock);
 
         var ok = await interactor.ProcessAsync(
             new SkapaVårdvalCmd(person.Id, "HSA-ENHET-1", new DateOnly(2024,1,1), new DateOnly(2024,12,31)),

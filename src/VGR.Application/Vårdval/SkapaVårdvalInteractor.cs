@@ -12,7 +12,7 @@ namespace VGR.Application.Vårdval;
 public sealed record SkapaVårdvalCmd(PersonId PersonId, string EnhetsHsaId, DateOnly Start, DateOnly? Slut);
 
 /// <summary>Interaktor: skapar ett nytt vårdval. Avslutar eventuellt aktivt vårdval. Kastar vid överlapp eller saknad person.</summary>
-public sealed class SkapaVårdvalInteractor(WriteDbContext write, IClock clock)
+public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext write, IClock clock)
 {
     /// <summary>Utför kommandot. Kastar vid saknad person, ogiltigt HSA-ID eller överlappande perioder.</summary>
     public async Task<Utfall<VårdvalId>> ProcessAsync(SkapaVårdvalCmd cmd, CancellationToken ct)
@@ -20,6 +20,18 @@ public sealed class SkapaVårdvalInteractor(WriteDbContext write, IClock clock)
         // 1) Validera indata
         var enhet = HsaId.Tolka(cmd.EnhetsHsaId);
         var giltighet = Tidsrymd.Skapa(cmd.Start, cmd.Slut);
+
+        // ADR-010 §4: Pushdown-överlappskontroll mot alla vårdval (inklusive historiska).
+        // .Where() triggar semantisk omskrivning (Överlappar → SQL) och returnerar EF-queryable.
+        var överlapp = await read.Vårdval
+            .WithSemantics()
+            .Where(v => v.PersonId == cmd.PersonId
+                     && v.EnhetsHsaId == enhet
+                     && v.Period.Överlappar(giltighet))
+            .AnyAsync(ct);
+
+        if (överlapp)
+            Throw.Vårdval.ÖverlappEjTillåtet(enhet, giltighet);
 
         // 2) Ladda personen
         var person = await write.Personer

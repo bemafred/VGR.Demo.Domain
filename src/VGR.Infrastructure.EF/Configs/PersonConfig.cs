@@ -36,10 +36,10 @@ internal sealed class PersonConfig : IEntityTypeConfiguration<Person>
         nav.SetField(nameof(Person.Vårdval));
         nav.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-        // Ensure the shadow FK RegionId exists with a known type before indexing it
-        b.Property<RegionId>(nameof(RegionId))
+        b.Property(x => x.RegionId)
          .HasConversion(v => v.Value, v => new RegionId(v));
 
-        b.HasIndex(nameof(RegionId), nameof(Personnummer)).IsUnique(false);
+        // ADR-010 §4: Personnummer unikt per Region — sista skyddet under samtidighet
+        b.HasIndex(x => new { x.RegionId, x.Personnummer }).IsUnique();
     }
 }

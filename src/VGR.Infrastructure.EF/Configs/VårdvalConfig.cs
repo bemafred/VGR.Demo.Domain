@@ -35,8 +35,12 @@ internal sealed class VårdvalConfig : IEntityTypeConfiguration<Vårdval>
          .ValueGeneratedOnAddOrUpdate()
          .HasDefaultValue(new byte[] { 0 });
 
-        // EF Core 8: cannot include complex members in HasIndex
-        // Keep a simpler composite index if useful for typical lookups:
         b.HasIndex(v => new { v.PersonId, v.EnhetsHsaId });
+
+        // ADR-010 §4: Högst ett aktivt (tillsvidare) vårdval per person.
+        // EF8 ComplexProperty hindrar HasIndex på Period.Slut — kolumnnamnet refereras direkt.
+        b.HasIndex(v => v.PersonId)
+         .IsUnique()
+         .HasFilter("Slut IS NULL");
     }
 }

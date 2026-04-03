@@ -1,7 +1,7 @@
 # ADR-010: Persistenslagret uttrycker relationella garantier för systeminvarianter
 
 ## Status
-Föreslagen
+Accepterad
 
 ## Kontext
 
@@ -102,16 +102,28 @@ Applikationslagret får fortfarande göra billig pushdown-check för snabb respo
 
 Om regeln är att en person bara får ha **ett öppet/aktivt vårdval åt gången**, ska EF-modellen uttrycka detta med ett **filtrerat unikt index** över `PersonId` där `Slut IS NULL` eller providerspecifik motsvarighet.
 
+**Känd begränsning:** `Period` är konfigurerad som `ComplexProperty` i EF 8, och EF:s `HasIndex` kan inte referera kolumner inuti en komplex typ. Det innebär att det filtrerade indexet inte kan uttryckas via Fluent API i nuvarande version. Tillåtna vägar framåt:
+
+- rå SQL i en migration (`migrationBuilder.Sql("CREATE UNIQUE INDEX ...")`)
+- denormalisering av `Slut` till en egen skuggkolumn för indexändamål
+- avvakta framtida EF-stöd för index på komplexa typers kolumner
+
+Valet av väg dokumenteras när produktionsprovider väljs (se §5).
+
 Detta ersätter inte domänens semantik, men det gör den relationella garantin explicit.
 
 #### Historiska överlapp
+
+Domänen kontrollerar överlapp i `Person.SkapaVårdval` genom att inspektera hela `Vårdval`-collectionen i minnet. Den nuvarande laddningsstrategin i `SkapaVårdvalInteractor` laddar dock **enbart aktiva vårdval** (via `Where(v => v.ÄrAktivt)`). Det innebär att historiska överlapp — mot redan avslutade vårdval på samma enhet — **inte fångas** av den nuvarande verkställighetsstrategin.
+
+Detta är ett medvetet val givet pushdown-principen, men konsekvensen måste vara explicit: antingen accepteras att historisk överlappkontroll inte är aktiv, eller så utökas laddningsstrategin till att inkludera relevanta historiska vårdval för den aktuella enheten.
 
 Om en regel går längre än “högst ett öppet vårdval” och i stället förbjuder **historiska överlapp över hela tidslinjen**, ska detta **inte** lösas genom att göra full hydrering till standard.
 
 I sådant fall ska regeln uttryckas genom någon av följande explicita strategier:
 
-- semantisk precheck i fråga före mutation
-- providerspecifik databasfunktionalitet om sådan väljs
+- semantisk precheck i fråga före mutation (t.ex. `AnyAsync` med `Överlappar`-expansion)
+- providerspecifik databasfunktionalitet (t.ex. SQL Server temporal tables eller exclusion constraints)
 - annan uttrycklig persistence policy definierad i separat ADR
 
 ### 5. Concurrency-strategin ska vara explicit och provider-medveten
@@ -150,7 +162,9 @@ Sådan logik är en testadapter, inte en del av produktionsinfrastrukturen, och 
 
 När en property redan finns i domänmodellen ska EF-konfigurationen i första hand referera den explicit och typat.
 
-Strängbaserad eller shadow-baserad konfiguration ska reserveras för fall där modellen verkligen kräver det.
+Shadow properties och strängbaserad konfiguration är legitima när domänmodellen **medvetet** inte exponerar relationen — exempelvis en rent infrastrukturell koppling som saknar domänbetydelse.
+
+När propertyn däremot redan finns i domänmodellen ska EF-konfigurationen referera den explicit. Exempelvis har `Person.RegionId` en tydlig domänroll (identitetskontext, domänhändelser) och ska konfigureras via `b.Property(x => x.RegionId)`, inte som shadow property.
 
 Målet är:
 
@@ -176,7 +190,7 @@ Målet är:
 
 ## Avgränsning
 
-Detta ADR beslutar **inte**:
+Denna ADR beslutar **inte**:
 
 - att hela aggregat alltid ska laddas
 - att alla domänregler måste översättas till databaskonstraints

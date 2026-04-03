@@ -22,7 +22,7 @@ public class SkapaVårdvalStories
         var clock = new TestClock();
         var ct = CancellationToken.None;
 
-        var interactor = new SkapaVårdvalInteractor(h.Write, clock);
+        var interactor = new SkapaVårdvalInteractor(h.Read, h.Write, clock);
         var act = () => interactor.ProcessAsync(
             new SkapaVårdvalCmd(new PersonId(Guid.NewGuid()), "HSA-ENHET-1", new DateOnly(2024, 1, 1), null), ct);
 
@@ -41,7 +41,7 @@ public class SkapaVårdvalStories
         h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync(ct);
 
-        var interactor = new SkapaVårdvalInteractor(h.Write, clock);
+        var interactor = new SkapaVårdvalInteractor(h.Read, h.Write, clock);
         var act = () => interactor.ProcessAsync(
             new SkapaVårdvalCmd(person.Id, "", new DateOnly(2024, 1, 1), null), ct);
 

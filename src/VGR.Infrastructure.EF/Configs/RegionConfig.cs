@@ -16,9 +16,10 @@ internal sealed class RegionConfig : IEntityTypeConfiguration<Region>
          .ValueGeneratedNever();
 
         // Map collection navigation via property and set backing field
+        // ADR-010 §8: Person.RegionId är en explicit domänegenskap — referera typat
         b.HasMany(r => r.AllaPersoner)
          .WithOne()
-         .HasForeignKey(nameof(RegionId))
+         .HasForeignKey(p => p.RegionId)
          .OnDelete(DeleteBehavior.Restrict);
 
         b.Property(x => x.RowVersion)
