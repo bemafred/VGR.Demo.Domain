@@ -1,7 +1,7 @@
 # ADR-011: Compile-time verifiering av semantiska expansioner
 
 ## Status
-Föreslagen
+Genomförd
 
 ## Kontext
 

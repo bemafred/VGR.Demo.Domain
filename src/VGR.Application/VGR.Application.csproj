@@ -4,7 +4,4 @@
         <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj"/>
         <ProjectReference Include="..\VGR.Infrastructure.EF\VGR.Infrastructure.EF.csproj"/>
     </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\VGR.Semantics.Generator\VGR.Semantics.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
-    </ItemGroup>
 </Project>

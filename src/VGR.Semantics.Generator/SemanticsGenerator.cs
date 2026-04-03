@@ -1,17 +1,32 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 
 namespace VGR.Semantics.Generator;
 
+/// <summary>
+/// Compile-time validering av semantiska expansioner (ADR-011).
+/// <para>
+/// Körs som analyzer i <c>VGR.Infrastructure.EF</c> — det enda projektet som ser båda sidor:
+/// <list type="bullet">
+///   <item><c>[SemanticQuery]</c> i domäntyper (via metadata-referens till VGR.Domain)</item>
+///   <item><c>[ExpansionFor]</c> i lokala expansionsfiler (via syntax trees)</item>
+/// </list>
+/// </para>
+/// <para>
+/// Diagnostiker:
+/// <list type="bullet">
+///   <item><b>SEMANTICS001</b> — <c>[SemanticQuery]</c>-medlem utan matchande <c>[ExpansionFor]</c> (Error)</item>
+///   <item><b>SEMANTICS002</b> — <c>[ExpansionFor]</c> som pekar på icke-<c>[SemanticQuery]</c>-medlem (Warning)</item>
+/// </list>
+/// </para>
+/// <para>Runtime wiring hanteras av <c>SemanticRegistry.DiscoverExpansions()</c> — generatorn är enbart diagnostik.</para>
+/// </summary>
 [Generator]
 public sealed class SemanticGenerator : IIncrementalGenerator
 {
-    // Diagnostiska beskrivningar
     private static readonly DiagnosticDescriptor MissingExpansionRule = new(
         id: "SEMANTICS001",
         title: "Saknad expansion för semantisk query",
@@ -32,62 +47,36 @@ public sealed class SemanticGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Samla alla metoder med [ExpansionFor]
+        // [ExpansionFor]-metoder hittas via syntax trees (lokala filer i Infrastructure.EF)
         var expansionMethods = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (node, _) => node is MethodDeclarationSyntax { AttributeLists.Count: > 0 },
                 transform: static (ctx, _) => (MethodDeclarationSyntax)ctx.Node)
             .Where(static m => m is not null);
 
-        // Samla alla metoder/properties med potentiell [SemanticQuery]
-        var semanticMembers = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: static (node, _) => node is MemberDeclarationSyntax { AttributeLists.Count: > 0 },
-                transform: static (ctx, _) => ctx.Node)
-            .Where(static m => m is not null);
-
-        var compilation = context.CompilationProvider;
-        var combined = compilation
-            .Combine(expansionMethods.Collect())
-            .Combine(semanticMembers.Collect());
+        var combined = context.CompilationProvider
+            .Combine(expansionMethods.Collect());
 
         context.RegisterSourceOutput(combined, static (spc, source) =>
-            Execute(spc, source.Left.Left, source.Left.Right, source.Right));
+            Execute(spc, source.Left, source.Right));
     }
 
     private static void Execute(
         SourceProductionContext context,
         Compilation compilation,
-        ImmutableArray<MethodDeclarationSyntax> expansionMethodDeclarations,
-        ImmutableArray<SyntaxNode> semanticMemberDeclarations)
+        ImmutableArray<MethodDeclarationSyntax> expansionMethodDeclarations)
     {
-        var expansionForAttrName = "VGR.Semantics.Abstractions.ExpansionForAttribute";
-        var expansionAttr = compilation.GetTypeByMetadataName(expansionForAttrName);
-
-        var semanticQueryAttrName = "VGR.Semantics.Abstractions.SemanticQueryAttribute";
-        var semanticAttr = compilation.GetTypeByMetadataName(semanticQueryAttrName);
+        var expansionAttr = compilation.GetTypeByMetadataName("VGR.Semantics.Abstractions.ExpansionForAttribute");
+        var semanticAttr = compilation.GetTypeByMetadataName("VGR.Semantics.Abstractions.SemanticQueryAttribute");
 
         if (expansionAttr is null || semanticAttr is null) return;
 
-        // Bygg register över alla [SemanticQuery]-medlemmar
-        var semanticMembersDict = new Dictionary<string, (ISymbol Symbol, Location Location)>();
+        // 1) Bygg register över alla [SemanticQuery]-medlemmar via metadata-scanning.
+        //    Dessa lever i refererade assemblies (VGR.Domain) — inte i lokala syntax trees.
+        var semanticMembersDict = new Dictionary<string, ISymbol>();
+        DiscoverSemanticMembers(compilation, semanticAttr, semanticMembersDict);
 
-        foreach (var memberDecl in semanticMemberDeclarations)
-        {
-            var model = compilation.GetSemanticModel(memberDecl.SyntaxTree);
-            var symbol = model.GetDeclaredSymbol(memberDecl);
-
-            if (symbol is null) continue;
-
-            if (symbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, semanticAttr)))
-            {
-                var key = GetMemberKey(symbol);
-                semanticMembersDict[key] = (symbol, symbol.Locations.FirstOrDefault() ?? Location.None);
-            }
-        }
-
-        // Bygg register över alla [ExpansionFor]-mappningar
-        var expansionPairs = new List<(ISymbol Target, IMethodSymbol Factory)>();
+        // 2) Bygg register över alla [ExpansionFor]-mappningar via syntax trees (lokala filer)
         var mappedSemanticMembers = new HashSet<string>();
 
         foreach (var methodDecl in expansionMethodDeclarations)
@@ -108,14 +97,10 @@ public sealed class SemanticGenerator : IIncrementalGenerator
 
                 if (candidates.Length == 0)
                 {
-                    // Target medlem finns inte alls
                     var attrLocation = attr.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? methodDecl.GetLocation();
                     context.ReportDiagnostic(Diagnostic.Create(
-                        OrphanedExpansionRule,
-                        attrLocation,
-                        factory.Name,
-                        targetType.Name,
-                        targetName));
+                        OrphanedExpansionRule, attrLocation,
+                        factory.Name, targetType.Name, targetName));
                     continue;
                 }
 
@@ -123,162 +108,90 @@ public sealed class SemanticGenerator : IIncrementalGenerator
 
                 if (semanticCandidate is null)
                 {
-                    // Expansion pekar på medlem utan [SemanticQuery]
                     var attrLocation = attr.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? methodDecl.GetLocation();
                     context.ReportDiagnostic(Diagnostic.Create(
-                        OrphanedExpansionRule,
-                        attrLocation,
-                        factory.Name,
-                        targetType.Name,
-                        targetName));
+                        OrphanedExpansionRule, attrLocation,
+                        factory.Name, targetType.Name, targetName));
                     continue;
                 }
 
-                expansionPairs.Add((semanticCandidate, factory));
                 mappedSemanticMembers.Add(GetMemberKey(semanticCandidate));
             }
         }
 
-        // Rapportera saknade expansions för [SemanticQuery]-medlemmar
-        foreach (var (key, (symbol, location)) in semanticMembersDict)
+        // 3) Rapportera saknade expansioner för [SemanticQuery]-medlemmar
+        foreach (var (key, symbol) in semanticMembersDict)
         {
             if (!mappedSemanticMembers.Contains(key))
             {
+                // Metadata-symboler har inga source locations — rapportera utan plats
                 context.ReportDiagnostic(Diagnostic.Create(
-                    MissingExpansionRule,
-                    location,
-                    symbol.ContainingType.Name,
-                    symbol.Name));
+                    MissingExpansionRule, Location.None,
+                    symbol.ContainingType.Name, symbol.Name));
             }
         }
+    }
 
-        // Runtime reflection in SemanticRegistry handles the actual wiring.
-        // The generator's role is compile-time validation only (diagnostics above).
+    /// <summary>
+    /// Skannar alla refererade assemblies (ej framework) efter typer med [SemanticQuery]-medlemmar.
+    /// Hittar symboler via metadata — inte syntax trees — och fungerar därför cross-project.
+    /// </summary>
+    private static void DiscoverSemanticMembers(
+        Compilation compilation,
+        INamedTypeSymbol semanticAttr,
+        Dictionary<string, ISymbol> result)
+    {
+        // Skanna kompilationens egna typer + alla refererade assemblies
+        var allAssemblies = new List<IAssemblySymbol> { compilation.Assembly };
+        allAssemblies.AddRange(
+            compilation.References
+                .Select(r => compilation.GetAssemblyOrModuleSymbol(r))
+                .OfType<IAssemblySymbol>());
+
+        foreach (var assembly in allAssemblies)
+        {
+            var name = assembly.Name;
+            if (name.StartsWith("System") || name.StartsWith("Microsoft") ||
+                name.StartsWith("netstandard") || name.StartsWith("mscorlib") ||
+                name.StartsWith("xunit") || name.StartsWith("FluentAssertions"))
+                continue;
+
+            ScanNamespace(assembly.GlobalNamespace, semanticAttr, result);
+        }
+    }
+
+    private static void ScanNamespace(
+        INamespaceSymbol ns,
+        INamedTypeSymbol semanticAttr,
+        Dictionary<string, ISymbol> result)
+    {
+        foreach (var type in ns.GetTypeMembers())
+            ScanType(type, semanticAttr, result);
+
+        foreach (var child in ns.GetNamespaceMembers())
+            ScanNamespace(child, semanticAttr, result);
+    }
+
+    private static void ScanType(
+        INamedTypeSymbol type,
+        INamedTypeSymbol semanticAttr,
+        Dictionary<string, ISymbol> result)
+    {
+        foreach (var member in type.GetMembers())
+        {
+            if (IsSemanticMember(member, semanticAttr))
+                result[GetMemberKey(member)] = member;
+        }
+
+        // Skanna nästlade typer
+        foreach (var nested in type.GetTypeMembers())
+            ScanType(nested, semanticAttr, result);
     }
 
     private static string GetMemberKey(ISymbol symbol)
     {
         var typeName = symbol.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         return $"{typeName}::{symbol.Name}";
-    }
-
-    private static void GenerateRegistry(
-        SourceProductionContext context,
-        List<(ISymbol Target, IMethodSymbol Factory)> pairs)
-    {
-        var sb = new StringBuilder();
-
-        sb.AppendLine("using System;");
-        sb.AppendLine("using System.Linq.Expressions;");
-        sb.AppendLine("using System.Reflection;");
-        sb.AppendLine("using System.Diagnostics.CodeAnalysis;");
-        sb.AppendLine();
-        sb.AppendLine("namespace VGR.Semantics.Linq;");
-        sb.AppendLine();
-        sb.AppendLine("internal static partial class SemanticRegistry");
-        sb.AppendLine("{");
-
-        // AOT-säker MethodInfo cache
-        sb.AppendLine("  /// <summary>AOT-safe MethodInfo cache via expression extraction.</summary>");
-        sb.AppendLine("  private static class MethodCache");
-        sb.AppendLine("  {");
-
-        int cacheIndex = 0;
-        var cacheNames = new List<string>();
-
-        foreach (var (target, factory) in pairs)
-        {
-            var cacheName = $"Method_{cacheIndex++}";
-            cacheNames.Add(cacheName);
-
-            var containingType = target switch
-            {
-                IMethodSymbol m => m.ContainingType,
-                IPropertySymbol p => p.ContainingType,
-                _ => throw new InvalidOperationException("Unexpected symbol type")
-            };
-
-            var tType = containingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                .Replace("global::", "");
-
-            sb.AppendLine($"    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof({tType}))]");
-
-            switch (target)
-            {
-                case IPropertySymbol prop:
-                    GeneratePropertyCache(sb, cacheName, tType, prop);
-                    break;
-
-                case IMethodSymbol method:
-                    GenerateMethodCache(sb, cacheName, tType, method);
-                    break;
-            }
-
-            sb.AppendLine();
-        }
-
-        sb.AppendLine("  }");
-        sb.AppendLine();
-
-        // Statisk konstruktor - registrering
-        sb.AppendLine("  static SemanticRegistry()");
-        sb.AppendLine("  {");
-
-        for (int i = 0; i < pairs.Count; i++)
-        {
-            var (_, factory) = pairs[i];
-            var fType = factory.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                .Replace("global::", "");
-
-            sb.AppendLine($"    _registry[MethodCache.{cacheNames[i]}] = {fType}.{factory.Name}();");
-        }
-
-        sb.AppendLine("  }");
-        sb.AppendLine("}");
-
-        context.AddSource("SemanticRegistry.g.cs", sb.ToString());
-    }
-
-    private static void GeneratePropertyCache(StringBuilder sb, string cacheName, string typeName, IPropertySymbol property)
-    {
-        var returnType = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-            .Replace("global::", "");
-
-        sb.AppendLine($"    internal static readonly MethodInfo {cacheName} =");
-        sb.AppendLine($"      ((PropertyInfo)((MemberExpression)");
-        sb.AppendLine($"        ((Expression<Func<{typeName}, {returnType}>>)(x => x.{property.Name})).Body)");
-        sb.AppendLine($"        .Member).GetGetMethod(nonPublic: true)!;");
-    }
-
-    private static void GenerateMethodCache(StringBuilder sb, string cacheName, string typeName, IMethodSymbol method)
-    {
-        if (method.Parameters.Length == 0)
-        {
-            // Parameterless method - använd Action
-            sb.AppendLine($"    internal static readonly MethodInfo {cacheName} =");
-            sb.AppendLine($"      ((MethodCallExpression)");
-            sb.AppendLine($"        ((Expression<Action<{typeName}>>)(x => x.{method.Name}())).Body)");
-            sb.AppendLine($"        .Method;");
-        }
-        else
-        {
-            // Method med parametrar
-            var paramTypes = method.Parameters
-                .Select(p => p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", ""))
-                .ToList();
-
-            var returnType = method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                .Replace("global::", "");
-
-            var paramNames = string.Join(", ", Enumerable.Range(0, method.Parameters.Length).Select(i => $"p{i}"));
-            var allTypes = string.Join(", ", new[] { typeName }.Concat(paramTypes).Append(returnType));
-
-            sb.AppendLine($"    internal static readonly MethodInfo {cacheName} =");
-            sb.AppendLine($"      ((MethodCallExpression)");
-            sb.AppendLine($"        ((Expression<Func<{allTypes}>>)");
-            sb.AppendLine($"          ((x, {paramNames}) => x.{method.Name}({paramNames}))).Body)");
-            sb.AppendLine($"        .Method;");
-        }
     }
 
     private static bool IsSemanticMember(ISymbol member, INamedTypeSymbol semanticAttr) =>
