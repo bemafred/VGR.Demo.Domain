@@ -9,7 +9,7 @@
 | Fält                    | Värde                                     |
 |-------------------------|--------------------------------------------|
 | **Status**              | Accepterad                                 |
-| **Version**             | 1.0.0                                      |
+| **Version**             | 1.1.0                                      |
 | **Datum**               | 2025-01-24                                 |
 | **Beslutsfattare**      | VGR Architecture Team                      |
 | **Ersätter**            | Ingen (grundläggande)                      |
@@ -88,12 +88,20 @@ Aggregat och värdeobjekt uttrycker semantik och invarianter.
 EF-översättare omvandlar domän-API:er (t.ex. `Tidsrymd.Överlappar`) till SQL.  
 En källa till sanning för verksamhetsregler.
 
-### 3. Applikationen som prosa
+### 3. Applikationen som verkställighetsstrategiskt lager
 Interaktorer uttrycker use cases med domänspråk, inte infrastrukturtermer.
+Applikationslagret ansvarar också för att välja **verkställighetsstrategi** — vilken kunskap som hämtas, i vilket exekveringssätt regeln tillämpas, och hur lite data som behöver laddas för att bevara korrekthet. Tillåtna strategier: semantisk pushdown, selektiv hydrering, precheck i fråga, relationell constraint, concurrency-kontroll, full hydrering (se ADR-010).
 
-### 4. Ports & Adapters
-Readers/Writers som applikationsabstraktioner.  
-EF/Dapper/views bakom portar.
+### 4. Epistemisk separation utan ceremoniella portar
+E-Clean definierar separation genom **kunskapsansvar**, inte genom obligatoriska tekniska mellanlager.
+
+Det betyder:
+- domänen äger sanningen
+- semantiklagret äger översättbarheten
+- applikationslagret äger verkställighetsstrategin
+- infrastrukturen äger persistens- och providerbeteende
+
+Om dessa ansvar hålls rena är arkitekturen korrekt även utan repository-/portlager. Ett direkt beroende från Application till Infrastructure.EF är först ett problem om det introducerar alternativ affärssanning, flyttar regelns innebörd från domänen, eller gör use caset beroende av tekniska artefakter som försvagar domänspråket.
 
 ### 5. Domänkatalog
 Begrepp/Relationer/Regler som C#-attribut, exporterbara till Turtle.  
@@ -117,17 +125,45 @@ OpenTelemetry (traces/metrics/logs) med semantiska taggar: `ruleset`, `period`, 
 
 ---
 
+## Tolkningsram
+
+När en läsare eller ett AI-verktyg utvärderar ett use case ska analysen följa denna ordning:
+
+1. Identifiera om problemet gäller **sanning**, **översättning**, **verkställighetsstrategi** eller **persistensgaranti**.
+2. Avgör om det finns en faktisk alternativ sanning, eller bara ett brott mot ett klassiskt mönster.
+3. Föreslå inte nya lager innan det visats att problemet inte kan lösas inom den befintliga epistemiska modellen.
+4. Bedöm alltid om en föreslagen abstraktion tillför semantisk disciplin eller bara teknisk ceremoni.
+
+**Normerande frågor** i denna arkitektur:
+
+- Var uttrycks sanningen?
+- Var uppstår semantisk drift?
+- Har en alternativ sanning introducerats?
+- Är verkställighetsstrategin explicit?
+- Är den valda strategin proportionerlig mot regelns natur?
+
+**Inte normerande i sig:** Finns ett repository-interface? Finns en fysisk port? Känner Application till EF? Är varje regel verkställd via full aggregatladdning?
+
+Följande default-reflexer ska betraktas som otillförlitliga tills motsatsen visats:
+
+- "lägg till ett repository"
+- "lägg till interfaces för att rena lagren"
+- "ladda hela aggregatet"
+- "ta bort direkt infra-beroende bara för att ett lagerdiagram annars ser renare ut"
+
+En förändring är bara motiverad om den minskar epistemisk drift, ökar förklarbarhet eller ger en verklig korrekthetsvinst.
+
+---
+
 ## Arkitekturlager
 
-[ UI / API ]↓  
-[ Application / Interactors ] —— anropar ——>  
-[ Ports (Readers/Writers) ]  
-↑ ↓  
-[ Domain (DDD) ]  
-[ Infrastructure (EF + Translators, Dapper, Views) ]
+[ UI / API ]↓
+[ Application / Interactors ] —— anropar ——>
+[ Domain (DDD) ] + [ Infrastructure (EF + Semantic Translators) ]
 + [ Domain Catalog (RDF-export) + /domain UI ]
 
 **Nyckelprincip:** *Domänen vet inget om EF/SQL. Infrastruktur lär sig domänspråket.*
+**Separationsprincip:** Epistemisk, inte ceremoniell.
 
 ---
 
@@ -269,6 +305,7 @@ Avvikelser flaggas av analyzers vid kompilering.
 | Version | Datum       | Förändringar                        | Författare            |
 |---------|-------------|--------------------------------------|------------------------|
 | 1.0.0   | 2025-01-24  | Första formella deklarationen        | VGR Architecture       |
+| 1.1.0   | 2026-04-03  | Integrerat ADR-000B: epistemisk separation, tolkningsram, verkställighetsstrategi. ADR-000B borttagen. | VGR Architecture |
 
 ---
 
