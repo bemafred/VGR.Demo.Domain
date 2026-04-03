@@ -1,7 +1,7 @@
 # ADR-004: Semantisk precision i undantagsfabriker
 
 ## Status
-Accepterad
+Genomförd
 
 ## Kontext
 I denna arkitektur är namn inte kosmetik utan bärande semantik.
@@ -36,6 +36,6 @@ Vi behöver därför ett beslut som skyddar precisionen i domänens felvokabulä
 4. **Oklara koder**: `Concurrency.Conflict` och `Idempotency.Duplicate` hade TODO-kommentarer. Åtgärd: koderna använder `nameof`-mönstret konsekvent, TODO:er borttagna.
 
 ## Relaterade dokument
-- `docs/ADR-000 E-Clean & Semantic Architecture.md`
-- `docs/KODERGONOMI.md`
-- `docs/PLACERING.md`
+- `docs/adr/ADR-000 E-Clean & Semantic Architecture.md`
+- `docs/guides/KODERGONOMI.md`
+- `docs/guides/PLACERING.md`

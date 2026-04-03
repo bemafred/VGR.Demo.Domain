@@ -1,7 +1,7 @@
 # ADR-008: Värdeobjektskontrakt, semantiska tolknings-API:er och odefinierade domänoperationer
 
 ## Status
-Accepterad
+Genomförd
 
 ## Kontext
 
@@ -262,11 +262,11 @@ Genomfört:
 
 ## Relaterade dokument
 
-- `docs/ADR-002 Semantic names for tests.md`
-- `docs/ADR-003 Domain failure vocabulary.md`
-- `docs/ADR-004 Semantic precision in exception factories.md`
-- `docs/ADR-005 Verification of domain failure semantics.md`
-- `docs/ADR-006 Delivery translates domain failure semantics to transport semantics.md`
-- `docs/ADR-007 Dual failure channel.md`
-- `docs/POLICY.md`
-- `docs/KODERGONOMI.md`
+- `docs/adr/ADR-002 Semantic names for tests.md`
+- `docs/adr/ADR-003 Domain failure vocabulary.md`
+- `docs/adr/ADR-004 Semantic precision in exception factories.md`
+- `docs/adr/ADR-005 Verification of domain failure semantics.md`
+- `docs/adr/ADR-006 Delivery translates domain failure semantics to transport semantics.md`
+- `docs/adr/ADR-007 Dual failure channel.md`
+- `docs/guides/POLICY.md`
+- `docs/guides/KODERGONOMI.md`

@@ -30,6 +30,6 @@ Vi använder **semantiska suffix** för testprojekt:
 - Verktyg som förväntar sig `.Tests` kan behöva konfigureras (t.ex. dotcover, NCrunch)
 
 ## Relaterade dokument
-- `docs/KODERGONOMI.md` – förklaring av semantiska namn som princip
-- `docs/PLACERING.md` – praktisk tillämpning i projektstrukturen
+- `docs/guides/KODERGONOMI.md` – förklaring av semantiska namn som princip
+- `docs/guides/PLACERING.md` – praktisk tillämpning i projektstrukturen
 - `AI-GUIDANCE.md` – instruktion till AI-verktyg

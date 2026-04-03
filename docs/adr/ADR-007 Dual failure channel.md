@@ -1,7 +1,7 @@
 # ADR-007: Dubbel felkanal — domänundantag och Utfall
 
 ## Status
-Accepterad
+Genomförd
 
 ## Kontext
 
@@ -75,6 +75,6 @@ Om behovet av kedjning uppstår ska det motiveras som en separat ADR.
 - Domänundantag som kastas i interaktorer propagerar tyst — det är upp till Delivery att fånga dem korrekt (se ADR-006, kända avvikelser).
 
 ## Relaterade dokument
-- `docs/ADR-003 Domain failure vocabulary.md` — domänens undantagsvokabulär
-- `docs/ADR-006 Delivery translates domain failure semantics to transport semantics.md` — HTTP-översättning
-- `docs/ADR-000 E-Clean & Semantic Architecture.md` — arkitekturgrund
+- `docs/adr/ADR-003 Domain failure vocabulary.md` — domänens undantagsvokabulär
+- `docs/adr/ADR-006 Delivery translates domain failure semantics to transport semantics.md` — HTTP-översättning
+- `docs/adr/ADR-000 E-Clean & Semantic Architecture.md` — arkitekturgrund

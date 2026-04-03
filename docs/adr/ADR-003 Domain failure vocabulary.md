@@ -1,7 +1,7 @@
 # ADR-003: Domänens semantiska felvokabulär
 
 ## Status
-Accepterad
+Genomförd
 
 ## Kontext
 E-Clean slår fast att domänspråket är primärt och att invariants uttrycks via exceptions.
@@ -37,6 +37,6 @@ Vi behöver därför ett uttryckligt beslut om att domänens fel är en del av d
 - `Throw.Person.OgiltigtPersonnummer` duplicerade `Throw.Personnummer.OgiltigtPersonnummer`. Åtgärd: konsoliderad till `Throw.Personnummer.OgiltigtPersonnummer`.
 
 ## Relaterade dokument
-- `docs/ADR-000 E-Clean & Semantic Architecture.md`
-- `docs/ARCHITECTURE-NAME.md`
-- `docs/POLICY.md`
+- `docs/adr/ADR-000 E-Clean & Semantic Architecture.md`
+- `docs/architecture/ARCHITECTURE-NAME.md`
+- `docs/guides/POLICY.md`

@@ -1,7 +1,7 @@
 # ADR-009: Produktionshärdning av delivery- och infrastrukturlager
 
 ## Status
-Accepterad
+Genomförd
 
 ## Kontext
 
@@ -96,6 +96,19 @@ Följande hör till deployment och drift, inte referensarkitekturen (se ADR-000 
 - Rate limiting och circuit breakers
 - Soft deletes och arkivering
 - Content negotiation
+
+## Implementationsstatus
+
+Alla 8 beslutspunkter är genomförda:
+
+1. Infrastrukturella undantag hanteras i `DomainMappingExtensions.HandleExceptions`
+2. RowVersion finns på Region, Person och Vårdval med `IsConcurrencyToken()` — providerspecifik `IsRowVersion()` appliceras vid val av produktionsprovider (se ADR-010 §5)
+3. `SemanticRegistry` använder `ConcurrentDictionary<MethodInfo, LambdaExpression>`
+4. RFC 9457-kompatibla `ProblemDetails` med Type (URN), Title, Status, Detail, Extensions["code"]
+5. Loggning via `ILogger`: domänfel → Warning, okända infra-fel → Error, avbrutna → Information
+6. `Utfall<T>.Fail(string error, string? code = null)` med valfri maskinläsbar kod
+7. `[ProducesResponseType]` på båda controllers för alla förväntade statuskoder
+8. DTO:er med `[Required]`, `[StringLength]`; `Guid.Empty`-avvisning i controllers
 
 ## Relaterade dokument
 - `docs/adr/ADR-000 E-Clean & Semantic Architecture.md`

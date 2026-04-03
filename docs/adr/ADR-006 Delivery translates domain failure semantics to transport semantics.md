@@ -1,7 +1,7 @@
 # ADR-006: Delivery översätter domänens felsemantik till transportsemantik
 
 ## Status
-Accepterad — med kända avvikelser i implementation
+Genomförd
 
 ## Kontext
 I E-Clean är domänfel domänfel.
@@ -112,10 +112,10 @@ Infrastrukturella undantag (ADR-009):
 Alla felsvar följer RFC 9457 med `Type` (URN), `Title`, `Status`, `Detail` och `Extensions["code"]` (för domänfel).
 
 ## Relaterade dokument
-- `docs/ADR-000 E-Clean & Semantic Architecture.md`
-- `docs/ADR-003 Domain failure vocabulary.md`
-- `docs/ADR-004 Semantic precision in exception factories.md`
-- `docs/ADR-005 Verification of domain failure semantics.md`
-- `docs/ADR-007 Dual failure channel.md`
-- `docs/ADR-009 Produktionshärdning av delivery- och infrastrukturlager.md`
-- `docs/POLICY.md`
+- `docs/adr/ADR-000 E-Clean & Semantic Architecture.md`
+- `docs/adr/ADR-003 Domain failure vocabulary.md`
+- `docs/adr/ADR-004 Semantic precision in exception factories.md`
+- `docs/adr/ADR-005 Verification of domain failure semantics.md`
+- `docs/adr/ADR-007 Dual failure channel.md`
+- `docs/adr/ADR-009 Produktionshärdning av delivery- och infrastrukturlager.md`
+- `docs/guides/POLICY.md`

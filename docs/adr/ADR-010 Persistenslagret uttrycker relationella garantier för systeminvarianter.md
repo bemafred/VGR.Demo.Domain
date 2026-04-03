@@ -1,7 +1,7 @@
 # ADR-010: Persistenslagret uttrycker relationella garantier för systeminvarianter
 
 ## Status
-Accepterad
+Genomförd
 
 ## Kontext
 
@@ -198,6 +198,14 @@ Denna ADR beslutar **inte**:
 - att historiska intervallöverlapp måste lösas med exakt en specifik databasteknik
 
 Detta ADR beslutar **endast** att relationella garantier, concurrency-strategi och ansvarsfördelning mellan applikation och persistens ska vara explicita.
+
+## Implementationsstatus
+
+1. Unikt index på `(RegionId, Personnummer)` i `PersonConfig` — sista skyddet mot dubbletter under samtidighet
+2. Filtrerat unikt index på `(PersonId) WHERE Slut IS NULL` i `VårdvalConfig` — högst ett aktivt vårdval per person
+3. Pushdown-överlappskontroll i `SkapaVårdvalInteractor` via `Överlappar`-expansion mot `ReadDbContext` — täcker historiska vårdval
+4. Explicit FK `HasForeignKey(p => p.RegionId)` i `RegionConfig`
+5. Concurrency tokens på alla aggregat med `IsConcurrencyToken()` — providerspecifik `IsRowVersion()` appliceras vid val av produktionsprovider
 
 ## Relaterade dokument
 

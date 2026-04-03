@@ -1,7 +1,7 @@
 # ADR-005: Felsemantik är verifierbar domänbeteende
 
 ## Status
-Accepterad
+Genomförd
 
 ## Kontext
 Som referensarkitektur måste lösningen inte bara modellera rätt semantik utan också verifiera den.
@@ -33,6 +33,6 @@ Alla kvarvarande Throw-fabriker har nu verifieringstester i `ThrowVerifications.
 Fabriker som saknade semantisk motivering (`Användare.EjAuktoriserad`, `Person.VårdvalSaknas`, `Person.HittadesInte`, `Vårdval.IngetAktivtVårdvalFinns`) har tagits bort i enlighet med ADR-003 och ADR-004.
 
 ## Relaterade dokument
-- `docs/ADR-000 E-Clean & Semantic Architecture.md`
-- `docs/POLICY.md`
-- `docs/ONBOARDING.md`
+- `docs/adr/ADR-000 E-Clean & Semantic Architecture.md`
+- `docs/guides/POLICY.md`
+- `docs/guides/ONBOARDING.md`
