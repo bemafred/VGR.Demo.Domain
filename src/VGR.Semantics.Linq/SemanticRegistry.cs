@@ -68,7 +68,7 @@ internal static class SemanticRegistry
         => _registry.TryGetValue(m, out lambda!);
     
 
-    public static void Register<T1, T2, TResult>(
+    internal static void Register<T1, T2, TResult>(
         Expression<Func<T1, T2, TResult>> domainCall,
         Expression<Func<T1, T2, TResult>> efExpression)
     {
@@ -78,7 +78,7 @@ internal static class SemanticRegistry
         Register(m.Method, efExpression);
     }
 
-    public static void Register<T1, TResult>(
+    internal static void Register<T1, TResult>(
         Expression<Func<T1, TResult>> domainCall,
         Expression<Func<T1, TResult>> efExpression)
     {

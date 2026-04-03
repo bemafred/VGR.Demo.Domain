@@ -12,7 +12,7 @@ public sealed class WriteDbContext : DbContext
     /// <summary>Alla personer.</summary>
     public DbSet<Person> Personer => Set<Person>();
     /// <summary>Alla vårdval.</summary>
-    public DbSet<Vårdval> Vardval => Set<Vårdval>();
+    public DbSet<Vårdval> Vårdval => Set<Vårdval>();
     /// <summary>Alla regioner.</summary>
     public DbSet<Region> Regioner => Set<Region>();
 

@@ -22,7 +22,9 @@ public sealed class SkapaVårdvalInteractor(ReadDbContext read, WriteDbContext w
         var giltighet = Tidsrymd.Skapa(cmd.Start, cmd.Slut);
 
         // ADR-010 §4: Pushdown-överlappskontroll mot alla vårdval (inklusive historiska).
-        // .Where() triggar semantisk omskrivning (Överlappar → SQL) och returnerar EF-queryable.
+        // Detta är en infrastrukturoptimering — ett billigt tidigt avslag utan aggregatladdning.
+        // Domänens egen invariant i Person.SkapaVårdval() är den suveräna kontrollen
+        // och får aldrig tas bort eller förbigås oavsett vad infrastrukturen redan kontrollerat.
         var överlapp = await read.Vårdval
             .WithSemantics()
             .Where(v => v.PersonId == cmd.PersonId

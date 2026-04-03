@@ -18,8 +18,8 @@ public static class TidsrymdExpansions
     [ExpansionFor(typeof(Tidsrymd), nameof(Tidsrymd.Överlappar))]
     public static Expression<Func<Tidsrymd, Tidsrymd, bool>> Överlappar_Expansion()
         => (a, b) =>
-            a.Start < (b.Slut ?? DateTimeOffset.MaxValue) &&
-            b.Start < (a.Slut ?? DateTimeOffset.MaxValue);
+            (b.Slut == null || a.Start < b.Slut) &&
+            (a.Slut == null || b.Start < a.Slut);
 
     /// <summary>Expansion: <see cref="Tidsrymd.ÄrTillsvidare"/> → <c>Slut IS NULL</c>.</summary>
     [ExpansionFor(typeof(Tidsrymd), nameof(Tidsrymd.ÄrTillsvidare))]

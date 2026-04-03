@@ -71,9 +71,6 @@ public sealed class Person
     }
 
     /// <summary>Domänhändelse: ett vårdval har skapats.</summary>
-    public sealed record VårdvalSkapat(RegionId RegionId, PersonId PersonId, Personnummer Personnummer, DateTimeOffset OccurredAt) : IDomainEvent
-    {
-        /// <summary>Unikt händelse-id.</summary>
-        public Guid EventId { get; } = Guid.NewGuid();
-    }
+    public sealed record VårdvalSkapat(RegionId RegionId, PersonId PersonId, Personnummer Personnummer, DateTimeOffset OccurredAt)
+        : DomainEvent(OccurredAt);
 }

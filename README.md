@@ -1,5 +1,7 @@
 # VGR Demo Domain – Epistemic Clean & Semantic Architecture (.NET / DDD / EF / CQRS-light)
 
+*Avancerat och enkelt är bättre än komplicerat och naivt.*
+
 Detta repo är en **referensarkitektur** för hur vi vill bygga domänstyrda system i .NET:
 
 - **Epistemic Clean (E-Clean)** – principerna:  
@@ -35,6 +37,9 @@ Nyckelidé:
 
 > Vi vill kunna garantera domänens integritet samt skriva queries i domänspråk (t.ex. `tidsrymd.Innehåller(tidpunkt)`)
 > och ändå få effektiv SQL, utan att duplicera regler i råa LINQ-uttryck eller komplicerande lagerkonstruktioner.
+> Detta ersätter explicita rituella lager i legacy arkitekturer som Ports & Adapters med mera.
+> Det **tillåter** direkt åtkomst till EF-kontexten, EF-kontexten i sig isolerar lösningen från databasen. 
+> Att byta ORM är därför *inte nödvändigt* - EF Core är en del av .NET och stöds av Microsoft.
 
 Det löses genom:
 

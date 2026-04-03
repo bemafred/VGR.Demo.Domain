@@ -31,8 +31,8 @@ public readonly record struct HsaId
         return true;
     }
 
-    /// <summary>Sant om HSA-ID:t avser en testenhet (innehåller 'T').</summary>
-    public bool IsTest => Value.Contains('T');
+    /// <summary>Sant om HSA-ID:t identifierar en testenhet (VGR-konvention: innehåller 'T').</summary>
+    public bool ÄrTestId => Value.Contains('T');
     /// <inheritdoc/>
     public override string ToString() => Value;
     /// <summary>Implicit konvertering till sträng.</summary>
