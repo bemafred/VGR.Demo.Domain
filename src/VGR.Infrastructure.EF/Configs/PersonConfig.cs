@@ -17,10 +17,14 @@ internal sealed class PersonConfig : IEntityTypeConfiguration<Person>
          .ValueGeneratedNever();
 
         b.Property(x => x.Personnummer)
-         .HasConversion(v => v.Value, v => Personnummer.Parse(v))
+         .HasConversion(v => v.Value, v => Personnummer.Tolka(v))
          .HasMaxLength(12).IsUnicode(false).IsRequired();
 
         b.Property(x => x.SkapadTid).IsRequired();
+        b.Property(x => x.RowVersion)
+         .IsConcurrencyToken()
+         .ValueGeneratedOnAddOrUpdate()
+         .HasDefaultValue(new byte[] { 0 });
 
         // Collection navigation: map the property and use the backing field
         b.HasMany(p => p.AllaVårdval)

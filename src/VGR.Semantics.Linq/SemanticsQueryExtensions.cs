@@ -2,8 +2,10 @@ using System.Linq.Expressions;
 
 namespace VGR.Semantics.Linq;
 
+/// <summary>Extensionmetoder för att aktivera semantisk omskrivning av LINQ-frågor.</summary>
 public static class SemanticQueryExtensions
 {
+    /// <summary>Wrapprar en <see cref="IQueryable{T}"/> så att domänmetoder (t.ex. <c>Innehåller</c>, <c>Överlappar</c>) automatiskt skrivs om till EF-kompatibla uttryck.</summary>
     public static IQueryable<T> WithSemantics<T>(this IQueryable<T> source)
     {
         if (source is null) throw new ArgumentNullException(nameof(source));

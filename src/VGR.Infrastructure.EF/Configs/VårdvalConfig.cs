@@ -30,6 +30,10 @@ internal sealed class VårdvalConfig : IEntityTypeConfiguration<Vårdval>
         });
 
         b.Property(x => x.SkapadTid).IsRequired();
+        b.Property(x => x.RowVersion)
+         .IsConcurrencyToken()
+         .ValueGeneratedOnAddOrUpdate()
+         .HasDefaultValue(new byte[] { 0 });
 
         // EF Core 8: cannot include complex members in HasIndex
         // Keep a simpler composite index if useful for typical lookups:

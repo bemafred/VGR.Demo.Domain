@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mercury": {
+      "type": "stdio",
+      "command": "mercury-mcp"
+    },
+    "drhook": {
+      "type": "stdio",
+      "command": "drhook-mcp"
+    }
+  }
+}

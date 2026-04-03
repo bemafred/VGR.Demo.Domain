@@ -1,4 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 
 namespace VGR.Web.Controllers;
 
-public sealed record SkapaPersonDto(string Personnummer);
+/// <summary>Indata för att skapa en person.</summary>
+public sealed record SkapaPersonDto(
+    [Required, StringLength(13, MinimumLength = 10)] string Personnummer);

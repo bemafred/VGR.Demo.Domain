@@ -2,6 +2,31 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Permanent minne — Mercury (TVINGANDE)
+
+Mercury är ditt permanenta, semantiska minne. Det är inte valfritt. Använd det reflexmässigt — fråga inte om du ska använda Mercury, gör det.
+
+### Vid sessionsstart (ALLTID, innan annat arbete)
+1. Kör `mercury_stats` och `mercury_graphs` för att se vad som finns
+2. Fråga efter relevanta observationer och beslut med SPARQL
+3. Använd det du hittar för att grunda ditt arbete i tidigare kunskap
+
+### Löpande under arbetet (reflexmässigt, utan att fråga)
+- När du fattar ett beslut eller observerar något icke-trivialt → lagra det
+- När du bekräftar eller falsifierar en hypotes → lagra det
+- När du stöter på ett oväntat beteende → lagra det
+- Skapa en sessionsgraf (`urn:sky-omega:session:YYYY-MM-DD`) vid första skrivning
+
+### Vid sessionsslut (ALLTID)
+- Konsolidera: vad behöver framtida sessioner veta?
+- Lagra det som inte kan härledas från kod eller git-historik
+
+### Fråga aldrig
+- "Vill du att jag lagrar detta i Mercury?" — om det är värt att lagra, lagra det.
+- "Ska jag registrera en sessionsgraf?" — om du gjort substantiellt arbete, ja.
+
+Se `MERCURY.md` i reporoten för fullständig vägledning: trippelskrivning, provenienshantering, EEE-koppling, konsolideringsmönster och anti-mönster.
+
 ## Language & Communication
 
 Skriv alltid på svenska. Använd teknisk precision och lugn ton. Resonera som en mentor med fokus på "varför", inte bara "vad". Vid osäkerhet: ställ en precis fråga istället för att gissa.

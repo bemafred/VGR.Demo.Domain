@@ -33,37 +33,26 @@ public sealed class DomainAggregateNotFoundException(string code, string message
 /// <summary>Idempotens nyckel återanvänd (samma kommando har redan körts).</summary>
 public sealed class DomainIdempotencyViolationException(string code, string message) : DomainException(code, message);
 
+/// <summary>Externt argument har ogiltigt format (rå indata → domänvärde misslyckas).</summary>
 public sealed class DomainArgumentFormatException(string code, string message) : DomainException(code, message);
+
+/// <summary>Operationen saknar semantisk mening för det aktuella värdet eller tillståndet.</summary>
+public sealed class DomainUndefinedOperationException(string code, string message) : DomainException(code, message);
 
 /// <summary>
 /// Samlad och IntelliSense-vänlig fabrik för domänundantag.
 /// Används för att kasta väl namngivna fel nära regeln som bryts.
 /// <code>
 /// if (slut &lt; start) Throw.Vårdval.SlutFöreStart(start, slut);
-/// if (!Personnummer.TryParse(raw, out _)) Throw.Personnummer.OgiltigtPersonnummer(raw);
+/// if (!Personnummer.FörsökTolka(raw, out _)) Throw.Personnummer.OgiltigtPersonnummer(raw);
 /// </code>
 /// </summary>
 [StackTraceHidden]
 public static class Throw
 {
-    /// <summary>
-    /// Tillhandahåller domänspecifika undantag relaterade till användaråtgärder.
-    /// </summary>
-    /// <remarks>
-    /// Denna klass är en del av domänens undantagshanteringsmekanism och används för att kasta väldefinierade undantag
-    /// vid obehöriga användaråtgärder inom applikationslagret.
-    /// </remarks>
-    public static class Användare
-    {
-        /// <summmary>Ej auktoriserad användare.</summmary>
-        /// <remarks>För applikationslagret.</remarks>
-        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-        public static void EjAuktoriserad(string meddelande)
-            => throw new UnauthorizedAccessException(meddelande);
-    }
-
     public static class Region
     {
+        /// <summary>Region med angivet id saknas.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void Saknas(RegionId regionId)
             => throw new DomainAggregateNotFoundException(
@@ -82,17 +71,16 @@ public static class Throw
                 $"Ogiltigt personnummer: '{raw}'.");
     }
 
-    /// <summary>
-    /// Tillhandahåller metoder för att kasta undantag relaterade till personspecifik validering och tillståndsövergångar.
-    /// </summary>
     public static class Person
     {
+        /// <summary>Personnummer finns redan inom regionen.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void Dubblett(string personnummmer)
             => throw new DomainInvariantViolationException(
                 $"{nameof(Person)}.{nameof(Dubblett)}",
                 $"Personnummer '{personnummmer}' finns redan.");
 
+        /// <summary>Person med angivet id saknas.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void Saknas(PersonId personId)
             => throw new DomainAggregateNotFoundException(
@@ -107,32 +95,8 @@ public static class Throw
                 $"{nameof(Person)}.{nameof(IngetAktivtVårdvalAttStänga)}",
                 "Det finns inget aktivt vårdval att avsluta.");
 
-        /// <summary>
-        /// VårdvalSaknas
-        /// </summary>
-        /// <param name="meddelande"></param>
-        /// <exception cref="DomainInvalidStateTransitionException"></exception>
-        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-        public static void VårdvalSaknas(string meddelande)
-            => throw new DomainInvalidStateTransitionException(
-                $"{nameof(Person)}.{nameof(VårdvalSaknas)}",
-                meddelande);
-
-        /// <summary>
-        /// Person hittades inte
-        /// </summary>
-        /// <param name="meddelande"></param>
-        /// <exception cref="DomainInvalidStateTransitionException"></exception>
-        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-        public static void HittadesInte(string meddelande)
-            => throw new DomainInvalidStateTransitionException(
-                $"{nameof(Person)}.{nameof(HittadesInte)}",
-                meddelande);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public static class Vårdval
     {
         /// <summary>Slutdatum före startdatum.</summary>
@@ -149,13 +113,6 @@ public static class Throw
                 $"{nameof(Vårdval)}.{nameof(AktivtFinnsRedan)}",
                 "Det finns redan ett aktivt vårdval och ytterligare får inte skapas.");
 
-        /// <summary>Försök skapa ett nytt vårdval fast ett aktivt redan finns.</summary>
-        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-        public static void IngetAktivtVårdvalFinns()
-            => throw new DomainInvariantViolationException(
-                $"{nameof(Vårdval)}.{nameof(IngetAktivtVårdvalFinns)}",
-                "Det finns inget aktivt vårdval.");
-
         /// <summary>Försök att avsluta ett redan avslutat vårdval.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void RedanAvslutat()
@@ -163,6 +120,7 @@ public static class Throw
                 $"{nameof(Vårdval)}.{nameof(RedanAvslutat)}",
                 "Vårdvalet är redan avslutat.");
 
+        /// <summary>Vårdvalet gäller inte på angivet HSA-ID.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void VårdvalGällerIntePåHsaId(string hsaId, string meddelande)
             => throw new DomainInvariantViolationException(
@@ -176,8 +134,9 @@ public static class Throw
                 $"{nameof(Vårdval)}.{nameof(StartFöreAktivtVårdval)}",
                 $"Nytt vårdval med start {Format(nyttStart)} kan inte starta före det aktiva vårdvalets start {Format(aktivtStart)}.");
 
+        /// <summary>Överlappande vårdval på samma enhet är inte tillåtet.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-        public static void ÖverlappEjTillåtet(SharedKernel.HsaId enhetHsaId, Tidsrymd giltighet)
+        public static void ÖverlappEjTillåtet(SharedKernel.HsaId enhetHsaId, SharedKernel.Tidsrymd giltighet)
             => throw new DomainInvariantViolationException(
                 $"{nameof(Vårdval)}.{nameof(ÖverlappEjTillåtet)}",
                 $"Överlappande vårdval på HSA-ID {enhetHsaId} {giltighet}.");
@@ -185,6 +144,7 @@ public static class Throw
 
     public static class Vårdcentral
     {
+        /// <summary>Läkaren är inte valbar på angiven enhet.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void LäkareEjValbarPåEnhet(string hsaId, string läkarHsaId)
             => throw new DomainInvalidStateTransitionException(
@@ -209,25 +169,93 @@ public static class Throw
                 $"HSA-ID '{hsaId}' saknar mappning till internt id.");
     }
 
-    public static class Concurrency // TODO: Även tekniska undantag kanske ska hanteras av domän metoder?
+    public static class Concurrency
     {
         /// <summary>Optimistisk samtidighetskonflikt vid uppdatering.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void Conflict(long expected, long actual)
             => throw new DomainConcurrencyConflictException(
-                $"{nameof(Concurrency)}.{nameof(Conflict)}", // TODO: Ingen bra kod här? Hur?
-                $"Samtidighetskonflikt: förväntad version {expected}, aktuell {actual}."
-                );
+                $"{nameof(Concurrency)}.{nameof(Conflict)}",
+                $"Samtidighetskonflikt: förväntad version {expected}, aktuell {actual}.");
     }
 
-    public static class Idempotency // TODO: Även tekniska undantag kanske ska hanteras av domän metoder?
+    public static class Idempotency
     {
+        /// <summary>Idempotens nyckel redan använd.</summary>
         [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
         public static void Duplicate(string key)
             => throw new DomainIdempotencyViolationException(
-                $"{nameof(Idempotency)}.{nameof(Duplicate)}", // TODO: Ingen bra kod här? Hur?
-                $"Idempotens nyckel '{key}' har redan använts."
-                );
+                $"{nameof(Idempotency)}.{nameof(Duplicate)}",
+                $"Idempotens nyckel '{key}' har redan använts.");
+    }
+
+    public static class Tidsrymd
+    {
+        /// <summary>Slut före start.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void SlutFöreStart(DateTimeOffset start, DateTimeOffset? slut)
+            => throw new DomainValidationException(
+                $"{nameof(Tidsrymd)}.{nameof(SlutFöreStart)}",
+                $"Slut {Format(slut)} måste vara ≥ start {Format(start)}.");
+
+        /// <summary>Steg måste vara positivt.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void StegMåsteVaraPositivt(TimeSpan steg)
+            => throw new DomainValidationException(
+                $"{nameof(Tidsrymd)}.{nameof(StegMåsteVaraPositivt)}",
+                $"Steg måste vara positivt, var {steg}.");
+
+        /// <summary>Varaktighet är odefinierad för tillsvidare-intervall.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void VaraktighetOdefinieradFörTillsvidare()
+            => throw new DomainUndefinedOperationException(
+                $"{nameof(Tidsrymd)}.{nameof(VaraktighetOdefinieradFörTillsvidare)}",
+                "Varaktighet är odefinierad för tillsvidare-intervall.");
+
+        /// <summary>Stegning kräver avgränsat intervall.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void StegningKräverAvgränsatIntervall()
+            => throw new DomainUndefinedOperationException(
+                $"{nameof(Tidsrymd)}.{nameof(StegningKräverAvgränsatIntervall)}",
+                "Kan inte stega ett tillsvidare-intervall.");
+
+        /// <summary>Enumerering kräver avgränsat intervall.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void EnumereringKräverAvgränsatIntervall()
+            => throw new DomainUndefinedOperationException(
+                $"{nameof(Tidsrymd)}.{nameof(EnumereringKräverAvgränsatIntervall)}",
+                "Kan inte enumerera ett tillsvidare-intervall.");
+
+        /// <summary>Omfång kräver minst ett intervall.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void OmfångKräverMinstEttIntervall()
+            => throw new DomainUndefinedOperationException(
+                $"{nameof(Tidsrymd)}.{nameof(OmfångKräverMinstEttIntervall)}",
+                "Tom sekvens — omfång kräver minst ett intervall.");
+
+        /// <summary>Konvertering till Datumintervall kräver avgränsat intervall.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void DatumintervallKräverAvgränsatIntervall()
+            => throw new DomainUndefinedOperationException(
+                $"{nameof(Tidsrymd)}.{nameof(DatumintervallKräverAvgränsatIntervall)}",
+                "Kan inte skapa Datumintervall från ett tillsvidare-intervall.");
+    }
+
+    public static class Datumintervall
+    {
+        /// <summary>Slut före start.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void SlutFöreStart(DateOnly start, DateOnly? slut)
+            => throw new DomainValidationException(
+                $"{nameof(Datumintervall)}.{nameof(SlutFöreStart)}",
+                $"Slut {slut} måste vara ≥ start {start}.");
+
+        /// <summary>Enumerering kräver avgränsat intervall.</summary>
+        [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
+        public static void EnumereringKräverAvgränsatIntervall()
+            => throw new DomainUndefinedOperationException(
+                $"{nameof(Datumintervall)}.{nameof(EnumereringKräverAvgränsatIntervall)}",
+                "Kan inte avge ett tillsvidare-intervall.");
     }
 
     private static string Format(DateTimeOffset? dt) => dt is null ? "–" : ((DateTimeOffset)dt).ToString("O");

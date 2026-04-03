@@ -6,7 +6,7 @@ using VGR.Technical.Testing;
 
 await using var h = new SqliteHarness();
 var region = Region.Skapa("14");
-var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), DateTimeOffset.UtcNow);
+var person = region.SkapaPerson(Personnummer.Tolka("19900101-1234"), DateTimeOffset.UtcNow);
 person.SkapaVårdval(HsaId.Tolka("HSA-1"),
     Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
     DateTimeOffset.UtcNow);

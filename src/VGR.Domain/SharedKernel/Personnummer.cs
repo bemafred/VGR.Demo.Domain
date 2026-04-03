@@ -18,38 +18,38 @@ public readonly record struct Personnummer
     private Personnummer(string v) => Value = v;
 
     /// <summary>
-    /// Parsar ett personnummer och normaliserar till 12 siffror.
+    /// Tolkar ett personnummer och normaliserar till 12 siffror.
     /// Kastar vid ogiltig inmatning.
     /// </summary>
     /// <param name="input">Inmatad sträng (kan innehålla '-' eller '+').</param>
     /// <exception cref="DomainArgumentFormatException">Om format eller datum är ogiltigt.</exception>
-    public static Personnummer Parse(string input)
+    public static Personnummer Tolka(string input)
     {
-        if (!TryParse(input, out var v))
-            Throw.Personnummer.OgiltigtPersonnummer(input); 
+        if (!FörsökTolka(input, out var v))
+            Throw.Personnummer.OgiltigtPersonnummer(input);
 
         return v;
     }
 
     /// <summary>
-    /// Försöker parsa personnummer (referensdatum: idag) och normaliserar till 12 siffror.
+    /// Försöker tolka personnummer (referensdatum: idag) och normaliserar till 12 siffror.
     /// </summary>
     /// <param name="input">Inmatad sträng (kan innehålla '-' eller '+').</param>
-    /// <param name="p">Resultat om parsen lyckas (YYYYMMDDXXXX).</param>
-    /// <returns>Sant vid lyckad parse.</returns>
-    public static bool TryParse(string? input, out Personnummer p)
-        => TryParse(input, DateOnly.FromDateTime(DateTime.Today), out p);
+    /// <param name="p">Resultat om tolkningen lyckas (YYYYMMDDXXXX).</param>
+    /// <returns>Sant vid lyckad tolkning.</returns>
+    public static bool FörsökTolka(string? input, out Personnummer p)
+        => FörsökTolka(input, DateOnly.FromDateTime(DateTime.Today), out p);
 
     /// <summary>
-    /// Försöker parsa personnummer och normaliserar till 12 siffror.
+    /// Försöker tolka personnummer och normaliserar till 12 siffror.
     /// 10-siffriga värden (YYMMDDXXXX) får sekel beräknat utifrån <paramref name="referenceDate"/> och separator:
     /// '-' eller ingen separator => [-99, 0] år relativt referensåret; '+' => [-199, -100] år.
     /// </summary>
     /// <param name="input">Inmatad sträng (kan innehålla '-' eller '+').</param>
     /// <param name="referenceDate">Datum som styr sekeltolkning för 10-siffriga värden.</param>
-    /// <param name="p">Resultat om parsen lyckas (YYYYMMDDXXXX).</param>
-    /// <returns>Sant vid lyckad parse.</returns>
-    public static bool TryParse(string? input, DateOnly referenceDate, out Personnummer p)
+    /// <param name="p">Resultat om tolkningen lyckas (YYYYMMDDXXXX).</param>
+    /// <returns>Sant vid lyckad tolkning.</returns>
+    public static bool FörsökTolka(string? input, DateOnly referenceDate, out Personnummer p)
     {
         p = default;
         if (string.IsNullOrWhiteSpace(input)) return false;

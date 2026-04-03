@@ -31,10 +31,10 @@ Vi behöver därför ett uttryckligt beslut om att domänens fel är en del av d
 - Fler domänspecifika undantagsfabriker kan behöva införas.
 - Gränsen mellan domänsignifikanta fel och tekniska kontraktsfel måste hållas tydlig.
 
-## Kända avvikelser
+## Tidigare kända avvikelser (åtgärdade)
 
-- `Throw.Användare.EjAuktoriserad` kastar `UnauthorizedAccessException` (BCL), inte en `DomainException`. Detta bryter mot principen att alla domänsignifikanta fel uttrycks via `DomainException`-hierarkin. Om auktorisering är domänsemantik bör en `DomainAuthorizationException` övervägas; om det är rent infrastrukturellt hör det inte hemma i `Throw`.
-- `Throw.Person.OgiltigtPersonnummer` och `Throw.Personnummer.OgiltigtPersonnummer` uttrycker samma felbegrepp med identisk implementering — en av dem bör konsolideras (se ADR-004).
+- `Throw.Användare.EjAuktoriserad` kastade `UnauthorizedAccessException` (BCL). Åtgärd: borttagen — auktorisering är inte domänsemantik i denna lösning (se ADR-008 §8).
+- `Throw.Person.OgiltigtPersonnummer` duplicerade `Throw.Personnummer.OgiltigtPersonnummer`. Åtgärd: konsoliderad till `Throw.Personnummer.OgiltigtPersonnummer`.
 
 ## Relaterade dokument
 - `docs/ADR-000 E-Clean & Semantic Architecture.md`

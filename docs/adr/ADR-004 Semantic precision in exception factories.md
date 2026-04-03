@@ -28,14 +28,12 @@ Vi behöver därför ett beslut som skyddar precisionen i domänens felvokabulä
 - Existerande fabriksnamn och kommentarer kan behöva justeras för att nå full precision.
 - Oanvända eller dubblerade fabriker kan behöva tas bort även om de känns bekväma att ha kvar.
 
-## Kända avvikelser
+## Tidigare kända avvikelser (åtgärdade)
 
-Följande brister mot beslutets principer har identifierats i den nuvarande implementationen:
-
-1. **Dubbletter**: `Throw.Person.OgiltigtPersonnummer` och `Throw.Personnummer.OgiltigtPersonnummer` uttrycker samma felbegrepp. Bör konsolideras till en kanonisk plats.
-2. **Felaktigt parameternamn**: `Throw.Person.Saknas(PersonId regionId)` — parametern heter `regionId` men typen är `PersonId`. Bryter mot principen att namn bär mening.
-3. **Semantisk feltyp**: `Throw.Person.HittadesInte` kastar `DomainInvalidStateTransitionException` men uttrycker att ett aggregat saknas — bör vara `DomainAggregateNotFoundException` (eller konsolideras med `Person.Saknas`).
-4. **Oklara koder**: `Concurrency.Conflict` och `Idempotency.Duplicate` har TODO-kommentarer om att koden inte är bra. Behöver domänförankring.
+1. **Dubbletter**: `Throw.Person.OgiltigtPersonnummer` duplicerade `Throw.Personnummer.OgiltigtPersonnummer`. Åtgärd: konsoliderad till en kanonisk plats under `Personnummer`.
+2. **Felaktigt parameternamn**: `Throw.Person.Saknas(PersonId regionId)` — parametern hette `regionId`. Åtgärd: korrigerad till `personId`.
+3. **Semantisk feltyp**: `Throw.Person.HittadesInte` kastade fel undantagstyp och duplicerade `Saknas`. Åtgärd: borttagen — `Throw.Person.Saknas` är kanonisk fabrik för saknat Person-aggregat.
+4. **Oklara koder**: `Concurrency.Conflict` och `Idempotency.Duplicate` hade TODO-kommentarer. Åtgärd: koderna använder `nameof`-mönstret konsekvent, TODO:er borttagna.
 
 ## Relaterade dokument
 - `docs/ADR-000 E-Clean & Semantic Architecture.md`

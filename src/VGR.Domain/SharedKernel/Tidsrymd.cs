@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using VGR.Domain.SharedKernel.Exceptions;
 using VGR.Semantics.Abstractions;
 
 namespace VGR.Domain.SharedKernel;
@@ -23,7 +24,9 @@ public readonly record struct Tidsrymd
 
     /// <summary>Varaktighet: <c>Slut - Start</c>. Kastar om slut saknas.</summary>
     public TimeSpan Varaktighet
-        => Slut is null ? throw new InvalidOperationException("Varaktighet är odefinierad för tillsvidare-intervall.") // TODO: Till lämplig DomainException
+        => Slut is null ? throw new Exceptions.DomainUndefinedOperationException(
+                              "Tidsrymd.VaraktighetOdefinieradFörTillsvidare",
+                              "Varaktighet är odefinierad för tillsvidare-intervall.")
                         : Slut.Value - Start;
 
     /// <summary>Sant om intervallet är tomt (<c>Start == Slut</c>).</summary>
@@ -33,7 +36,7 @@ public readonly record struct Tidsrymd
     private Tidsrymd(DateTimeOffset start, DateTimeOffset? slut)
     {
         if (slut is { } e && e < start)
-            throw new ArgumentOutOfRangeException(nameof(slut), "Slut måste vara ≥ Start."); // TODO: Till lämplig DomainException
+            Throw.Tidsrymd.SlutFöreStart(start, slut);
 
         Start = start;
         Slut  = slut;
@@ -150,9 +153,9 @@ public readonly record struct Tidsrymd
     public IEnumerable<Tidsrymd> Stega(TimeSpan steg, bool inkluderaSistaKortare = true)
     {
         if (steg <= TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(steg));
+            Throw.Tidsrymd.StegMåsteVaraPositivt(steg);
         if (ÄrTillsvidare)
-            throw new InvalidOperationException("Kan inte stega ett tillsvidare-intervall.");
+            Throw.Tidsrymd.StegningKräverAvgränsatIntervall();
 
         var cursor = Start;
         while (cursor + steg <= Slut!.Value)
@@ -169,9 +172,9 @@ public readonly record struct Tidsrymd
     public IEnumerable<DateTimeOffset> Varje(TimeSpan steg, bool inkluderaSlut = false)
     {
         if (steg <= TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(steg));
+            Throw.Tidsrymd.StegMåsteVaraPositivt(steg);
         if (ÄrTillsvidare)
-            throw new InvalidOperationException("Kan inte enumerera ett tillsvidare-intervall utan explicit stoppvillkor.");
+            Throw.Tidsrymd.EnumereringKräverAvgränsatIntervall();
 
         for (var t = Start; t < Slut!.Value; t += steg)
             yield return t;
@@ -205,7 +208,7 @@ public readonly record struct Tidsrymd
     public static Tidsrymd Omfång(IEnumerable<Tidsrymd> intervall)
     {
         var enumerated = intervall as IList<Tidsrymd> ?? intervall.ToList();
-        if (enumerated.Count == 0) throw new ArgumentException("Tom sekvens.");
+        if (enumerated.Count == 0) Throw.Tidsrymd.OmfångKräverMinstEttIntervall();
 
         var min = enumerated.Min(x => x.Start);
         DateTimeOffset? max = enumerated.Any(x => x.Slut is null)
@@ -215,11 +218,7 @@ public readonly record struct Tidsrymd
         return new(min, max);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="ts"></param>
-    /// <returns></returns>
+    /// <summary>Sant om intervallet varar längre än angiven tidslängd. Tillsvidare-intervall ger alltid <c>true</c>.</summary>
     public bool VararLängreÄn(TimeSpan ts)
     {
         if (ÄrTillsvidare)
@@ -232,7 +231,7 @@ public readonly record struct Tidsrymd
     public Datumintervall TillDatumintervall()
     {
         if (ÄrTillsvidare)
-            throw new InvalidOperationException("Kan inte skapa Datumintervall från ett tillsvidare-intervall.");
+            Throw.Tidsrymd.DatumintervallKräverAvgränsatIntervall();
         return Datumintervall.FrånTidsrymd(this);
     }
 

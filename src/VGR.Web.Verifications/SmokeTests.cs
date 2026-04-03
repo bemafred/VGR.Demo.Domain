@@ -66,7 +66,7 @@ public class SmokeTests
 
         // Initiera region och person via aggregat för att undvika dubbla spårade instanser
         var region = Region.Skapa("14");
-        var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), clock.UtcNow);
+        var person = region.SkapaPerson(Personnummer.Tolka("19900101-1234"), clock.UtcNow);
 
         write.Regioner.Add(region);
         await write.SaveChangesAsync(ct);

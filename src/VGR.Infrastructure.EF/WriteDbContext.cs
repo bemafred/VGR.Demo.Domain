@@ -4,12 +4,16 @@ using VGR.Infrastructure.EF.Configs;
 
 namespace VGR.Infrastructure.EF;
 
+/// <summary>Skrivoptimerad DbContext med change tracking. Används för kommandon som ändrar tillstånd.</summary>
 public sealed class WriteDbContext : DbContext
 {
     private readonly Action<ModelConfigurationBuilder> _conventions;
 
+    /// <summary>Alla personer.</summary>
     public DbSet<Person> Personer => Set<Person>();
+    /// <summary>Alla vårdval.</summary>
     public DbSet<Vårdval> Vardval => Set<Vårdval>();
+    /// <summary>Alla regioner.</summary>
     public DbSet<Region> Regioner => Set<Region>();
 
     public WriteDbContext(DbContextOptions<WriteDbContext> options,

@@ -8,12 +8,12 @@
 
 | Fält                    | Värde                                     |
 |-------------------------|--------------------------------------------|
-| **Status**              | Föreslagen                                 |
+| **Status**              | Accepterad                                 |
 | **Version**             | 1.0.0                                      |
 | **Datum**               | 2025-01-24                                 |
 | **Beslutsfattare**      | VGR Architecture Team                      |
 | **Ersätter**            | Ingen (grundläggande)                      |
-| **Relaterade ADR:er**   | ADR-001 (Indexpolicy), ADR-002 (Semantiska namn), ADR-003 (Felvokabulär), ADR-004 (Semantisk precision), ADR-005 (Verifierbar felsemantik), ADR-006 (Transportöversättning), ADR-007 (Dubbel felkanal) |
+| **Relaterade ADR:er**   | ADR-001 (Indexpolicy), ADR-002 (Semantiska namn), ADR-003 (Felvokabulär), ADR-004 (Semantisk precision), ADR-005 (Verifierbar felsemantik), ADR-006 (Transportöversättning), ADR-007 (Dubbel felkanal), ADR-008 (Värdeobjektskontrakt), ADR-009 (Produktionshärdning), ADR-010 (Relationella garantier) |
 
 ---
 
@@ -258,6 +258,9 @@ Avvikelser flaggas av analyzers vid kompilering.
 - **ADR-005** – Felsemantik är verifierbar domänbeteende
 - **ADR-006** – Delivery översätter domänens felsemantik till transportsemantik
 - **ADR-007** – Dubbel felkanal: domänundantag och Utfall
+- **ADR-008** – Värdeobjektskontrakt, semantiska tolknings-API:er och odefinierade domänoperationer
+- **ADR-009** – Produktionshärdning av delivery- och infrastrukturlager
+- **ADR-010** – Persistenslagret uttrycker relationella garantier för systeminvarianter
 
 ---
 

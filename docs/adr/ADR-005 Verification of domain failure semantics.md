@@ -26,17 +26,11 @@ Vi behöver därför ett beslut som gör undantagsytan verifierbar på samma sä
 - Verifieringsytan ökar.
 - Introduktion av nya undantagsfabriker kräver mer disciplin i testskrivandet.
 
-## Kända avvikelser
+## Tidigare kända avvikelser (åtgärdade)
 
-Flera undantagsfabriker i `Throw` saknar idag verifieringstester:
-- `Throw.Användare.EjAuktoriserad`
-- `Throw.Person.VårdvalSaknas`, `Throw.Person.HittadesInte`
-- `Throw.Vårdval.AktivtFinnsRedan`, `Throw.Vårdval.RedanAvslutat`, `Throw.Vårdval.VårdvalGällerIntePåHsaId`
-- `Throw.Vårdcentral.LäkareEjValbarPåEnhet`
-- `Throw.HsaId.MappningSaknas`
-- `Throw.Concurrency.Conflict`, `Throw.Idempotency.Duplicate`
+Alla kvarvarande Throw-fabriker har nu verifieringstester i `ThrowVerifications.cs`.
 
-Dessa bör antingen verifieras eller motiveras som reserverade för framtida scenarier, i enlighet med beslutet.
+Fabriker som saknade semantisk motivering (`Användare.EjAuktoriserad`, `Person.VårdvalSaknas`, `Person.HittadesInte`, `Vårdval.IngetAktivtVårdvalFinns`) har tagits bort i enlighet med ADR-003 och ADR-004.
 
 ## Relaterade dokument
 - `docs/ADR-000 E-Clean & Semantic Architecture.md`

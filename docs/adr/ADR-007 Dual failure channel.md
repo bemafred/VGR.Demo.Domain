@@ -51,7 +51,7 @@ Domänundantag som kastas av domänobjekt inom interaktorn fångas **inte** av i
 | **Ägare** | Domänlagret | Applikationslagret |
 | **Semantik** | Bruten invariant, ogiltigt tillstånd | Förväntat alternativt utfall |
 | **Förväntad?** | Nej — ska aldrig ske i korrekt flöde | Ja — normalt driftutfall |
-| **Bär domänkod?** | Ja (`DomainException.Code`) | Nej (fritext felmeddelande) |
+| **Bär domänkod?** | Ja (`DomainException.Code`) | Valfritt (`Utfall.Code`, ADR-009) |
 | **Kontrollflöde** | Avbryter — exception propageras | Fortsätter — anroparen beslutar |
 
 ### 5. Utfall är inte en monad
@@ -71,7 +71,7 @@ Om behovet av kedjning uppstår ska det motiveras som en separat ADR.
 
 ### Nackdelar
 - Två felmönster kräver att utvecklare förstår gränsdragningen.
-- `Utfall<T>.Fail` bär ingen maskinläsbar kod — klientens möjlighet att agera programmatiskt på specifika affärsfel begränsas till fritext.
+- ~~`Utfall<T>.Fail` bär ingen maskinläsbar kod~~ — Åtgärdad i ADR-009: `Fail` accepterar nu valfri `code`-parameter. Delivery bär `code` i `Extensions["code"]` om den finns.
 - Domänundantag som kastas i interaktorer propagerar tyst — det är upp till Delivery att fånga dem korrekt (se ADR-006, kända avvikelser).
 
 ## Relaterade dokument

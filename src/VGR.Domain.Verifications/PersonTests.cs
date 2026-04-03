@@ -13,7 +13,7 @@ public class PersonTests
     [Fact]
     public void SkapaPerson_SätterFält()
     {
-        var pnr = Personnummer.Parse("19900101-1234");
+        var pnr = Personnummer.Tolka("19900101-1234");
         var nu = new DateTimeOffset(2024,1,1,12,0,0,TimeSpan.Zero);
 
         var region = Region.Skapa("14");
@@ -28,7 +28,7 @@ public class PersonTests
     public void SkapaVårdval_Överlapp_Kastar()
     {
         var region = Region.Skapa("14");
-        var p = region.SkapaPerson(Personnummer.Parse("19900101-1234"), DateTimeOffset.UtcNow);
+        var p = region.SkapaPerson(Personnummer.Tolka("19900101-1234"), DateTimeOffset.UtcNow);
         var enhet = HsaId.Tolka("HSA-ENHET-1");
         var läkare = HsaId.Tolka("HSA-LAKARE-1");
 

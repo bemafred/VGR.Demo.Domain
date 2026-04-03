@@ -21,6 +21,11 @@ internal sealed class RegionConfig : IEntityTypeConfiguration<Region>
          .HasForeignKey(nameof(RegionId))
          .OnDelete(DeleteBehavior.Restrict);
 
+        b.Property(x => x.RowVersion)
+         .IsConcurrencyToken()
+         .ValueGeneratedOnAddOrUpdate()
+         .HasDefaultValue(new byte[] { 0 });
+
         var nav = b.Metadata.FindNavigation(nameof(Region.AllaPersoner))!;
         nav.SetField(nameof(Region.Personer)); // explicit backing field
         nav.SetPropertyAccessMode(PropertyAccessMode.Field);

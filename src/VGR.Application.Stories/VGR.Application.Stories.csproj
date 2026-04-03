@@ -9,9 +9,15 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="FluentAssertions"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="xunit"/>
         <PackageReference Include="xunit.runner.visualstudio"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\VGR.Application\VGR.Application.csproj"/>
+        <ProjectReference Include="..\VGR.Technical.Testing\VGR.Technical.Testing.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

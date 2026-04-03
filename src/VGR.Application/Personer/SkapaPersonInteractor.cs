@@ -8,13 +8,16 @@ using VGR.Semantics.Linq;
 
 namespace VGR.Application.Personer;
 
+/// <summary>Kommando för att skapa en person inom en region.</summary>
 public sealed record SkapaPersonCmd(RegionId RegionId, string Personnummer);
 
+/// <summary>Interaktor: skapar en ny person i en region. Kontrollerar dubbletter och validerar personnummer.</summary>
 public sealed class SkapaPersonInteractor(ReadDbContext read, WriteDbContext write, IClock clock)
 {
+    /// <summary>Utför kommandot. Returnerar <c>Utfall.Fail</c> vid dubblett, kastar vid saknad region.</summary>
     public async Task<Utfall<PersonId>> ProcessAsync(SkapaPersonCmd cmd, CancellationToken ct)
     {
-        var pnr = Personnummer.Parse(cmd.Personnummer);
+        var pnr = Personnummer.Tolka(cmd.Personnummer);
 
         // Pushdown: dubblett inom region?
         var dubblett = await read.Personer

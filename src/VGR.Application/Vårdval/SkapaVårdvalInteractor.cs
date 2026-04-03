@@ -8,10 +8,13 @@ using VGR.Semantics.Linq;
 
 namespace VGR.Application.Vårdval;
 
+/// <summary>Kommando för att skapa ett vårdval för en person vid en vårdenhet.</summary>
 public sealed record SkapaVårdvalCmd(PersonId PersonId, string EnhetsHsaId, DateOnly Start, DateOnly? Slut);
 
+/// <summary>Interaktor: skapar ett nytt vårdval. Avslutar eventuellt aktivt vårdval. Kastar vid överlapp eller saknad person.</summary>
 public sealed class SkapaVårdvalInteractor(WriteDbContext write, IClock clock)
 {
+    /// <summary>Utför kommandot. Kastar vid saknad person, ogiltigt HSA-ID eller överlappande perioder.</summary>
     public async Task<Utfall<VårdvalId>> ProcessAsync(SkapaVårdvalCmd cmd, CancellationToken ct)
     {
         // 1) Validera indata

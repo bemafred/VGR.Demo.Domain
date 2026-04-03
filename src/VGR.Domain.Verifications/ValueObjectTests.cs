@@ -12,9 +12,9 @@ public class ValueObjectTests
     [InlineData("19900101-1234", "199001011234")]
     [InlineData("19851212-0000", "198512120000")]
     [InlineData("199001011234",  "199001011234")]
-    public void Personnummer_Parse_Normaliserar_Till_12Siffror(string input, string expected)
+    public void Personnummer_Tolka_Normaliserar_Till_12Siffror(string input, string expected)
     {
-        var p = Personnummer.Parse(input);
+        var p = Personnummer.Tolka(input);
         ((string)p).Should().Be(expected);
     }
 
@@ -25,9 +25,9 @@ public class ValueObjectTests
     [InlineData("900101-1234", "2025-01-01", "199001011234")]
     [InlineData("9001011234",  "2025-01-01", "199001011234")]
     [InlineData("900101+1234", "2025-01-01", "189001011234")]
-    public void Personnummer_TryParse_MedReferens_Normaliserar_10Siffror(string input, string referenceDate, string expected)
+    public void Personnummer_FörsökTolka_MedReferens_Normaliserar_10Siffror(string input, string referenceDate, string expected)
     {
-        var ok = Personnummer.TryParse(input, DateOnly.Parse(referenceDate), out var p);
+        var ok = Personnummer.FörsökTolka(input, DateOnly.Parse(referenceDate), out var p);
         ok.Should().BeTrue();
         p.ToString().Should().Be(expected);
     }
@@ -35,9 +35,9 @@ public class ValueObjectTests
     [Theory]
     [InlineData("")]
     [InlineData("abc")]
-    public void Personnummer_Parse_Fel_Kastar(string s)
+    public void Personnummer_Tolka_Fel_Kastar(string s)
     {
-        Action act = () => Personnummer.Parse(s);
+        Action act = () => Personnummer.Tolka(s);
         act.Should().Throw<DomainValidationException>();
     }
 

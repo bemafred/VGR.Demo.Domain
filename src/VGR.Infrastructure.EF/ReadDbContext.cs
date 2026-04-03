@@ -4,12 +4,16 @@ using VGR.Infrastructure.EF.Configs;
 
 namespace VGR.Infrastructure.EF;
 
+/// <summary>Läsoptimerad DbContext med <see cref="QueryTrackingBehavior.NoTracking"/>. Används för frågor utan sidoeffekter.</summary>
 public sealed class ReadDbContext : DbContext
 {
     private readonly Action<ModelConfigurationBuilder> _conventions;
 
+    /// <summary>Alla personer.</summary>
     public DbSet<Person> Personer => Set<Person>();
+    /// <summary>Alla vårdval.</summary>
     public DbSet<Vårdval> Vårdval => Set<Vårdval>();
+    /// <summary>Alla regioner.</summary>
     public DbSet<Region> Regioner => Set<Region>();
 
     public ReadDbContext(DbContextOptions<ReadDbContext> options,

@@ -16,7 +16,7 @@ public class VårdvalTests
         var nu = DateTimeOffset.UtcNow;
 
         var region = Region.Skapa("14");
-        var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        var person = region.SkapaPerson(Personnummer.Tolka("19900101-1234"), nu);
         var v = person.SkapaVårdval(HsaId.Tolka("HSA-ENHET-1"), Tidsrymd.SkapaTillsvidare(new DateOnly(2024,1,1)), nu);
 
         var act = () => v.Avsluta(new DateOnly(2023,12,31));

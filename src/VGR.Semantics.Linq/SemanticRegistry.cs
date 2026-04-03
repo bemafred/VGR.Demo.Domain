@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using VGR.Semantics.Abstractions;
@@ -12,7 +13,7 @@ namespace VGR.Semantics.Linq;
 /// </summary>
 internal static class SemanticRegistry
 {
-    private static readonly Dictionary<MethodInfo, LambdaExpression> _registry = [];
+    private static readonly ConcurrentDictionary<MethodInfo, LambdaExpression> _registry = new();
 
     static SemanticRegistry()
     {

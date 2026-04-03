@@ -74,7 +74,7 @@ public sealed class TidsrymdCorrelations
         var nu = DateTimeOffset.UtcNow;
 
         var region = Region.Skapa("14");
-        var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        var person = region.SkapaPerson(Personnummer.Tolka("19900101-1234"), nu);
         person.SkapaVårdval(HsaId.Tolka("HSA-1"), period, nu);
         h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync();
@@ -193,9 +193,9 @@ public sealed class TidsrymdCorrelations
         var nu = DateTimeOffset.UtcNow;
 
         var region = Region.Skapa("14");
-        var person1 = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        var person1 = region.SkapaPerson(Personnummer.Tolka("19900101-1234"), nu);
         person1.SkapaVårdval(HsaId.Tolka("HSA-1"), p1, nu);
-        var person2 = region.SkapaPerson(Personnummer.Parse("19900202-5678"), nu);
+        var person2 = region.SkapaPerson(Personnummer.Tolka("19900202-5678"), nu);
         person2.SkapaVårdval(HsaId.Tolka("HSA-2"), p2, nu);
         h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync();
@@ -261,7 +261,7 @@ public sealed class TidsrymdCorrelations
         var nu = DateTimeOffset.UtcNow;
 
         var region = Region.Skapa("14");
-        var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        var person = region.SkapaPerson(Personnummer.Tolka("19900101-1234"), nu);
         person.SkapaVårdval(HsaId.Tolka("HSA-1"), period, nu);
         h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync();
@@ -324,7 +324,7 @@ public sealed class TidsrymdCorrelations
         var nu = DateTimeOffset.UtcNow;
 
         var region = Region.Skapa("14");
-        var person = region.SkapaPerson(Personnummer.Parse("19900101-1234"), nu);
+        var person = region.SkapaPerson(Personnummer.Tolka("19900101-1234"), nu);
         var vårdval = person.SkapaVårdval(HsaId.Tolka("HSA-1"), period, nu);
         h.Write.Regioner.Add(region);
         await h.Write.SaveChangesAsync();

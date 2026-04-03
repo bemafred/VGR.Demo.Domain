@@ -1,6 +1,7 @@
 namespace VGR.Domain.SharedKernel;
 
 using System.Collections.Generic;
+using VGR.Domain.SharedKernel.Exceptions;
 
 /// <summary>
 /// Ett kalenderintervall på datumnivå med halvöppen semantik: <c>[Start, Slut)</c>.
@@ -44,7 +45,7 @@ public readonly record struct Datumintervall
     private Datumintervall(DateOnly start, DateOnly? slut)
     {
         if (slut is { } s && s < start)
-            throw new ArgumentOutOfRangeException(nameof(slut), "Slut måste vara ≥ Start.");
+            Throw.Datumintervall.SlutFöreStart(start, slut);
             
         Start = start;
         Slut = slut;
@@ -80,7 +81,7 @@ public readonly record struct Datumintervall
     public IEnumerable<DateOnly> VarjeDag()
     {
         if (ÄrTillsvidare)
-            throw new InvalidOperationException("Kan inte avge ett tillsvidare-intervall utan explicit stoppvillkor.");
+            Throw.Datumintervall.EnumereringKräverAvgränsatIntervall();
 
         for (var d = Start; d < Slut!.Value; d = d.AddDays(1))
             yield return d;

@@ -30,20 +30,27 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Architecture & Docs", "1. Architecture & Docs", "{8941DA92-7CD6-4266-9F91-58C61D5352E4}"
 	ProjectSection(SolutionItems) = preProject
 		AI-GUIDANCE.md = AI-GUIDANCE.md
-		docs\ANALYS.md = docs\ANALYS.md
-		docs\ANALYZER_REGLER.md = docs\ANALYZER_REGLER.md
-		docs\ARCHITECTURE-CANON.md = docs\ARCHITECTURE-CANON.md
-		docs\ARCHITECTURE-NAME.md = docs\ARCHITECTURE-NAME.md
-		docs\ARCHITECTURE-WHY.md = docs\ARCHITECTURE-WHY.md
-		docs\KODERGONOMI.md = docs\KODERGONOMI.md
-		docs\ONBOARDING.md = docs\ONBOARDING.md
-		docs\PLACERING.md = docs\PLACERING.md
-		docs\POLICY.md = docs\POLICY.md
 		README.md = README.md
-		docs\ADR-002 Semantic names for tests.md = docs\ADR-002 Semantic names for tests.md
-		docs\solution-vertical-order.svg = docs\solution-vertical-order.svg
-		docs\ADR-001 Index.md = docs\ADR-001 Index.md
-		docs\ADR-000 E-Clean & Semantic Architecture.md = docs\ADR-000 E-Clean & Semantic Architecture.md
+		docs\guides\ANALYS.md = docs\guides\ANALYS.md
+		docs\guides\ANALYZER_REGLER.md = docs\guides\ANALYZER_REGLER.md
+		docs\guides\KODERGONOMI.md = docs\guides\KODERGONOMI.md
+		docs\guides\ONBOARDING.md = docs\guides\ONBOARDING.md
+		docs\guides\PLACERING.md = docs\guides\PLACERING.md
+		docs\guides\POLICY.md = docs\guides\POLICY.md
+		docs\guides\QUICKSTART.md = docs\guides\QUICKSTART.md
+		docs\architecture\ARCHITECTURE-CANON.md = docs\architecture\ARCHITECTURE-CANON.md
+		docs\architecture\ARCHITECTURE-NAME.md = docs\architecture\ARCHITECTURE-NAME.md
+		docs\architecture\ARCHITECTURE-WHY.md = docs\architecture\ARCHITECTURE-WHY.md
+		docs\adr\ADR-000 E-Clean & Semantic Architecture.md = docs\adr\ADR-000 E-Clean & Semantic Architecture.md
+		docs\adr\ADR-001 Index.md = docs\adr\ADR-001 Index.md
+		docs\adr\ADR-002 Semantic names for tests.md = docs\adr\ADR-002 Semantic names for tests.md
+		docs\adr\ADR-003 Domain failure vocabulary.md = docs\adr\ADR-003 Domain failure vocabulary.md
+		docs\adr\ADR-004 Semantic precision in exception factories.md = docs\adr\ADR-004 Semantic precision in exception factories.md
+		docs\adr\ADR-005 Verification of domain failure semantics.md = docs\adr\ADR-005 Verification of domain failure semantics.md
+		docs\adr\ADR-006 Delivery translates domain failure semantics to transport semantics.md = docs\adr\ADR-006 Delivery translates domain failure semantics to transport semantics.md
+		docs\adr\ADR-007 Dual failure channel.md = docs\adr\ADR-007 Dual failure channel.md
+		docs\adr\ADR-008 Värdeobjektskontrakt och semantiska tolknings-API:er och odefinierade domänoperationer.md = docs\adr\ADR-008 Värdeobjektskontrakt och semantiska tolknings-API:er och odefinierade domänoperationer.md
+		docs\adr\ADR-009 Produktionshärdning av delivery- och infrastrukturlager.md = docs\adr\ADR-009 Produktionshärdning av delivery- och infrastrukturlager.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Core Domain", "5. Core Domain", "{1C14E1A2-3FBB-41EC-A68E-FB11627458F5}"
@@ -77,22 +84,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Application.Stories", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Infrastructure.Diagnostics", "src\VGR.Infrastructure.Diagnostics\VGR.Infrastructure.Diagnostics.csproj", "{B3504F7A-5EDA-4FA2-ABA2-FBBDD3EC0AD5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Appendices A-I", "Appendices A-I", "{04B02D02-2771-4AF2-BA3F-23B25358DA97}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Appendices A-J", "Appendices A-J", "{04B02D02-2771-4AF2-BA3F-23B25358DA97}"
 	ProjectSection(SolutionItems) = preProject
-		docs\APPENDIX B – Design Principles of Semantic Architecture.md = docs\APPENDIX B – Design Principles of Semantic Architecture.md
-		docs\APPENDIX G – Semantic Registry Specification.md = docs\APPENDIX G – Semantic Registry Specification.md
-		docs\APPENDIX I – Semantic Expansion Rules.md = docs\APPENDIX I – Semantic Expansion Rules.md
-		docs\APPENDIX F – AI-Assisted Development with Semantic Architecture.md = docs\APPENDIX F – AI-Assisted Development with Semantic Architecture.md
-		docs\APPENDIX E – Comparison with Clean Architecture & Domain-Driven Design.md = docs\APPENDIX E – Comparison with Clean Architecture & Domain-Driven Design.md
-		docs\APPENDIX C – Semantic Components.md = docs\APPENDIX C – Semantic Components.md
-		docs\APPENDIX A – Platform Dependence.md = docs\APPENDIX A – Platform Dependence.md
-		docs\APPENDIX D – Tooling Integration & The Roslyn Semantic Model.md = docs\APPENDIX D – Tooling Integration & The Roslyn Semantic Model.md
-		docs\APPENDIX H - Semantic Query Patterns.md = docs\APPENDIX H - Semantic Query Patterns.md
+		docs\appendix\APPENDIX A – Platform Dependence.md = docs\appendix\APPENDIX A – Platform Dependence.md
+		docs\appendix\APPENDIX B – Design Principles of Semantic Architecture.md = docs\appendix\APPENDIX B – Design Principles of Semantic Architecture.md
+		docs\appendix\APPENDIX C – Semantic Components.md = docs\appendix\APPENDIX C – Semantic Components.md
+		docs\appendix\APPENDIX D – Tooling Integration & The Roslyn Semantic Model.md = docs\appendix\APPENDIX D – Tooling Integration & The Roslyn Semantic Model.md
+		docs\appendix\APPENDIX E – Comparison with Clean Architecture & Domain-Driven Design.md = docs\appendix\APPENDIX E – Comparison with Clean Architecture & Domain-Driven Design.md
+		docs\appendix\APPENDIX F – AI-Assisted Development with Semantic Architecture.md = docs\appendix\APPENDIX F – AI-Assisted Development with Semantic Architecture.md
+		docs\appendix\APPENDIX G – Semantic Registry Specification.md = docs\appendix\APPENDIX G – Semantic Registry Specification.md
+		docs\appendix\APPENDIX H - Semantic Query Patterns.md = docs\appendix\APPENDIX H - Semantic Query Patterns.md
+		docs\appendix\APPENDIX I – Semantic Expansion Rules.md = docs\appendix\APPENDIX I – Semantic Expansion Rules.md
+		docs\appendix\APPENDIX J - Performance & Query Optimization.md = docs\appendix\APPENDIX J - Performance & Query Optimization.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images & diagrams", "Images & diagrams", "{B6314D76-6A07-497E-983D-509CBEFF4AB6}"
 	ProjectSection(SolutionItems) = preProject
-		docs\solution-vertical-order.svg = docs\solution-vertical-order.svg
+		docs\architecture\solution-vertical-order.svg = docs\architecture\solution-vertical-order.svg
 	EndProjectSection
 EndProject
 Global

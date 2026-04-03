@@ -3,8 +3,10 @@ namespace VGR.Domain.SharedKernel;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>Algoritmer för bearbetning av tidsintervall: subtraktion, klippning och lucksökning.</summary>
 public static class TidsrymdAlgoritmer
 {
+    /// <summary>Subtraherar <paramref name="cutter"/> från <paramref name="source"/>. Returnerar kvarvarande delar.</summary>
     public static IEnumerable<Tidsrymd> Subtrahera(this Tidsrymd source, Tidsrymd cutter)
     {
         if (!source.Överlappar(cutter))
@@ -20,6 +22,7 @@ public static class TidsrymdAlgoritmer
             yield return Tidsrymd.Skapa(cutter.Slut.Value, source.Slut.Value);
     }
 
+    /// <summary>Klipper varje intervall mot ett fönster och returnerar de delar som ligger innanför.</summary>
     public static IEnumerable<Tidsrymd> KlippMotFönster(IEnumerable<Tidsrymd> intervall, Tidsrymd fönster)
     {
         foreach (var i in intervall)
@@ -29,6 +32,7 @@ public static class TidsrymdAlgoritmer
         }
     }
 
+    /// <summary>Beräknar fria luckor (otäckta delar) inom ett fönster givet en mängd täckande intervall.</summary>
     public static IReadOnlyList<Tidsrymd> FriaLuckor(in Tidsrymd fönster, IEnumerable<Tidsrymd> täckning)
     {
         var cut = Tidsrymd.Normalisera(KlippMotFönster(täckning, fönster));

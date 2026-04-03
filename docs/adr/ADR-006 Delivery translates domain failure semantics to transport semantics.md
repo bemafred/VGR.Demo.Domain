@@ -81,36 +81,35 @@ Sådana mönster får endast införas där deras mening är fullständigt underb
 - `ProblemDetails.type` ska beskriva transportproblemets mening.
 - Domänens undantagsinformation ska läggas i separata fält eller extensions, inte blandas ihop med transportkod.
 
-## Kända avvikelser
+## Tidigare kända avvikelser (åtgärdade)
 
-Den nuvarande implementationen i `DomainMappingExtensions.HandleExceptions` avviker från beslutets principer på två sätt:
+Den ursprungliga implementationen hade två brister:
 
-### 1. Global typ-till-status-mappning utan epistemisk motivering
+1. **Global typ-till-status-mappning utan epistemisk motivering** — endast `DomainInvariantViolationException` (409) och `DomainArgumentFormatException` (400) hanterades; övriga föll till 500.
+2. **Ofullständig undantagshantering** — fem av sju `DomainException`-typer gav generiska 500-svar.
 
-Beslut §5 förbjuder globala mappningar utan fullständig epistemisk grund. Den aktuella koden gör precis detta:
+Åtgärd: pragmatisk default-mappning med epistemisk motivering per typ:
 
-```csharp
-DomainInvariantViolationException => 409
-DomainArgumentFormatException => 400
-_ => 500
-```
+| Undantagstyp | HTTP | Motivering |
+|---|---|---|
+| `DomainArgumentFormatException` | 400 | Klientens indata har fel format |
+| `DomainValidationException` | 422 | Semantiskt ogiltig domänindata |
+| `DomainAggregateNotFoundException` | 404 | Efterfrågad resurs saknas |
+| `DomainInvariantViolationException` | 409 | Tillståndskonflikt — begäran bryter invariant |
+| `DomainInvalidStateTransitionException` | 409 | Tillståndskonflikt — otillåten övergång |
+| `DomainConcurrencyConflictException` | 409 | Samtidighetskonflikt |
+| `DomainIdempotencyViolationException` | 409 | Duplicerad begäran |
+| `DomainUndefinedOperationException` | 422 | Operationen saknar mening för aktuellt tillstånd |
 
-Varje mappning bör motiveras utifrån HTTP-ytans semantik, inte bara undantagstypen.
+Infrastrukturella undantag (ADR-009):
 
-### 2. Ofullständig undantagshantering
+| Undantagstyp | HTTP | Motivering |
+|---|---|---|
+| `OperationCanceledException` | 499 | Klienten avbröt begäran |
+| `DbUpdateConcurrencyException` | 409 | Optimistisk samtidighetskonflikt |
+| `DbUpdateException` | 422 | Databaskonstraint bruten |
 
-Fem av sju `DomainException`-typer faller igenom till `_ => 500`:
-- `DomainValidationException` — kastas av `Personnummer.Parse` och `HsaId.Tolka`, vanliga vid felaktig indata. Faller till 500 i stället för ett klientvänligt svar.
-- `DomainAggregateNotFoundException` — kastas av `Throw.Region.Saknas` och `Throw.Person.Saknas`. Faller till 500 i stället för 404.
-- `DomainInvalidStateTransitionException` — kastas av `Throw.Vårdval.RedanAvslutat`, `Throw.Person.IngetAktivtVårdvalAttStänga` m.fl. Faller till 500.
-- `DomainConcurrencyConflictException` — faller till 500.
-- `DomainIdempotencyViolationException` — faller till 500.
-
-Detta innebär att klienter får generiska 500-svar för domänfel som borde ge meningsfull feedback.
-
-### Rekommendation
-
-Antingen motivera varje mappning per HTTP-yta (som beslutet föreskriver) eller medvetet tillåta en pragmatisk default-mappning för referensarkitekturen med tydlig dokumentation om varför varje undantagstyp → statuskod-par är semantiskt korrekt i detta sammanhang.
+Alla felsvar följer RFC 9457 med `Type` (URN), `Title`, `Status`, `Detail` och `Extensions["code"]` (för domänfel).
 
 ## Relaterade dokument
 - `docs/ADR-000 E-Clean & Semantic Architecture.md`
@@ -118,4 +117,5 @@ Antingen motivera varje mappning per HTTP-yta (som beslutet föreskriver) eller 
 - `docs/ADR-004 Semantic precision in exception factories.md`
 - `docs/ADR-005 Verification of domain failure semantics.md`
 - `docs/ADR-007 Dual failure channel.md`
+- `docs/ADR-009 Produktionshärdning av delivery- och infrastrukturlager.md`
 - `docs/POLICY.md`
