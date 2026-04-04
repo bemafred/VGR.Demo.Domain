@@ -3,6 +3,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\VGR.Semantics.Linq\VGR.Semantics.Linq.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Assets\edgar-badge.svg" LogicalName="edgar-badge.svg"/>
     <EmbeddedResource Include="Assets\edgar-favicon.svg" LogicalName="edgar-favicon.svg"/>
   </ItemGroup>

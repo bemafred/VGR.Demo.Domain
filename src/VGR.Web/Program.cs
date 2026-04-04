@@ -15,9 +15,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Vgr")
     ?? "Host=localhost;Database=vgr;Username=bemafred";
 
+// CQRS-light - läs kontexten
 builder.Services.AddDbContext<ReadDbContext>(o =>
     o.UseNpgsql(connectionString)
      .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+
+// CQRS-light - skriv kontexten
 builder.Services.AddDbContext<WriteDbContext>(o =>
     o.UseNpgsql(connectionString));
 
@@ -38,6 +41,8 @@ using (var scope = app.Services.CreateScope())
     db.Database.EnsureCreated();
 }
 
-app.UseDomain(typeof(Region).Assembly);
+SemanticRegistry.UseDomain(typeof(Region).Assembly);
+app.MapDomainEndpoints();
 app.MapControllers();
+
 app.Run();

@@ -1,39 +1,40 @@
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using VGR.Semantics.Linq;
 
 namespace VGR.Technical.Web;
 
 /// <summary>
 /// Extension method som registrerar domänens webbyta.
-/// Anropas med <c>app.UseDomain(typeof(Region).Assembly)</c>.
+/// Konsumerar metadata från <see cref="SemanticRegistry"/>.
 /// </summary>
 public static class DomainEndpoints
 {
-    private static Assembly[] _domainAssemblies = [];
-
     /// <summary>
-    /// Registrerar domänens webbyta: indexsida (<c>/</c>), favicon och framtida <c>/domain</c>.
+    /// Registrerar domänens webbyta: indexsida (<c>/</c>), <c>/domain</c>, favicon och assets.
+    /// Kräver att <see cref="SemanticRegistry.UseDomain"/> har anropats först.
     /// </summary>
-    public static WebApplication UseDomain(this WebApplication app, params Assembly[] domainAssemblies)
+    public static WebApplication MapDomainEndpoints(this WebApplication app)
     {
-        _domainAssemblies = domainAssemblies;
+        app.MapGet("/", () =>
+        {
+            var model = SemanticRegistry.GetModel();
+            return Results.Content(IndexPage.Render(model), "text/html");
+        }).ExcludeFromDescription();
 
-        app.MapGet("/", () => Results.Content(IndexPage.Render(domainAssemblies), "text/html"))
-           .ExcludeFromDescription();
+        app.MapGet("/domain", () =>
+        {
+            var model = SemanticRegistry.GetModel();
+            return Results.Content(DomainPage.Render(model), "text/html");
+        }).ExcludeFromDescription();
 
         app.MapGet("/favicon.svg", () =>
-        {
-            var svg = EmbeddedAssets.Read("edgar-favicon.svg");
-            return Results.Content(svg, "image/svg+xml");
-        }).ExcludeFromDescription();
+            Results.Content(EmbeddedAssets.Read("edgar-favicon.svg"), "image/svg+xml"))
+            .ExcludeFromDescription();
 
         app.MapGet("/edgar-badge.svg", () =>
-        {
-            var svg = EmbeddedAssets.Read("edgar-badge.svg");
-            return Results.Content(svg, "image/svg+xml");
-        }).ExcludeFromDescription();
+            Results.Content(EmbeddedAssets.Read("edgar-badge.svg"), "image/svg+xml"))
+            .ExcludeFromDescription();
 
         return app;
     }

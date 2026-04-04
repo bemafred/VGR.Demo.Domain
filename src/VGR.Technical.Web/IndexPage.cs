@@ -1,4 +1,4 @@
-using System.Reflection;
+using VGR.Semantics.Abstractions;
 
 namespace VGR.Technical.Web;
 
@@ -7,10 +7,13 @@ namespace VGR.Technical.Web;
 /// </summary>
 internal static class IndexPage
 {
-    public static string Render(Assembly[] domainAssemblies)
+    public static string Render(DomainModel model)
     {
-        var assemblyNames = string.Join(", ",
-            domainAssemblies.Select(a => a.GetName().Name));
+        var typeCount = model.Types.Count;
+        var aggregates = model.Types.Count(t => t.Kind == DomainTypeKind.Aggregate);
+        var entities = model.Types.Count(t => t.Kind == DomainTypeKind.Entity);
+        var valueObjects = model.Types.Count(t => t.Kind is DomainTypeKind.ValueObject or DomainTypeKind.Identity);
+        var summary = $"{aggregates} aggregat, {entities} entiteter, {valueObjects} värdeobjekt — {typeCount} typer totalt";
 
         return $$"""
             <!DOCTYPE html>
@@ -103,7 +106,7 @@ internal static class IndexPage
                     <p class="subtitle">
                         Referensarkitektur — E-Clean &amp; Semantic Architecture
                     </p>
-                    <p class="assemblies">{{assemblyNames}}</p>
+                    <p class="assemblies">{{summary}}</p>
                     <nav>
                         <a href="/domain">Domän</a>
                         <a href="/api">API</a>

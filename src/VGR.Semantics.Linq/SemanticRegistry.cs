@@ -11,13 +11,38 @@ namespace VGR.Semantics.Linq;
 /// The source generator (SemanticGenerator) provides compile-time validation
 /// but the actual wiring is dynamic — expansions can live in any loaded assembly.
 /// </summary>
-internal static class SemanticRegistry
+/// <remarks>
+/// Also serves as the single authority for domain metadata via
+/// <see cref="UseDomain"/> and <see cref="GetModel"/>.
+/// </remarks>
+public static class SemanticRegistry
 {
     private static readonly ConcurrentDictionary<MethodInfo, LambdaExpression> _registry = new();
+    private static Assembly[] _domainAssemblies = [];
+    private static DomainModel? _cachedModel;
 
     static SemanticRegistry()
     {
         DiscoverExpansions();
+    }
+
+    /// <summary>
+    /// Deklarerar vilka assemblies som innehåller domäntyper.
+    /// Anropas en gång vid uppstart: <c>SemanticRegistry.UseDomain(typeof(Region).Assembly)</c>.
+    /// </summary>
+    public static void UseDomain(params Assembly[] domainAssemblies)
+    {
+        _domainAssemblies = domainAssemblies;
+        _cachedModel = null; // invalidera cache
+    }
+
+    /// <summary>
+    /// Returnerar domänens fullständiga statiska struktur.
+    /// Bygger modellen lazy vid första anrop, cachas därefter.
+    /// </summary>
+    public static DomainModel GetModel()
+    {
+        return _cachedModel ??= DomainModelBuilder.Build(_domainAssemblies, _registry);
     }
 
     private static void DiscoverExpansions()
