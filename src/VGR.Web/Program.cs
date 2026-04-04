@@ -10,9 +10,15 @@ using VGR.Semantics.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DbContexts (example: in-memory for demo only)
-builder.Services.AddDbContext<ReadDbContext>(o => o.UseInMemoryDatabase("vgr").UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
-builder.Services.AddDbContext<WriteDbContext>(o => o.UseInMemoryDatabase("vgr"));
+// DbContexts — PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("Vgr")
+    ?? "Host=localhost;Database=vgr;Username=bemafred";
+
+builder.Services.AddDbContext<ReadDbContext>(o =>
+    o.UseNpgsql(connectionString)
+     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+builder.Services.AddDbContext<WriteDbContext>(o =>
+    o.UseNpgsql(connectionString));
 
 // Clock
 builder.Services.AddSingleton<IClock, SystemClock>();
@@ -23,5 +29,13 @@ builder.Services.AddScoped<SkapaVårdvalInteractor>();
 
 builder.Services.AddControllers();
 var app = builder.Build();
+
+// Säkerställ att schemat finns (code-first, inga migrations)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+    db.Database.EnsureCreated();
+}
+
 app.MapControllers();
 app.Run();
