@@ -36,7 +36,8 @@ internal static class ApiPage
                     {
                         p.Name,
                         Type = FormatTypeName(p.ParameterType),
-                        Source = p.BindingInfo?.BindingSource?.DisplayName ?? "unknown"
+                        Source = p.BindingInfo?.BindingSource?.DisplayName ?? "unknown",
+                        DtoFields = ExtractDtoFields(p.ParameterType, p.BindingInfo?.BindingSource?.DisplayName)
                     }).ToList(),
                     Produces = produces
                         .GroupBy(p => p.StatusCode)
@@ -97,11 +98,21 @@ internal static class ApiPage
 
                     if (bodyParams.Count > 0)
                     {
-                        body.AppendLine("<h3>Kropp</h3>");
-                        body.AppendLine("<table><tbody>");
                         foreach (var p in bodyParams)
-                            body.AppendLine($"<tr><td class=\"param-name\">{Esc(p.Name)}</td><td class=\"param-type\">{Esc(p.Type)}</td></tr>");
-                        body.AppendLine("</tbody></table>");
+                        {
+                            body.AppendLine($"<h3>Body — <span class=\"param-type\">{Esc(p.Type)}</span></h3>");
+                            if (p.DtoFields.Count > 0)
+                            {
+                                body.AppendLine("<table><thead><tr><th>Fält</th><th>Typ</th><th></th></tr></thead><tbody>");
+                                foreach (var f in p.DtoFields)
+                                {
+                                    var tags = string.Join(" ", f.Tags.Select(t =>
+                                        $"<span class=\"tag {t.Css}\">{Esc(t.Label)}</span>"));
+                                    body.AppendLine($"<tr><td class=\"param-name\">{Esc(f.Name)}</td><td class=\"param-type\">{Esc(f.Type)}</td><td>{tags}</td></tr>");
+                                }
+                                body.AppendLine("</tbody></table>");
+                            }
+                        }
                     }
 
                     body.AppendLine("</div>");
@@ -111,7 +122,7 @@ internal static class ApiPage
                 if (ep.Produces.Count > 0)
                 {
                     body.AppendLine("<div class=\"details\">");
-                    body.AppendLine("<h3>Svar</h3>");
+                    body.AppendLine("<h3>Response</h3>");
                     body.AppendLine("<table><tbody>");
                     foreach (var p in ep.Produces.OrderBy(p => p.StatusCode))
                     {
@@ -264,6 +275,11 @@ internal static class ApiPage
                     .status.redirect { color: #fbbf24; }
                     .status.error { color: #f87171; }
 
+                    .tag { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 0.15rem; margin-left: 0.25rem; }
+                    .tag.req { background: #331a1a; color: #f87171; }
+                    .tag.len { background: #1a1a2a; color: #818cf8; }
+                    .tag.opt { background: #1a2a1a; color: #86efac; }
+
                     .empty { color: #555; font-style: italic; padding: 2rem 0; }
 
                     footer {
@@ -293,6 +309,44 @@ internal static class ApiPage
             </body>
             </html>
             """;
+    }
+
+    private record DtoFieldTag(string Label, string Css);
+    private record DtoField(string Name, string Type, List<DtoFieldTag> Tags);
+
+    private static List<DtoField> ExtractDtoFields(Type type, string? source)
+    {
+        // Bara expandera body-parametrar (DTO:er), inte path/query-parametrar
+        if (source is not "Body") return [];
+        if (type.IsPrimitive || type == typeof(string) || type == typeof(Guid)) return [];
+
+        return type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+            .Select(p =>
+            {
+                var tags = new List<DtoFieldTag>();
+
+                // Required
+                if (p.GetCustomAttributes(true).Any(a => a.GetType().Name == "RequiredAttribute"))
+                    tags.Add(new DtoFieldTag("required", "req"));
+
+                // StringLength
+                var strLen = p.GetCustomAttributes(true)
+                    .FirstOrDefault(a => a.GetType().Name == "StringLengthAttribute");
+                if (strLen is not null)
+                {
+                    var max = (int)strLen.GetType().GetProperty("MaximumLength")!.GetValue(strLen)!;
+                    var min = (int)strLen.GetType().GetProperty("MinimumLength")!.GetValue(strLen)!;
+                    tags.Add(new DtoFieldTag($"{min}–{max}", "len"));
+                }
+
+                // Nullable
+                var underlying = Nullable.GetUnderlyingType(p.PropertyType);
+                if (underlying is not null)
+                    tags.Add(new DtoFieldTag("nullable", "opt"));
+
+                return new DtoField(p.Name, FormatTypeName(p.PropertyType), tags);
+            })
+            .ToList();
     }
 
     private static string FormatTypeName(Type type)
