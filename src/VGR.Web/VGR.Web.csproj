@@ -4,6 +4,7 @@
     <ProjectReference Include="..\VGR.Infrastructure.EF\VGR.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\VGR.Domain\VGR.Domain.csproj" />
     <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj" />
+    <ProjectReference Include="..\VGR.Technical.Web\VGR.Technical.Web.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />

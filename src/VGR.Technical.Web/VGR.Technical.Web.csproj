@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\edgar-badge.svg" LogicalName="edgar-badge.svg"/>
+    <EmbeddedResource Include="Assets\edgar-favicon.svg" LogicalName="edgar-favicon.svg"/>
+  </ItemGroup>
+</Project>

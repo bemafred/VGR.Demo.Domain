@@ -6,6 +6,7 @@ using VGR.Technical;
 using VGR.Domain;
 using VGR.Domain.SharedKernel;
 using VGR.Semantics.Linq;
+using VGR.Technical.Web;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,5 +38,6 @@ using (var scope = app.Services.CreateScope())
     db.Database.EnsureCreated();
 }
 
+app.UseDomain(typeof(Region).Assembly);
 app.MapControllers();
 app.Run();
