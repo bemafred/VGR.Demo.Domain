@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using VGR.Semantics.Linq;
 
 namespace VGR.Technical.Web;
@@ -11,7 +13,7 @@ namespace VGR.Technical.Web;
 public static class DomainEndpoints
 {
     /// <summary>
-    /// Registrerar domänens webbyta: indexsida (<c>/</c>), <c>/domain</c>, favicon och assets.
+    /// Registrerar domänens webbyta: indexsida (<c>/</c>), <c>/domain</c>, <c>/api</c>, favicon och assets.
     /// Kräver att <see cref="SemanticRegistry.UseDomain"/> har anropats först.
     /// </summary>
     public static WebApplication MapDomainEndpoints(this WebApplication app)
@@ -27,6 +29,11 @@ public static class DomainEndpoints
             var model = SemanticRegistry.GetModel();
             return Results.Content(DomainPage.Render(model), "text/html");
         }).ExcludeFromDescription();
+
+        var dataSources = app.Services.GetRequiredService<IEnumerable<EndpointDataSource>>();
+        app.MapGet("/api", () =>
+            Results.Content(ApiPage.Render(dataSources), "text/html"))
+            .ExcludeFromDescription();
 
         app.MapGet("/favicon.svg", () =>
             Results.Content(EmbeddedAssets.Read("edgar-favicon.svg"), "image/svg+xml"))
