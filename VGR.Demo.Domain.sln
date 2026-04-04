@@ -49,6 +49,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADR", "ADR", "{A57764AC-277
 		docs\adr\ADR-008 Värdeobjektskontrakt och semantiska tolknings-API:er och odefinierade domänoperationer.md = docs\adr\ADR-008 Värdeobjektskontrakt och semantiska tolknings-API:er och odefinierade domänoperationer.md
 		docs\adr\ADR-009 Produktionshärdning av delivery- och infrastrukturlager.md = docs\adr\ADR-009 Produktionshärdning av delivery- och infrastrukturlager.md
 		docs\adr\ADR-010 Persistenslagret uttrycker relationella garantier för systeminvarianter.md = docs\adr\ADR-010 Persistenslagret uttrycker relationella garantier för systeminvarianter.md
+		docs\adr\ADR-011 Compile-time verifiering av semantiska expansioner.md = docs\adr\ADR-011 Compile-time verifiering av semantiska expansioner.md
+		docs\adr\ADR-012 Automatiskt domän-UI via reflection.md = docs\adr\ADR-012 Automatiskt domän-UI via reflection.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Architecture", "Architecture", "{D904C177-A619-432C-93C5-72C36F9BA54E}"
