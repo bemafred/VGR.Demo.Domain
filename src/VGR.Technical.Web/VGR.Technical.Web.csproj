@@ -3,6 +3,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\VGR.Semantics.Linq\VGR.Semantics.Linq.csproj"/>
   </ItemGroup>
   <ItemGroup>

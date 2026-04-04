@@ -45,6 +45,12 @@ public static class SemanticRegistry
         return _cachedModel ??= DomainModelBuilder.Build(_domainAssemblies, _registry);
     }
 
+    /// <summary>
+    /// Returnerar de assemblies som deklarerats via <see cref="UseDomain"/>.
+    /// Används av <c>/data</c>-routes för att resolva CLR-typer från domänmodellen.
+    /// </summary>
+    public static Assembly[] GetDomainAssemblies() => _domainAssemblies;
+
     private static void DiscoverExpansions()
     {
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())

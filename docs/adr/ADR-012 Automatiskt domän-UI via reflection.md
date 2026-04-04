@@ -137,11 +137,11 @@ existerar parallellt och ersätter inget.
 
 ## Implementationsstatus
 
-- [ ] ADR dokumenterad
-- [ ] Steg 1: `/data` med listning av aggregat och instanser (ReadDbContext)
-- [ ] Steg 2: Navigation av relationer (`/data/{type}/{id}/{relation}`)
-- [ ] Steg 3: POST-routes för fabriksmetod-invocation (WriteDbContext)
-- [ ] Steg 4: HTML-formulär med vanilla JS
+- [x] ADR dokumenterad
+- [x] Steg 1: `/data` med listning av aggregat och instanser (ReadDbContext)
+- [x] Steg 2: Navigation av relationer (`/data/{type}/{id}/{relation}`)
+- [x] Steg 3: POST-routes för fabriksmetod-invocation (WriteDbContext)
+- [x] Steg 4: HTML-formulär med vanilla JS
 
 ## Relaterade dokument
 

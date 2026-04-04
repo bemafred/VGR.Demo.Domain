@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using VGR.Semantics.Linq;
+using VGR.Technical.Web.Data;
 
 namespace VGR.Technical.Web;
 
@@ -42,6 +43,8 @@ public static class DomainEndpoints
         app.MapGet("/edgar-badge.svg", () =>
             Results.Content(EmbeddedAssets.Read("edgar-badge.svg"), "image/svg+xml"))
             .ExcludeFromDescription();
+
+        DataEndpoints.Map(app);
 
         return app;
     }

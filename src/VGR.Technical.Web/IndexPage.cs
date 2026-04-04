@@ -110,6 +110,7 @@ internal static class IndexPage
                     <nav>
                         <a href="/domain">Domän</a>
                         <a href="/api">API</a>
+                        <a href="/data">Data</a>
                     </nav>
                 </main>
                 <footer>
