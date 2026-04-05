@@ -105,6 +105,7 @@ internal static class IndexPage
                     <h1>VGR.Demo.Domain</h1>
                     <p class="subtitle">
                         Referensarkitektur — E-Clean &amp; Semantic Architecture
+                        <br><em>.NET Native Holistic Architectural Excellence</em>
                     </p>
                     <p class="assemblies">{{summary}}</p>
                     <nav>
