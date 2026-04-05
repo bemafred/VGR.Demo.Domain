@@ -191,7 +191,23 @@ internal static class DataLayout
                     font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
                     white-space: pre-wrap;
                     display: none;
+                    position: relative;
                 }
+
+                .result-banner .close-btn {
+                    position: absolute;
+                    top: 0.3rem;
+                    right: 0.5rem;
+                    background: none;
+                    border: none;
+                    color: inherit;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    opacity: 0.6;
+                    padding: 0 0.3rem;
+                }
+
+                .result-banner .close-btn:hover { opacity: 1; }
 
                 .result-banner.success { background: #1a3320; color: #4ade80; border: 1px solid #2a5530; display: block; }
                 .result-banner.error { background: #331a1a; color: #f87171; border: 1px solid #552a2a; display: block; }

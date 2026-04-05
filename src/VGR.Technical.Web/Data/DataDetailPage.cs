@@ -156,6 +156,19 @@ internal static class DataDetailPage
 
     private static string MethodFormScript() => """
         <script>
+        function showBanner(banner, text) {
+            banner.textContent = '';
+            const span = document.createElement('span');
+            span.textContent = text;
+            banner.appendChild(span);
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'close-btn';
+            btn.textContent = '×';
+            btn.onclick = () => { banner.style.display = 'none'; };
+            banner.appendChild(btn);
+            banner.style.display = 'block';
+        }
         document.querySelectorAll('.method-form form').forEach(form => {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -181,20 +194,17 @@ internal static class DataDetailPage
 
                     if (res.ok) {
                         banner.className = 'result-banner success';
-                        banner.textContent = typeof body === 'object' ? JSON.stringify(body, null, 2) : body;
-                        banner.style.display = 'block';
-                        setTimeout(() => location.reload(), 1200);
+                        const msg = typeof body === 'object' ? JSON.stringify(body, null, 2) : body;
+                        showBanner(banner, msg);
                     } else {
                         banner.className = 'result-banner error';
                         const detail = body.detail || body.title || text;
                         const code = body.extensions?.code || body.code || '';
-                        banner.textContent = `${res.status}: ${detail}${code ? ' [' + code + ']' : ''}`;
-                        banner.style.display = 'block';
+                        showBanner(banner, `${res.status}: ${detail}${code ? ' [' + code + ']' : ''}`);
                     }
                 } catch (err) {
                     banner.className = 'result-banner error';
-                    banner.textContent = err.message;
-                    banner.style.display = 'block';
+                    showBanner(banner, err.message);
                 }
             });
         });

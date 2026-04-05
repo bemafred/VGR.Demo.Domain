@@ -101,6 +101,26 @@ internal static class DataInstancesPage
 
     private static string MethodFormScript() => """
         <script>
+        function showBanner(banner, text, url) {
+            banner.textContent = '';
+            const span = document.createElement('span');
+            span.textContent = text;
+            banner.appendChild(span);
+            if (url) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.textContent = ' → visa';
+                link.style.cssText = 'color: inherit; margin-left: 0.5rem;';
+                banner.appendChild(link);
+            }
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'close-btn';
+            btn.textContent = '×';
+            btn.onclick = () => { banner.style.display = 'none'; };
+            banner.appendChild(btn);
+            banner.style.display = 'block';
+        }
         document.querySelectorAll('.method-form form').forEach(form => {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -126,21 +146,17 @@ internal static class DataInstancesPage
 
                     if (res.ok) {
                         banner.className = 'result-banner success';
-                        banner.textContent = typeof body === 'object' ? JSON.stringify(body, null, 2) : body;
-                        banner.style.display = 'block';
-                        if (body.url) setTimeout(() => location.href = body.url, 1200);
-                        else setTimeout(() => location.reload(), 1200);
+                        const msg = typeof body === 'object' ? JSON.stringify(body, null, 2) : body;
+                        showBanner(banner, msg, body.url);
                     } else {
                         banner.className = 'result-banner error';
                         const detail = body.detail || body.title || text;
                         const code = body.extensions?.code || body.code || '';
-                        banner.textContent = `${res.status}: ${detail}${code ? ' [' + code + ']' : ''}`;
-                        banner.style.display = 'block';
+                        showBanner(banner, `${res.status}: ${detail}${code ? ' [' + code + ']' : ''}`);
                     }
                 } catch (err) {
                     banner.className = 'result-banner error';
-                    banner.textContent = err.message;
-                    banner.style.display = 'block';
+                    showBanner(banner, err.message);
                 }
             });
         });
