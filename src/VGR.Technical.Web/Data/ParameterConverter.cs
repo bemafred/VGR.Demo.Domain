@@ -59,9 +59,12 @@ internal static class ParameterConverter
             return element.GetBoolean();
 
         if (targetType == typeof(DateTimeOffset))
-            return element.ValueKind == JsonValueKind.String
+        {
+            var dto = element.ValueKind == JsonValueKind.String
                 ? DateTimeOffset.Parse(element.GetString()!, CultureInfo.InvariantCulture)
                 : element.GetDateTimeOffset();
+            return dto.ToUniversalTime();
+        }
 
         if (targetType == typeof(DateOnly))
             return DateOnly.Parse(element.GetString()!, CultureInfo.InvariantCulture);
@@ -100,12 +103,12 @@ internal static class ParameterConverter
         {
             if (element.TryGetProperty("start", out var startEl) || element.TryGetProperty("Start", out startEl))
             {
-                var start = DateTimeOffset.Parse(startEl.GetString()!, CultureInfo.InvariantCulture);
+                var start = DateTimeOffset.Parse(startEl.GetString()!, CultureInfo.InvariantCulture).ToUniversalTime();
 
                 var hasSlut = element.TryGetProperty("slut", out var slutEl) || element.TryGetProperty("Slut", out slutEl);
                 if (hasSlut && slutEl.ValueKind != JsonValueKind.Null)
                 {
-                    var slut = DateTimeOffset.Parse(slutEl.GetString()!, CultureInfo.InvariantCulture);
+                    var slut = DateTimeOffset.Parse(slutEl.GetString()!, CultureInfo.InvariantCulture).ToUniversalTime();
                     var skapaMethod = targetType.GetMethod("Skapa", BindingFlags.Public | BindingFlags.Static,
                         [typeof(DateTimeOffset), typeof(DateTimeOffset)]);
                     return skapaMethod!.Invoke(null, [start, slut]);
