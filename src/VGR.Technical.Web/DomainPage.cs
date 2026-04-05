@@ -27,7 +27,7 @@ internal static class DomainPage
 
             foreach (var type in group.OrderBy(t => t.Name))
             {
-                body.AppendLine($"""<details class="domain-type" open>""");
+                body.AppendLine($"""<details class="domain-type">""");
                 body.AppendLine($"<summary><span class=\"type-name\">{Esc(type.Name)}</span> <span class=\"badge {kindCss}\">{kindLabel}</span></summary>");
 
                 // Properties

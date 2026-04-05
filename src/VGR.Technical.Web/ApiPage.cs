@@ -76,7 +76,7 @@ internal static class ApiPage
                 var methods = string.Join(" ", ep.Methods.Select(m =>
                     $"<span class=\"method {m.ToLowerInvariant()}\">{Esc(m)}</span>"));
 
-                body.AppendLine($"""<details class="endpoint" open>""");
+                body.AppendLine($"""<details class="endpoint">""");
                 body.AppendLine($"<summary>{methods} <span class=\"route\">{Esc(ep.Route)}</span></summary>");
 
                 // Parameters
@@ -89,7 +89,7 @@ internal static class ApiPage
 
                     if (pathParams.Count > 0)
                     {
-                        body.AppendLine("<h3>Path-parametrar</h3>");
+                        body.AppendLine("<h3><span class=\"label\">Path-parametrar</span></h3>");
                         body.AppendLine("<table><tbody>");
                         foreach (var p in pathParams)
                             body.AppendLine($"<tr><td class=\"param-name\">{Esc(p.Name)}</td><td class=\"param-type\">{Esc(p.Type)}</td></tr>");
@@ -100,7 +100,7 @@ internal static class ApiPage
                     {
                         foreach (var p in bodyParams)
                         {
-                            body.AppendLine($"<h3>Body — <span class=\"param-type\">{Esc(p.Type)}</span></h3>");
+                            body.AppendLine($"<h3><span class=\"label\">Body</span> — <span class=\"param-type\">{Esc(p.Type)}</span></h3>");
                             if (p.DtoFields.Count > 0)
                             {
                                 body.AppendLine("<table><thead><tr><th>Fält</th><th>Typ</th><th></th></tr></thead><tbody>");
@@ -122,7 +122,7 @@ internal static class ApiPage
                 if (ep.Produces.Count > 0)
                 {
                     body.AppendLine("<div class=\"details\">");
-                    body.AppendLine("<h3>Response</h3>");
+                    body.AppendLine("<h3><span class=\"label\">Response</span></h3>");
                     body.AppendLine("<table><tbody>");
                     foreach (var p in ep.Produces.OrderBy(p => p.StatusCode))
                     {
@@ -240,13 +240,25 @@ internal static class ApiPage
                         font-size: 0.75rem;
                         font-weight: 400;
                         color: #666;
-                        text-transform: uppercase;
                         letter-spacing: 0.08em;
                         margin-bottom: 0.5rem;
                         margin-top: 0.5rem;
                     }
 
+                    .details h3 .label {
+                        text-transform: uppercase;
+                    }
+
                     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+
+                    thead th {
+                        padding: 0.3rem 0.5rem;
+                        text-align: left;
+                        font-weight: 400;
+                        font-size: 0.75rem;
+                        color: #666;
+                        border-bottom: 1px solid #222;
+                    }
 
                     tbody td {
                         padding: 0.3rem 0.5rem;
