@@ -106,6 +106,12 @@ await using var h = new SqliteHarness();
 - **Semantic correlations** (`VGR.Semantics.Linq.Correlations`): Verify domain methods match SQL translation
 - **E2E tests** (`VGR.Web.Verifications`): Full stack with SQLite in-memory
 
+## ADR-underhåll
+
+ADR-dokument i `docs/adr/` har en `## Status`-sektion. Giltiga statusar: **Föreslagen**, **Accepterad**, **Genomförd**, **Ersatt**, **Avvisad**.
+
+**Regel:** När du implementerar en ADR (eller verifierar att en ADR:s alla steg är klara), uppdatera dess status till `Genomförd`. Om en ADR har en implementationschecklista (`- [x]`/`- [ ]`), bocka av steg allteftersom de slutförs. Status och checklista ska alltid spegla verkligheten i koden.
+
 ## Code Principles
 
 - **Simplicity First** – choose the most understandable solution

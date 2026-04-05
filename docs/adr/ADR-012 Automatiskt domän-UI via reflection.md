@@ -1,7 +1,7 @@
 # ADR-012: Automatiskt domän-UI via reflection
 
 ## Status
-Föreslagen
+Genomförd
 
 ## Kontext
 

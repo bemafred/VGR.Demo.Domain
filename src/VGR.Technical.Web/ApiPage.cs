@@ -89,7 +89,7 @@ internal static class ApiPage
 
                     if (pathParams.Count > 0)
                     {
-                        body.AppendLine("<h3>Vägparametrar</h3>");
+                        body.AppendLine("<h3>Path-parametrar</h3>");
                         body.AppendLine("<table><tbody>");
                         foreach (var p in pathParams)
                             body.AppendLine($"<tr><td class=\"param-name\">{Esc(p.Name)}</td><td class=\"param-type\">{Esc(p.Type)}</td></tr>");
