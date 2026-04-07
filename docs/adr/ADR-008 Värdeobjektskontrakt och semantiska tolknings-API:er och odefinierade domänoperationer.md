@@ -1,4 +1,4 @@
-# ADR-008: Värdeobjektskontrakt, semantiska tolknings-API:er och odefinierade domänoperationer
+# ADR-008: Värdeobjektskontrakt, semantiska tolknings-APIer och odefinierade domänoperationer
 
 ## Status
 Genomförd
