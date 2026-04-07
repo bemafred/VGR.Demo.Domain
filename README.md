@@ -1,6 +1,6 @@
 # VGR Demo Domain – Epistemic Clean & Semantic Architecture (.NET / DDD / EF / CQRS-light)
 
-**Version 1.0.0** — .NET 10.0 / C# 14 / EF Core / PostgreSQL / 104 tester / 13 ADR:er
+**Version 1.0.0** — .NET 10.0 / C# 14 / EF Core / PostgreSQL & SQL Server / 123 tester / 16 ADR:er
 
 *Avancerat och enkelt är bättre än komplicerat och naivt.*
 
@@ -68,7 +68,7 @@ Solution-folderstrukturen speglar ansvarsområden. Uppdelningen är **vertikal**
 | | `VGR.Application.Stories` | Applikationsnära stories/scenarion och verifiering. |
 | **Technical Domain** | `VGR.Technical` | Tekniska byggblock (`Utfall`, `IClock`). |
 | | `VGR.Technical.Testing` | Stödfunktioner för testning (`SqliteHarness`). |
-| | `VGR.Technical.Web` | System-UI: `app.UseDomain()`, reflection-driven `/domain`- och `/api`-vyer. |
+| | `VGR.Technical.Web` | System-UI: `app.MapDomainEndpoints()`, reflection-driven `/domain`- och `/api`-vyer. |
 | | `VGR.Technical.Verifications` | Verifiering av tekniska byggblock. |
 | **Semantic Core** | `VGR.Semantics.Abstractions` | Attribut och kontrakt (`SemanticQueryAttribute`, `ExpansionForAttribute`). |
 | | `VGR.Semantics.Linq` | Query-provider + expression-rewriter (`WithSemantics()`, `SemanticRegistry`). |
@@ -78,6 +78,7 @@ Solution-folderstrukturen speglar ansvarsområden. Uppdelningen är **vertikal**
 | **Infrastructure** | `VGR.Infrastructure.EF` | EF Core-konfiguration, `ReadDbContext`, `WriteDbContext` (CQRS-light). |
 | | `VGR.Infrastructure.Diagnostics` | Infrastrukturrelaterad verifiering/diagnostik. |
 | | `VGR.Infrastructure.PostgreSQL.Verifications` | Integrationstester mot riktig PostgreSQL. |
+| | `VGR.Infrastructure.SqlServer.Verifications` | Integrationstester mot riktig SQL Server. |
 | **Delivery (API & Hosting)** | `VGR.Web` | ASP.NET Core-API, controllers, HTTP-mappning. |
 | | `VGR.Web.Verifications` | E2E-/integrationstester (SQLite in-memory). |
 | **Quality & Guardrails** | `VGR.Analyzers` | Roslyn-regler för domänen (`VGR001`, `VGR002`). |
@@ -96,9 +97,10 @@ src/
   VGR.Technical/
     Utfall.cs, IClock.cs
   VGR.Technical.Testing/
-    SqliteHarness.cs
+    SqliteHarness.cs, PostgresHarness.cs, SqlServerHarness.cs
+    KräverPostgresFactAttribute.cs, KräverSqlServerFactAttribute.cs
   VGR.Technical.Web/
-    DomainEndpoints.cs, DomainPage.cs, ApiPage.cs
+    DomainEndpoints.cs, DataEndpoints.cs, DomainPage.cs, ApiPage.cs
   VGR.Technical.Verifications/
   VGR.Semantics.Abstractions/
   VGR.Semantics.Generator/
@@ -111,6 +113,7 @@ src/
     ReadDbContext.cs, WriteDbContext.cs
   VGR.Infrastructure.Diagnostics/
   VGR.Infrastructure.PostgreSQL.Verifications/
+  VGR.Infrastructure.SqlServer.Verifications/
   VGR.Web/
   VGR.Web.Verifications/
 tools/
@@ -225,7 +228,7 @@ Genom att all översättning sker på **ett ställe** blir controllers tunna, fe
 
 ## 6. Bygg och kör
 
-Kräver .NET SDK som stöder `net10.0` och PostgreSQL för webapplikationen.
+Kräver .NET SDK som stöder `net10.0`. Webapplikationen använder SQL Server på Windows och PostgreSQL på macOS (villkorat i `Program.cs`).
 
 ### Kör webben
 
@@ -233,10 +236,11 @@ Kräver .NET SDK som stöder `net10.0` och PostgreSQL för webapplikationen.
 dotnet run --project src/VGR.Web/VGR.Web.csproj
 ```
 
-Webben använder PostgreSQL (Npgsql) och exponerar tre system-UI-sidor via `app.UseDomain()`:
+Webben exponerar fyra system-UI-sidor via `app.MapDomainEndpoints()`:
 - `/` — indexsida
 - `/domain` — reflection-driven domänstrukturvy
 - `/api` — reflection-driven endpoint-vy
+- `/data` — reflection-driven datavy (CRUD mot domäntyper)
 
 ### Bygg lösningen
 
@@ -247,11 +251,8 @@ dotnet build VGR.Demo.Domain.sln
 ### Kör tester
 
 ```bash
-# Alla tester (exklusive PostgreSQL-integrationstester)
+# Alla tester — DB-specifika tester skippas automatiskt om servern inte är nåbar
 dotnet test VGR.Demo.Domain.sln
-
-# PostgreSQL-integrationstester (kräver aktiv PostgreSQL)
-dotnet test src/VGR.Infrastructure.PostgreSQL.Verifications
 ```
 
 Testprojekt och vad de verifierar:
@@ -266,6 +267,7 @@ Testprojekt och vad de verifierar:
 | `VGR.Technical.Verifications` | `Utfall`, tekniska byggblock | Ingen |
 | `VGR.Infrastructure.Diagnostics` | Schema, index, NoTracking, RowVersion | SQLite |
 | `VGR.Infrastructure.PostgreSQL.Verifications` | Infrastruktur + korrelationer mot PostgreSQL | PostgreSQL |
+| `VGR.Infrastructure.SqlServer.Verifications` | Infrastruktur + korrelationer mot SQL Server | SQL Server |
 
 ---
 
@@ -283,7 +285,7 @@ Se `docs/guides/ANALYZER_REGLER.md`. Severity konfigureras i `.editorconfig` (de
 
 | Kategori | Sökväg | Innehåll |
 |---|---|---|
-| **ADR:er** | `docs/adr/ADR-000..012` | 13 arkitekturbeslut (E-Clean, testnamn, felhantering, härdning, expansioner, domän-UI) |
+| **ADR:er** | `docs/adr/ADR-000..015` | 16 arkitekturbeslut (E-Clean, testnamn, felhantering, härdning, expansioner, domän-UI, DB-providrar) |
 | **Arkitektur** | `docs/architecture/` | CANON, NAME, WHY — destillerade principer |
 | **Guides** | `docs/guides/` | ANALYS, POLICY, KODERGONOMI, PLACERING, ONBOARDING, QUICKSTART, ANALYZER_REGLER |
 | **Appendices** | `docs/appendix/` | A–J: plattform, design, komponenter, tooling, jämförelser, AI, registry, patterns, regler, prestanda |
