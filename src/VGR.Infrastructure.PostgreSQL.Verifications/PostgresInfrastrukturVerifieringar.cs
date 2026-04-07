@@ -12,7 +12,7 @@ namespace VGR.Infrastructure.PostgreSQL.Verifications;
 /// </summary>
 public sealed class PostgresInfrastrukturVerifieringar
 {
-    [Fact]
+    [KräverPostgresFact]
     public async Task Schema_SkaparTabeller()
     {
         await using var h = new PostgresHarness();
@@ -27,7 +27,7 @@ public sealed class PostgresInfrastrukturVerifieringar
               .And.Contain("Vårdval");
     }
 
-    [Fact]
+    [KräverPostgresFact]
     public async Task Schema_FiltreratUniktIndex_EttAktivtVårdvalPerPerson()
     {
         await using var h = new PostgresHarness();
@@ -59,7 +59,7 @@ public sealed class PostgresInfrastrukturVerifieringar
             .Where(ex => ex.Message.Contains("IX_Vårdval_PersonId"));
     }
 
-    [Fact]
+    [KräverPostgresFact]
     public async Task ReadDbContext_LeverarDetachedEntiteter()
     {
         await using var h = new PostgresHarness();
@@ -73,7 +73,7 @@ public sealed class PostgresInfrastrukturVerifieringar
         h.Read.Entry(loaded).State.Should().Be(EntityState.Detached);
     }
 
-    [Fact]
+    [KräverPostgresFact]
     public async Task ValueObjectKonvertering_Personnummer_Rundresa()
     {
         await using var h = new PostgresHarness();
@@ -89,7 +89,7 @@ public sealed class PostgresInfrastrukturVerifieringar
         person.Personnummer.Should().Be(pnr);
     }
 
-    [Fact]
+    [KräverPostgresFact]
     public async Task ComplexProperty_Period_SparasOchLäses()
     {
         await using var h = new PostgresHarness();
@@ -109,7 +109,7 @@ public sealed class PostgresInfrastrukturVerifieringar
         vårdval.Period.ÄrTillsvidare.Should().BeTrue();
     }
 
-    [Fact]
+    [KräverPostgresFact]
     public async Task RowVersion_SättsVidSparning()
     {
         await using var h = new PostgresHarness();

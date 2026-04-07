@@ -12,7 +12,7 @@ namespace VGR.Infrastructure.SqlServer.Verifications;
 /// </summary>
 public sealed class SqlServerInfrastrukturVerifieringar
 {
-    [Fact]
+    [KräverSqlServerFact]
     public async Task Schema_SkaparTabeller()
     {
         await using var h = new SqlServerHarness();
@@ -27,7 +27,7 @@ public sealed class SqlServerInfrastrukturVerifieringar
               .And.Contain("Vårdval");
     }
 
-    [Fact]
+    [KräverSqlServerFact]
     public async Task Schema_FiltreratUniktIndex_EttAktivtVårdvalPerPerson()
     {
         await using var h = new SqlServerHarness();
@@ -54,7 +54,7 @@ public sealed class SqlServerInfrastrukturVerifieringar
             .Where(ex => ex.Message.Contains("IX_Vårdval_PersonId"));
     }
 
-    [Fact]
+    [KräverSqlServerFact]
     public async Task ReadDbContext_LeverarDetachedEntiteter()
     {
         await using var h = new SqlServerHarness();
@@ -68,7 +68,7 @@ public sealed class SqlServerInfrastrukturVerifieringar
         h.Read.Entry(loaded).State.Should().Be(EntityState.Detached);
     }
 
-    [Fact]
+    [KräverSqlServerFact]
     public async Task ValueObjectKonvertering_Personnummer_Rundresa()
     {
         await using var h = new SqlServerHarness();
@@ -84,7 +84,7 @@ public sealed class SqlServerInfrastrukturVerifieringar
         person.Personnummer.Should().Be(pnr);
     }
 
-    [Fact]
+    [KräverSqlServerFact]
     public async Task ComplexProperty_Period_SparasOchLäses()
     {
         await using var h = new SqlServerHarness();
@@ -104,7 +104,7 @@ public sealed class SqlServerInfrastrukturVerifieringar
         vårdval.Period.ÄrTillsvidare.Should().BeTrue();
     }
 
-    [Fact]
+    [KräverSqlServerFact]
     public async Task RowVersion_SättsVidSparning()
     {
         await using var h = new SqlServerHarness();

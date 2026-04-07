@@ -15,6 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 // DbContexts — PostgreSQL (Mac) / SQL Server (Windows)
 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
+builder.Configuration.AddJsonFile(
+    isWindows ? "appsettings.Development.Windows.json" : "appsettings.Development.Mac.json",
+    optional: true, reloadOnChange: false);
+
 var connectionString = builder.Configuration.GetConnectionString("Vgr")
     ?? (isWindows
         ? "Server=.;Database=vgr;Trusted_Connection=True;TrustServerCertificate=True"

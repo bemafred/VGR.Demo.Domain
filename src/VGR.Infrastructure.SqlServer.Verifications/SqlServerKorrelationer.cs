@@ -49,7 +49,7 @@ public sealed class SqlServerKorrelationer
         };
     }
 
-    [Theory]
+    [KräverSqlServerTheory]
     [MemberData(nameof(InnehållerScenarier))]
     public async Task Innehåller_DomänEkvivalentSqlServer(
         Tidsrymd period, DateTimeOffset tidpunkt, bool förväntat, string scenario)
@@ -125,7 +125,7 @@ public sealed class SqlServerKorrelationer
         };
     }
 
-    [Theory]
+    [KräverSqlServerTheory]
     [MemberData(nameof(ÖverlapparScenarier))]
     public async Task Överlappar_DomänEkvivalentSqlServer(
         Tidsrymd p1, Tidsrymd p2, bool förväntat, string scenario)
@@ -179,7 +179,7 @@ public sealed class SqlServerKorrelationer
         };
     }
 
-    [Theory]
+    [KräverSqlServerTheory]
     [MemberData(nameof(ÄrTillsvidareScenarier))]
     public async Task ÄrTillsvidare_DomänEkvivalentSqlServer(
         Tidsrymd period, bool förväntat, string scenario)
@@ -226,7 +226,7 @@ public sealed class SqlServerKorrelationer
         };
     }
 
-    [Theory]
+    [KräverSqlServerTheory]
     [MemberData(nameof(VårdvalÄrAktivtScenarier))]
     public async Task VårdvalÄrAktivt_DomänEkvivalentSqlServer(
         Tidsrymd period, bool förväntat, string scenario)

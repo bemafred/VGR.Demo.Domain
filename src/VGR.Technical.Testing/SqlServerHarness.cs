@@ -49,6 +49,17 @@ public sealed class SqlServerHarness : IAsyncDisposable
         Write.Database.EnsureCreated();
     }
 
+    public static bool ÄrTillgänglig()
+    {
+        try
+        {
+            using var conn = new SqlConnection("Server=.;Database=master;Trusted_Connection=True;TrustServerCertificate=True");
+            conn.Open();
+            return true;
+        }
+        catch { return false; }
+    }
+
     public async ValueTask DisposeAsync()
     {
         await Write.DisposeAsync();

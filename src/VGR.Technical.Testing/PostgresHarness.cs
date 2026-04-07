@@ -49,6 +49,17 @@ public sealed class PostgresHarness : IAsyncDisposable
         Write.Database.EnsureCreated();
     }
 
+    public static bool ÄrTillgänglig()
+    {
+        try
+        {
+            using var conn = new NpgsqlConnection("Host=localhost;Database=postgres;Username=bemafred");
+            conn.Open();
+            return true;
+        }
+        catch { return false; }
+    }
+
     public async ValueTask DisposeAsync()
     {
         await Write.DisposeAsync();

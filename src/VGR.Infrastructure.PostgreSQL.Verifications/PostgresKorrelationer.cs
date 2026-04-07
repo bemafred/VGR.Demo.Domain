@@ -49,7 +49,7 @@ public sealed class PostgresKorrelationer
         };
     }
 
-    [Theory]
+    [KräverPostgresTheory]
     [MemberData(nameof(InnehållerScenarier))]
     public async Task Innehåller_DomänEkvivalentPostgreSQL(
         Tidsrymd period, DateTimeOffset tidpunkt, bool förväntat, string scenario)
@@ -125,7 +125,7 @@ public sealed class PostgresKorrelationer
         };
     }
 
-    [Theory]
+    [KräverPostgresTheory]
     [MemberData(nameof(ÖverlapparScenarier))]
     public async Task Överlappar_DomänEkvivalentPostgreSQL(
         Tidsrymd p1, Tidsrymd p2, bool förväntat, string scenario)
@@ -179,7 +179,7 @@ public sealed class PostgresKorrelationer
         };
     }
 
-    [Theory]
+    [KräverPostgresTheory]
     [MemberData(nameof(ÄrTillsvidareScenarier))]
     public async Task ÄrTillsvidare_DomänEkvivalentPostgreSQL(
         Tidsrymd period, bool förväntat, string scenario)
@@ -226,7 +226,7 @@ public sealed class PostgresKorrelationer
         };
     }
 
-    [Theory]
+    [KräverPostgresTheory]
     [MemberData(nameof(VårdvalÄrAktivtScenarier))]
     public async Task VårdvalÄrAktivt_DomänEkvivalentPostgreSQL(
         Tidsrymd period, bool förväntat, string scenario)
