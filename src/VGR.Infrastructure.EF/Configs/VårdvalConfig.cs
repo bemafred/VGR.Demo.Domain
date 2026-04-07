@@ -39,9 +39,8 @@ internal sealed class VårdvalConfig : IEntityTypeConfiguration<Vårdval>
 
         // ADR-010 §4: Högst ett aktivt (tillsvidare) vårdval per person.
         // EF8 ComplexProperty hindrar HasIndex på Period.Slut — kolumnnamnet refereras direkt.
-        // Dubbla citattecken krävs: PostgreSQL case-foldar ocitera identifierare.
         b.HasIndex(v => v.PersonId)
          .IsUnique()
-         .HasFilter("\"Slut\" IS NULL");
+         .HasFilter("Slut IS NULL");
     }
 }

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 using VGR.Application.Personer;
 using VGR.Application.Vårdval;
@@ -11,18 +12,26 @@ using VGR.Technical.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DbContexts — PostgreSQL
+// DbContexts — PostgreSQL (Mac) / SQL Server (Windows)
+var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
 var connectionString = builder.Configuration.GetConnectionString("Vgr")
-    ?? "Host=localhost;Database=vgr;Username=bemafred";
+    ?? (isWindows
+        ? "Server=.;Database=vgr;Trusted_Connection=True;TrustServerCertificate=True"
+        : "Host=localhost;Database=vgr;Username=bemafred");
+
+void ConfigureProvider(DbContextOptionsBuilder o) =>
+    _ = isWindows ? o.UseSqlServer(connectionString) : o.UseNpgsql(connectionString);
 
 // CQRS-light - läs kontexten
 builder.Services.AddDbContext<ReadDbContext>(o =>
-    o.UseNpgsql(connectionString)
-     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+{
+    ConfigureProvider(o);
+    o.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 
 // CQRS-light - skriv kontexten
-builder.Services.AddDbContext<WriteDbContext>(o =>
-    o.UseNpgsql(connectionString));
+builder.Services.AddDbContext<WriteDbContext>(ConfigureProvider);
 
 // Clock
 builder.Services.AddSingleton<IClock, SystemClock>();
