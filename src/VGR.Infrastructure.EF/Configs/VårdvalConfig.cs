@@ -5,7 +5,7 @@ using VGR.Domain.SharedKernel;
 
 namespace VGR.Infrastructure.EF.Configs;
 
-internal sealed class VårdvalConfig : IEntityTypeConfiguration<Vårdval>
+internal sealed class VårdvalConfig(string slutÄrNullFilter) : IEntityTypeConfiguration<Vårdval>
 {
     public void Configure(EntityTypeBuilder<Vårdval> b)
     {
@@ -39,8 +39,9 @@ internal sealed class VårdvalConfig : IEntityTypeConfiguration<Vårdval>
 
         // ADR-010 §4: Högst ett aktivt (tillsvidare) vårdval per person.
         // EF8 ComplexProperty hindrar HasIndex på Period.Slut — kolumnnamnet refereras direkt.
+        // Filtret är rå SQL — providerberoende citering krävs (PostgreSQL: "Slut", SQL Server: Slut).
         b.HasIndex(v => v.PersonId)
          .IsUnique()
-         .HasFilter("Slut IS NULL");
+         .HasFilter(slutÄrNullFilter);
     }
 }

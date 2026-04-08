@@ -27,8 +27,12 @@ public sealed class WriteDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
+        var slutFilter = Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL"
+            ? "\"Slut\" IS NULL"
+            : "Slut IS NULL";
+
         mb.ApplyConfiguration(new PersonConfig());
-        mb.ApplyConfiguration(new VårdvalConfig());
+        mb.ApplyConfiguration(new VårdvalConfig(slutFilter));
         mb.ApplyConfiguration(new RegionConfig());
     }
 }
