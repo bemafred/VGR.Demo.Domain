@@ -2,6 +2,12 @@
 
 ***Ensuring Epistemic Clarity Does Not Compromise Execution Efficiency***
 
+> **Epistemisk status: Emergence → Delvis Engineered**
+> Basmekanismerna (`WithSemantics()`, expression rewriting, pushdown via LINQ) är implementerade
+> och verifierade. Följande delar är ännu inte implementerade: formella pushdown-tester (§3.3),
+> `.Include()`-flaggning via analyzer (§4.3), OpenTelemetry-instrumentering (§8.1),
+> execution plan visualization.
+
 ## 1. Introduction
 
 Semantic Architecture introduces several layers of abstraction:

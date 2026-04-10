@@ -73,6 +73,10 @@ Vi bryter med detta och använder **semantiskt meningsfulla suffix**:
 | `VGR.Semantics.Linq.Tests` | **`VGR.Semantics.Linq.Verifications`** | Vi *verifierar* att semantisk översättning fungerar korrekt.       |
 | *(saknas traditionellt)*   | **`VGR.Semantics.Linq.Correlations`**  | Vi *korrelerar* domänmetoder (in-memory) med SQL-resultat (EF).    |
 | `VGR.Web.Tests`            | **`VGR.Web.Verifications`**            | Vi *verifierar* end-to-end-flöden från HTTP till databas.          |
+| *(saknas traditionellt)*   | **`VGR.Application.Stories`**          | Vi beskriver användningsfall som *stories* med domänord.           |
+| *(saknas traditionellt)*   | **`VGR.Technical.Verifications`**      | Vi *verifierar* teknisk domän och infrastrukturstöd.               |
+| *(saknas traditionellt)*   | **`VGR.Infrastructure.PostgreSQL.Verifications`** | Vi *verifierar* providerspecifikt beteende för PostgreSQL. |
+| *(saknas traditionellt)*   | **`VGR.Infrastructure.SqlServer.Verifications`**  | Vi *verifierar* providerspecifikt beteende för SQL Server. |
 
 ### Varför inte bara "Tests"?
 

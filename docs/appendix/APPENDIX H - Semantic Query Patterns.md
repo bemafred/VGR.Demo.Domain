@@ -2,6 +2,11 @@
 
 ***Formal Patterns for Expressing Meaning Through LINQ and Expression Trees in Semantic Architecture***
 
+> **Epistemisk status: Engineered**
+> Mönstren i detta dokument matchar den faktiska implementationen. Predicate-, Temporal-
+> och Expansion-Based-mönster är verifierade i kodbasen. Ett syntaxexempel för
+> `[ExpansionFor]` var felaktigt och har korrigerats (attributet tar två parametrar).
+
 ## 1. Introduction
 
 Semantic queries are a core mechanism in Semantic Architecture.
@@ -138,8 +143,8 @@ Queries enriched with automatically discovered expansion rules.
 #### Example
 
 ```csharp
-[ExpansionFor(typeof(PersonEntity))] // TODO: Exemplet är olagligt
-public static Expression<Func<PersonEntity, CareChoiceEntity?>> ActiveCareChoice(DateTimeOffset now)
+[ExpansionFor(typeof(PersonEntity), nameof(PersonEntity.ActiveCareChoice))]
+public static Expression<Func<PersonEntity, CareChoiceEntity?>> ActiveCareChoice_Expansion()
 {
     return person => person.CareChoices
         .FirstOrDefault(c => c.ValidFrom <= now && now < c.ValidTo);

@@ -26,7 +26,7 @@ Lösningen är organiserad i solution-folders som speglar ansvarsområden:
 
 ## Svagheter (Cons)
 
-1. **Fler projekt och koncept** (Semantic Core, generators, analyzers) → kräver struktur, dokumentation och introduktion (definierad i ÒNBOARDING.md`)
+1. **Fler projekt och koncept** (Semantic Core, generators, analyzers) → kräver struktur, dokumentation och introduktion (definierad i `ONBOARDING.md`)
 2. **Shadow properties** kräver tydlig EF-konfiguration.
 3. **Två felvägar (Throw/Outcome)** → tydlig policy (definierad i `POLICY.md`).
 4. **EF-beroende** – medvetet accepterat för enkelhetens skull.

@@ -2,6 +2,13 @@
 
 ***Formal Specification for Cross-Component Semantic Enrichment in Semantic Architecture***
 
+> **Epistemisk status: Delvis Engineered**
+> Expansionsmekanismen är implementerad: `[ExpansionFor]`-attribut (tar två parametrar:
+> `targetType` och `targetMethodName`), `SemanticRegistry` med iterativ expression
+> rewriting (upp till 8 djup). Följande delar är ännu inte implementerade:
+> prioritetslogik (§6.2), kategorisering av expansionstyper (§5), komponentgränshantering
+> (§7), villkorad tillämpning. Alla expansioner appliceras likvärdigt utan prioritetsordning.
+
 ## 1. Introduction
 
 Semantic Expansion Rules (“expansions”) are one of the most powerful mechanisms in Semantic Architecture.
@@ -57,16 +64,15 @@ This rule must:
 
 ### 4.1. Attribute-Based Declaration
 
-Expansions are declared using an attribute such as:
+Expansions are declared using an attribute with two parameters:
 
 ```csharp
-[ExpansionFor(typeof(PersonEntity))]
+[ExpansionFor(typeof(PersonEntity), nameof(PersonEntity.ActiveCareChoice))]
 ```
 
 This indicates:
--	the source component/entity
--	the conceptual context
--	the enrichment target
+-	the target type
+-	the target method name (the `[SemanticQuery]`-marked method being expanded)
 
 ### 4.2. Expansion Method Signature
 

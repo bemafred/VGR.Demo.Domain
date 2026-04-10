@@ -50,6 +50,8 @@ unifieras genom `VGR.Technical.Testing.SqliteHarness`.
 
 | Lager | Projekt | Fokus | Harness |
 |-------|---------|-------|---------|
-| **Domain** | `VGR.Domain.Tests` | Aggregat, VO, invariants | Nej – pure C# |
+| **Domain** | `VGR.Domain.Verifications` | Aggregat, VO, invariants | Nej – pure C# |
 | **Semantic** | `VGR.Semantics.Linq.Correlations` | Domänmetoder → SQL-korrekthet | **Ja** – SqliteHarness |
-| **E2E/Integration** | `VGR.Tests` | Interaktorer, web, end-to-end | **Ja** – SqliteHarness |
+| **Application** | `VGR.Application.Stories` | Interaktorer, användningsfall | **Ja** – SqliteHarness |
+| **E2E/Integration** | `VGR.Web.Verifications` | Web, end-to-end | **Ja** – SqliteHarness |
+| **Provider** | `VGR.Infrastructure.PostgreSQL.Verifications`, `...SqlServer.Verifications` | Providerspecifikt beteende | Ja – respektive provider |

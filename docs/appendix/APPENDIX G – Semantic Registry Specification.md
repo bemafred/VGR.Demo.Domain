@@ -2,6 +2,15 @@
 
 ***The Structural Backbone of Semantic Architecture***
 
+> **Epistemisk status: Emergence → Delvis Engineered**
+> Detta dokument beskriver den *fullständiga målarkitekturen* för Semantic Registry.
+> Den nuvarande implementationen (`SemanticRegistry` i `VGR.Semantics.Linq`) realiserar
+> kärnfunktionaliteten: `MethodInfo→LambdaExpression`-mappning, iterativ expression rewriting
+> och `DomainModel`-reflektion. Följande delar är ännu inte implementerade:
+> Query Registry (§3.1), Projection Registry (§3.2), Component Registry (§3.4),
+> expansionsprioritering, komponentgränshantering.
+> Expansion Registry (§3.3) är delvis realiserad som en platt `ConcurrentDictionary`.
+
 ## 1. Introduction
 
 The **Semantic Registry** is the central coordination mechanism of Semantic Architecture.

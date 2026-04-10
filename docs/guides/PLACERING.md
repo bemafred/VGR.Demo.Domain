@@ -29,12 +29,16 @@ Detta är **kod-ergonomi i praktiken** – namn som bär mening genom hela stack
 |                                        | `VGR.Domain.Queries`               | Domännära queries/predikat (utan EF-beroende).                                                              |
 |                                        | `VGR.Domain.Verifications`         | Enhetstester av domänen och domän-queries (utan infrastruktur).                                             |
 | **Application (UseCases)**             | `VGR.Application`                  | Interaktorer (kommandon och queries) som orkestrerar domän + infrastruktur.                                 |
+|                                        | `VGR.Application.Stories`          | **Stories**: BDD-liknande verifiering av interaktorer och användningsfall.                                   |
 | **Semantic Core**                      | `VGR.Semantics.Abstractions`       | Attribut och kontrakt för semantiska queries (`SemanticQueryAttribute`, `ExpansionForAttribute`).           |
 |                                        | `VGR.Semantics.Linq`               | Query-provider + expression-rewriter (`WithSemantics`, `SemanticRegistry`) för domän→EF-LINQ.               |
 |                                        | `VGR.Semantics.Generator`          | Source generator som bygger upp semantik-registret vid compile-time.                                        |
 |                                        | `VGR.Semantics.Linq.Verifications` | **Verifiering** av semantisk översättning och query-beteende.                                               |
 |                                        | `VGR.Semantics.Linq.Correlations`  | **Korrelation** av domänmetoder mot SQL via SQLite in-memory.                                               |
 | **Infrastructure (Persistence & IO)**  | `VGR.Infrastructure.EF`            | Entity Framework-konfiguration och `DbContext` (Read/Write, pushdown-strategi).                             |
+|                                        | `VGR.Infrastructure.Diagnostics`   | Diagnostik för EF-beteende och DbContext.                                                                   |
+|                                        | `VGR.Infrastructure.PostgreSQL.Verifications` | **Verifiering** av providerspecifikt beteende för PostgreSQL.                                      |
+|                                        | `VGR.Infrastructure.SqlServer.Verifications`  | **Verifiering** av providerspecifikt beteende för SQL Server.                                      |
 | **Delivery (API & Hosting)**           | `VGR.Web`                          | ASP.NET Core-API, controllers, hosting.                                                                     |
 |                                        | `VGR.Web.Verifications`            | **Verifiering** end-to-end: interaktorer och webb (SQLite in-memory).                                       |
 | **Technical Domain**                   | `VGR.Technical`                    | Teknisk domän: `Utfall`, `Map`, `IClock`, intern infrastruktur för interaktorer.                            |
@@ -47,7 +51,7 @@ Detta är **kod-ergonomi i praktiken** – namn som bär mening genom hela stack
 
 ## Appendices – Arkitektonisk Djupdykning
 
-Appendixen (A–I) utgör den **epistemiska och teoretiska grunden** för arkitekturen. De förklarar *varför* arkitekturen är som den är, inte bara *hur* den fungerar.
+Appendixen (A–J) utgör den **epistemiska och teoretiska grunden** för arkitekturen. De förklarar *varför* arkitekturen är som den är, inte bara *hur* den fungerar.
 
 ### Översikt: Vad varje appendix innehåller
 
@@ -62,6 +66,7 @@ Appendixen (A–I) utgör den **epistemiska och teoretiska grunden** för arkite
 | **G** | **Semantic Registry Specification** | Formell specifikation av Semantic Registry – arkitekturens "semantiska ryggrad". |
 | **H** | **Semantic Query Patterns** | De sju kanoniska mönstren för semantiska queries (Predicate, Projection, Composite, Expansion-Based, Temporal, Joined, Aggregation). |
 | **I** | **Semantic Expansion Rules** | Hur expansionsregler fungerar – den mekanism som gör arkitekturen till en semantisk graf utan graph-databas. |
+| **J** | **Performance & Query Optimization** | Prestandaprinciper, pushdown-strategi, indexeringspolicy och observability-riktlinjer. |
 
 ### Vem ska läsa vilken appendix?
 

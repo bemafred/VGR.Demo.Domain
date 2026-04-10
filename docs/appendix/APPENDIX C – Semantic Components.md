@@ -2,6 +2,12 @@
 
 ***A Formal Definition of Components in Semantic Architecture***
 
+> **Epistemisk status: Emergence**
+> Semantic Components som koncept är inte formaliserat i koden genom dedikerade attribut
+> eller registrering. Domäntyper klassificeras via `DomainTypeKind` (Aggregate, Entity,
+> ValueObject etc.) i `DomainModel`, inte via en explicit komponentmodell.
+> Dokumentet beskriver en konceptuell målbild.
+
 ## 1. Introduction
 
 The term component is widely used across the software industry, often with inconsistent or ambiguous meaning.
