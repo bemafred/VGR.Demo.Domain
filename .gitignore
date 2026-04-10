@@ -488,3 +488,4 @@ $RECYCLE.BIN/
 *.swp
 
 .claude/settings.local.json
+.mcp.json

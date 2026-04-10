@@ -15,6 +15,7 @@ public static class DomainMappingExtensions
     public static async Task<IActionResult> Map(this ControllerBase self, Func<CancellationToken, Task<Utfall>> action, CancellationToken ct)
     {
         var logger = self.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("VGR.Web.Map");
+
         try
         {
             var outcome = await action(ct);
@@ -30,6 +31,7 @@ public static class DomainMappingExtensions
     public static async Task<IActionResult> Map<T>(this ControllerBase self, Func<CancellationToken, Task<Utfall<T>>> action, CancellationToken ct, Func<T, object>? shape = null)
     {
         var logger = self.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("VGR.Web.Map");
+
         try
         {
             var outcome = await action(ct);
@@ -42,9 +44,7 @@ public static class DomainMappingExtensions
     }
 
     private static IActionResult ToHttp(ControllerBase self, Utfall utfall)
-        => utfall.IsSuccess
-            ? self.Ok()
-            : BusinessProblem(self, utfall.Error, utfall.Code);
+        => utfall.IsSuccess ? self.Ok() : BusinessProblem(self, utfall.Error, utfall.Code);
 
     private static IActionResult ToHttp<T>(ControllerBase self, Utfall<T> outcome, Func<T, object>? shape = null)
         => outcome.IsSuccess
@@ -60,8 +60,10 @@ public static class DomainMappingExtensions
             Status = 400,
             Detail = msg
         };
-        if (code is not null)
+
+        if (code is not null) 
             problem.Extensions["code"] = code;
+
         return new ObjectResult(problem) { StatusCode = 400 };
     }
 
@@ -119,6 +121,7 @@ public static class DomainMappingExtensions
 
             default:
                 logger.LogError(ex, "Ohanterat fel.");
+
                 return InfrastructureProblem(self, "urn:vgr:infrastructure:internal-error",
                     "Internt fel", 500,
                     "Ett oväntat fel inträffade.");
@@ -135,6 +138,7 @@ public static class DomainMappingExtensions
             Detail = ex.Message,
             Extensions = { ["code"] = ex.Code }
         };
+
         return new ObjectResult(problem) { StatusCode = statusCode };
     }
 
@@ -147,6 +151,7 @@ public static class DomainMappingExtensions
             Status = statusCode,
             Detail = detail
         };
+
         return new ObjectResult(problem) { StatusCode = statusCode };
     }
 }
