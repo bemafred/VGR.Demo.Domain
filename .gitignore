@@ -3,7 +3,8 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-# LLM files
+zips/
+
 .claude/
 .mcp.json
 
@@ -488,4 +489,3 @@ $RECYCLE.BIN/
 *.swp
 
 .claude/settings.local.json
-.mcp.json
