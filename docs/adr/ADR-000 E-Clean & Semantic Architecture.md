@@ -9,11 +9,11 @@
 | Fält                    | Värde                                     |
 |-------------------------|--------------------------------------------|
 | **Status**              | Accepterad                                 |
-| **Version**             | 1.1.0                                      |
+| **Version**             | 1.5.0                                      |
 | **Datum**               | 2025-01-24                                 |
 | **Beslutsfattare**      | VGR Architecture Team                      |
 | **Ersätter**            | Ingen (grundläggande)                      |
-| **Relaterade ADR:er**   | ADR-001 (Indexpolicy), ADR-002 (Semantiska namn), ADR-003 (Felvokabulär), ADR-004 (Semantisk precision), ADR-005 (Verifierbar felsemantik), ADR-006 (Transportöversättning), ADR-007 (Dubbel felkanal), ADR-008 (Värdeobjektskontrakt), ADR-009 (Produktionshärdning), ADR-010 (Relationella garantier) |
+| **Relaterade ADR:er**   | ADR-001 (Indexpolicy), ADR-002 (Semantiska namn), ADR-003 (Felvokabulär), ADR-004 (Semantisk precision), ADR-005 (Verifierbar felsemantik), ADR-006 (Transportöversättning), ADR-007 (Dubbel felkanal), ADR-008 (Värdeobjektskontrakt), ADR-009 (Produktionshärdning), ADR-010 (Relationella garantier), ADR-011 (Compile-time semantiska expansioner), ADR-012 (Domän-UI via reflection), ADR-013 (RegionKod), ADR-014 (Delivery/infra-separation), ADR-015 (Onboarding-princip), ADR-016 (Epistemisk baslinje) |
 
 ---
 

@@ -234,7 +234,7 @@ internal static class DataLayout
             {{bodyHtml}}
             <footer>
                 <a href="https://github.com/bemafred/sky-omega">
-                    <img src="/edgar-badge.svg" alt="Sky Omega">
+                    <img src="/edgar-badge.svg" alt="Sky Omega" title="Edgar">
                 </a>
             </footer>
         </body>

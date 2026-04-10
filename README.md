@@ -1,6 +1,6 @@
 # VGR Demo Domain – Epistemic Clean & Semantic Architecture (.NET / DDD / EF / CQRS-light)
 
-**Version 1.0.0** — .NET 10.0 / C# 14 / EF Core / PostgreSQL & SQL Server / 123 tester / 16 ADR:er
+**Version 1.5.0** — .NET 10.0 / C# 14 / EF Core / PostgreSQL & SQL Server / 104 tester / 17 ADR:er
 
 *Avancerat och enkelt är bättre än komplicerat och naivt.*
 
@@ -285,7 +285,7 @@ Se `docs/guides/ANALYZER_REGLER.md`. Severity konfigureras i `.editorconfig` (de
 
 | Kategori | Sökväg | Innehåll |
 |---|---|---|
-| **ADR:er** | `docs/adr/ADR-000..015` | 16 arkitekturbeslut (E-Clean, testnamn, felhantering, härdning, expansioner, domän-UI, DB-providrar) |
+| **ADR:er** | `docs/adr/ADR-000..016` | 17 arkitekturbeslut (E-Clean, testnamn, felhantering, härdning, expansioner, domän-UI, DB-providrar, epistemisk baslinje) |
 | **Arkitektur** | `docs/architecture/` | CANON, NAME, WHY — destillerade principer |
 | **Guides** | `docs/guides/` | ANALYS, POLICY, KODERGONOMI, PLACERING, ONBOARDING, QUICKSTART, ANALYZER_REGLER |
-| **Appendices** | `docs/appendix/` | A–J: plattform, design, komponenter, tooling, jämförelser, AI, registry, patterns, regler, prestanda |
+| **Appendices** | `docs/appendix/A–J` | Plattform, design, komponenter, tooling, jämförelser, AI, registry, patterns, regler, prestanda |
