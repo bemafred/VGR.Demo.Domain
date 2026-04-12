@@ -99,4 +99,31 @@ public class DbContextDiagnostics
 
         loaded.RowVersion.Should().NotBeNullOrEmpty();
     }
+
+    [Fact]
+    public async Task StaleWrite_KastarDbUpdateConcurrencyException()
+    {
+        await using var h = new SqliteHarness();
+
+        // 1. Skapa och spara en region
+        var region = Region.Skapa("14");
+        h.Write.Regioner.Add(region);
+        await h.Write.SaveChangesAsync();
+
+        // 2. Ladda regionen (tracked med RowVersion = {0})
+        var loaded = await h.Write.Regioner.FirstAsync();
+
+        // 3. Simulera concurrent writer: ändra RowVersion direkt i databasen
+        var guidId = loaded.Id.Value;
+        var rows = await h.Write.Database.ExecuteSqlRawAsync(
+            "UPDATE Region SET RowVersion = X'01' WHERE Id = {0}", guidId);
+        rows.Should().Be(1, "raw SQL ska uppdatera exakt en rad");
+
+        // 4. Markera en property som ändrad så EF genererar UPDATE med WHERE RowVersion = X'00'
+        h.Write.Entry(loaded).Property(nameof(Region.Kod)).IsModified = true;
+
+        var act = () => h.Write.SaveChangesAsync();
+
+        await act.Should().ThrowAsync<DbUpdateConcurrencyException>();
+    }
 }

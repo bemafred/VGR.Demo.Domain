@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -27,42 +26,8 @@ public sealed class TidsrymdCorrelations
 
     #region Innehåller – Kritiska SQL-översättningsfall
 
-    public static IEnumerable<object[]> InnehållerScenarier()
-    {
-        var reftid = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
-
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            reftid,
-            true,
-            "NULL-hantering (tillsvidare)"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(reftid, reftid.AddDays(30)),
-            reftid,
-            true,
-            "Start inkluderad (<=)"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(reftid.AddDays(-30), reftid),
-            reftid,
-            false,
-            "Slut exkluderad (<)"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(reftid.AddDays(-30), reftid.AddDays(30)),
-            reftid,
-            true,
-            "AND-operator"
-        };
-    }
-
     [Theory]
-    [MemberData(nameof(InnehållerScenarier))]
+    [MemberData(nameof(TidsrymdTestScenarier.InnehållerScenarier), MemberType = typeof(TidsrymdTestScenarier))]
     public async Task Innehåller_Korrelation_DomainEkvivalentSql(
         Tidsrymd period,
         DateTimeOffset tidpunkt,
@@ -106,82 +71,8 @@ public sealed class TidsrymdCorrelations
 
     #region Överlappar – Overlap-semantik
 
-    public static IEnumerable<object[]> ÖverlapparScenarier()
-    {
-        var p1Start = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        var p1End = new DateTimeOffset(2024, 6, 30, 0, 0, 0, TimeSpan.Zero);
-
-        var periode1 = Tidsrymd.Skapa(p1Start, p1End);
-
-        // Helt skilda intervall
-        yield return new object[]
-        {
-            periode1,
-            Tidsrymd.Skapa(
-                new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)
-            ),
-            false,
-            "Helt skilda intervall"
-        };
-
-        // Helt överlappande
-        yield return new object[]
-        {
-            periode1,
-            Tidsrymd.Skapa(
-                new DateTimeOffset(2024, 3, 1, 0, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2024, 4, 30, 0, 0, 0, TimeSpan.Zero)
-            ),
-            true,
-            "Helt överlappande"
-        };
-
-        // Delvis överlappande
-        yield return new object[]
-        {
-            periode1,
-            Tidsrymd.Skapa(
-                new DateTimeOffset(2024, 5, 1, 0, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2024, 7, 31, 0, 0, 0, TimeSpan.Zero)
-            ),
-            true,
-            "Delvis överlappande"
-        };
-
-        // Angränsande (inte överlappande enligt halvöppen semantik)
-        yield return new object[]
-        {
-            periode1,
-            Tidsrymd.Skapa(
-                new DateTimeOffset(2024, 6, 30, 0, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)
-            ),
-            false,
-            "Angränsande – inte överlappande"
-        };
-
-        // Med NULL (tillsvidare möter begränsad)
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            periode1,
-            true,
-            "Tillsvidare möter begränsad"
-        };
-
-        // Båda tillsvidare
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 6, 1, 0, 0, 0, TimeSpan.Zero)),
-            true,
-            "Båda tillsvidare"
-        };
-    }
-
     [Theory]
-    [MemberData(nameof(ÖverlapparScenarier))]
+    [MemberData(nameof(TidsrymdTestScenarier.ÖverlapparScenarier), MemberType = typeof(TidsrymdTestScenarier))]
     public async Task Överlappar_Korrelation_DomainEkvivalentSql(
         Tidsrymd p1,
         Tidsrymd p2,
@@ -230,27 +121,8 @@ public sealed class TidsrymdCorrelations
 
     #region ÄrTillsvidare – NULL-hantering
 
-    public static IEnumerable<object[]> ÄrTillsvidareScenarier()
-    {
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            true,
-            "Slut är null"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(
-                new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)
-            ),
-            false,
-            "Slut är satt"
-        };
-    }
-
     [Theory]
-    [MemberData(nameof(ÄrTillsvidareScenarier))]
+    [MemberData(nameof(TidsrymdTestScenarier.ÄrTillsvidareScenarier), MemberType = typeof(TidsrymdTestScenarier))]
     public async Task ÄrTillsvidare_Korrelation_DomainEkvivalentSql(
         Tidsrymd period,
         bool förväntat,
@@ -293,27 +165,8 @@ public sealed class TidsrymdCorrelations
 
     #region ÄrAktivt (Vårdval) – Aggregat-expansion
 
-    public static IEnumerable<object[]> VårdvalÄrAktivtScenarier()
-    {
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            true,
-            "Vårdval är aktivt (tillsvidare)"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(
-                new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)
-            ),
-            false,
-            "Vårdval är avslutat"
-        };
-    }
-
     [Theory]
-    [MemberData(nameof(VårdvalÄrAktivtScenarier))]
+    [MemberData(nameof(TidsrymdTestScenarier.VårdvalÄrAktivtScenarier), MemberType = typeof(TidsrymdTestScenarier))]
     public async Task VårdvalÄrAktivt_Korrelation_DomainEkvivalentSql(
         Tidsrymd period,
         bool förväntat,

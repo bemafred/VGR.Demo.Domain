@@ -1,13 +1,13 @@
 # ADR-017: Testförstärkning och verifieringsbaslinje
 
 ## Status
-Föreslagen
+Genomförd
 
 ## Kontext
 
 Kodbasanalysen (v1.5.0) visar att arkitekturens kärna — domän, semantisk expression rewriting och EF-konfiguration — har stark testtäckning. Däremot saknas verifieringar i flera lager som bär produktionsansvar.
 
-### Nuvarande testlandskap (104 tester)
+### Testlandskap vid beslut (104 tester, nu 133)
 
 | Projekt | Tester | Fokus |
 |---------|--------|-------|
@@ -113,15 +113,15 @@ Detta eliminerar repetitiv setup-kod (~10–15 rader per test) och gör nya test
 
 ## Implementationsstatus
 
-- [ ] Application.Stories: lyckade flöden för SkapaPersonInteractor
-- [ ] Application.Stories: lyckade flöden för SkapaVårdvalInteractor
-- [ ] Application.Stories: överlappskontroll och automatisk avslutning
-- [ ] Infrastructure.Diagnostics: concurrency-test (stale write → exception)
-- [ ] Web.Verifications: HTTP-mappning per feltyp (Utfall + alla DomainException-subtyper)
-- [ ] Web.Verifications: ProblemDetails.Extensions["code"] verifieras
-- [ ] Technical.Testing: TestScenario-builder
-- [ ] Korrelationstester: gemensamma scenarier extraherade
-- [ ] PostgreSQL/SqlServer-verifieringar: använder delade scenarier
+- [x] Application.Stories: lyckade flöden för SkapaPersonInteractor
+- [x] Application.Stories: lyckade flöden för SkapaVårdvalInteractor
+- [x] Application.Stories: överlappskontroll och automatisk avslutning
+- [x] Infrastructure.Diagnostics: concurrency-test (stale write → exception)
+- [x] Web.Verifications: HTTP-mappning per feltyp (Utfall + alla DomainException-subtyper)
+- [x] Web.Verifications: ProblemDetails.Extensions["code"] verifieras
+- [x] Technical.Testing: TestScenario-builder
+- [x] Korrelationstester: gemensamma scenarier extraherade
+- [x] PostgreSQL/SqlServer-verifieringar: använder delade scenarier
 
 ## Relaterade dokument
 

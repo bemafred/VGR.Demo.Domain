@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using VGR.Domain;
 using VGR.Domain.SharedKernel;
@@ -23,34 +22,8 @@ public sealed class SqlServerKorrelationer
 
     #region Innehåller
 
-    public static IEnumerable<object[]> InnehållerScenarier()
-    {
-        var reftid = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
-
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            reftid, true, "NULL-hantering (tillsvidare)"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(reftid, reftid.AddDays(30)),
-            reftid, true, "Start inkluderad (<=)"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(reftid.AddDays(-30), reftid),
-            reftid, false, "Slut exkluderad (<)"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(reftid.AddDays(-30), reftid.AddDays(30)),
-            reftid, true, "AND-operator"
-        };
-    }
-
     [KräverSqlServerTheory]
-    [MemberData(nameof(InnehållerScenarier))]
+    [MemberData(nameof(TidsrymdTestScenarier.InnehållerScenarier), MemberType = typeof(TidsrymdTestScenarier))]
     public async Task Innehåller_DomänEkvivalentSqlServer(
         Tidsrymd period, DateTimeOffset tidpunkt, bool förväntat, string scenario)
     {
@@ -84,49 +57,8 @@ public sealed class SqlServerKorrelationer
 
     #region Överlappar
 
-    public static IEnumerable<object[]> ÖverlapparScenarier()
-    {
-        var p1Start = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        var p1End = new DateTimeOffset(2024, 6, 30, 0, 0, 0, TimeSpan.Zero);
-        var periode1 = Tidsrymd.Skapa(p1Start, p1End);
-
-        yield return new object[]
-        {
-            periode1,
-            Tidsrymd.Skapa(new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero),
-                           new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)),
-            false, "Helt skilda intervall"
-        };
-        yield return new object[]
-        {
-            periode1,
-            Tidsrymd.Skapa(new DateTimeOffset(2024, 3, 1, 0, 0, 0, TimeSpan.Zero),
-                           new DateTimeOffset(2024, 4, 30, 0, 0, 0, TimeSpan.Zero)),
-            true, "Helt överlappande"
-        };
-        yield return new object[]
-        {
-            periode1,
-            Tidsrymd.Skapa(new DateTimeOffset(2024, 6, 30, 0, 0, 0, TimeSpan.Zero),
-                           new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)),
-            false, "Angränsande – inte överlappande"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            periode1,
-            true, "Tillsvidare möter begränsad"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 6, 1, 0, 0, 0, TimeSpan.Zero)),
-            true, "Båda tillsvidare"
-        };
-    }
-
     [KräverSqlServerTheory]
-    [MemberData(nameof(ÖverlapparScenarier))]
+    [MemberData(nameof(TidsrymdTestScenarier.ÖverlapparScenarier), MemberType = typeof(TidsrymdTestScenarier))]
     public async Task Överlappar_DomänEkvivalentSqlServer(
         Tidsrymd p1, Tidsrymd p2, bool förväntat, string scenario)
     {
@@ -164,23 +96,8 @@ public sealed class SqlServerKorrelationer
 
     #region ÄrTillsvidare
 
-    public static IEnumerable<object[]> ÄrTillsvidareScenarier()
-    {
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            true, "Slut är null"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
-                           new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)),
-            false, "Slut är satt"
-        };
-    }
-
     [KräverSqlServerTheory]
-    [MemberData(nameof(ÄrTillsvidareScenarier))]
+    [MemberData(nameof(TidsrymdTestScenarier.ÄrTillsvidareScenarier), MemberType = typeof(TidsrymdTestScenarier))]
     public async Task ÄrTillsvidare_DomänEkvivalentSqlServer(
         Tidsrymd period, bool förväntat, string scenario)
     {
@@ -211,23 +128,8 @@ public sealed class SqlServerKorrelationer
 
     #region ÄrAktivt (Vårdval)
 
-    public static IEnumerable<object[]> VårdvalÄrAktivtScenarier()
-    {
-        yield return new object[]
-        {
-            Tidsrymd.SkapaTillsvidare(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            true, "Vårdval är aktivt (tillsvidare)"
-        };
-        yield return new object[]
-        {
-            Tidsrymd.Skapa(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
-                           new DateTimeOffset(2024, 12, 31, 0, 0, 0, TimeSpan.Zero)),
-            false, "Vårdval är avslutat"
-        };
-    }
-
     [KräverSqlServerTheory]
-    [MemberData(nameof(VårdvalÄrAktivtScenarier))]
+    [MemberData(nameof(TidsrymdTestScenarier.VårdvalÄrAktivtScenarier), MemberType = typeof(TidsrymdTestScenarier))]
     public async Task VårdvalÄrAktivt_DomänEkvivalentSqlServer(
         Tidsrymd period, bool förväntat, string scenario)
     {

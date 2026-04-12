@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using VGR.Application.Personer;
 using VGR.Domain;
 using VGR.Domain.SharedKernel;
@@ -10,9 +11,34 @@ namespace VGR.Application.Stories;
 
 public class SkapaPersonStories
 {
-    private sealed class TestClock : IClock
+
+    [Fact]
+    public async Task LyckadSkapning_GerUtfallOkMedPersonId()
     {
-        public DateTimeOffset UtcNow => new(2024, 1, 1, 12, 0, 0, TimeSpan.Zero);
+        await using var h = new SqliteHarness();
+        var s = await new TestScenario(h).MedRegion("14").Bygg();
+
+        var interactor = new SkapaPersonInteractor(h.Read, h.Write, s.Clock);
+        var result = await interactor.ProcessAsync(
+            new SkapaPersonCmd(s.Region.Id, "19900101-1234"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBe(default(PersonId));
+    }
+
+    [Fact]
+    public async Task LyckadSkapning_PersisterarPerson()
+    {
+        await using var h = new SqliteHarness();
+        var s = await new TestScenario(h).MedRegion("14").Bygg();
+
+        var interactor = new SkapaPersonInteractor(h.Read, h.Write, s.Clock);
+        await interactor.ProcessAsync(
+            new SkapaPersonCmd(s.Region.Id, "19900101-1234"), CancellationToken.None);
+
+        var person = await h.Read.Personer.FirstAsync();
+        person.Personnummer.Should().Be(Personnummer.Tolka("19900101-1234"));
+        person.RegionId.Should().Be(s.Region.Id);
     }
 
     [Fact]

@@ -10,6 +10,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj"/>
+        <ProjectReference Include="..\VGR.Domain\VGR.Domain.csproj"/>
         <ProjectReference Include="..\VGR.Infrastructure.EF\VGR.Infrastructure.EF.csproj"/>
     </ItemGroup>
 </Project>

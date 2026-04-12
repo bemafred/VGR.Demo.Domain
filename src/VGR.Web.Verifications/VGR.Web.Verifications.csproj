@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="xunit"/>
         <PackageReference Include="xunit.runner.visualstudio">
@@ -18,5 +22,6 @@
         <ProjectReference Include="..\VGR.Domain\VGR.Domain.csproj"/>
         <ProjectReference Include="..\VGR.Technical.Testing\VGR.Technical.Testing.csproj"/>
         <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj"/>
+        <ProjectReference Include="..\VGR.Technical.Web\VGR.Technical.Web.csproj"/>
     </ItemGroup>
 </Project>
