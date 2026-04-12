@@ -1,6 +1,6 @@
 using VGR.Semantics.Abstractions;
 
-namespace VGR.Technical.Web;
+namespace VGR.Technical.Web.SystemUI;
 
 /// <summary>
 /// Renderar indexsidan — systemets landningssida med domänidentitet.

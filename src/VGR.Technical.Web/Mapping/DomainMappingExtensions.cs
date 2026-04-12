@@ -1,9 +1,13 @@
+using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using VGR.Domain.SharedKernel.Exceptions;
 using VGR.Technical;
 
-namespace VGR.Web.Controllers;
+namespace VGR.Technical.Web.Mapping;
 
 /// <summary>
 /// Extensionmetoder för att mappa interaktorresultat (<see cref="Utfall"/>) och domänundantag till HTTP-svar.
@@ -23,7 +27,7 @@ public static class DomainMappingExtensions
         }
         catch (Exception ex)
         {
-            return HandleExceptions(self, ex, logger);
+            return HandleExceptionAsAction(self, ex, logger);
         }
     }
 
@@ -39,9 +43,53 @@ public static class DomainMappingExtensions
         }
         catch (Exception ex)
         {
-            return HandleExceptions(self, ex, logger);
+            return HandleExceptionAsAction(self, ex, logger);
         }
     }
+
+    /// <summary>Mappar ett undantag till <see cref="IResult"/> för minimal API-endpoints.</summary>
+    public static IResult HandleException(Exception ex)
+    {
+        ex = Unwrap(ex);
+
+        if (ex is DomainException domainEx)
+        {
+            var (statusCode, typeSlug) = Classify(domainEx);
+            return Results.Problem(
+                type: $"urn:vgr:domain:{typeSlug}",
+                title: domainEx.GetType().Name.Replace("Domain", "").Replace("Exception", ""),
+                statusCode: statusCode,
+                detail: domainEx.Message,
+                extensions: new Dictionary<string, object?> { ["code"] = domainEx.Code });
+        }
+
+        if (ex is DbUpdateConcurrencyException)
+        {
+            return Results.Problem(
+                type: "urn:vgr:infrastructure:concurrency-conflict",
+                title: "Samtidighetskonflikt",
+                statusCode: 409,
+                detail: "Resursen har ändrats av en annan begäran. Försök igen.");
+        }
+
+        if (ex is DbUpdateException)
+        {
+            return Results.Problem(
+                type: "urn:vgr:infrastructure:constraint-violation",
+                title: "Databaskonflikt",
+                statusCode: 422,
+                detail: "Begäran bryter mot en databaskonstraint.");
+        }
+
+        return Results.Problem(
+            type: "urn:vgr:infrastructure:internal-error",
+            title: "Internt fel",
+            statusCode: 500,
+            detail: "Ett oväntat fel inträffade.");
+    }
+
+    private static Exception Unwrap(Exception ex)
+        => ex is TargetInvocationException { InnerException: { } inner } ? inner : ex;
 
     private static IActionResult ToHttp(ControllerBase self, Utfall utfall)
         => utfall.IsSuccess ? self.Ok() : BusinessProblem(self, utfall.Error, utfall.Code);
@@ -61,14 +109,16 @@ public static class DomainMappingExtensions
             Detail = msg
         };
 
-        if (code is not null) 
+        if (code is not null)
             problem.Extensions["code"] = code;
 
         return new ObjectResult(problem) { StatusCode = 400 };
     }
 
-    private static IActionResult HandleExceptions(ControllerBase self, Exception ex, ILogger logger)
+    private static IActionResult HandleExceptionAsAction(ControllerBase self, Exception ex, ILogger logger)
     {
+        ex = Unwrap(ex);
+
         switch (ex)
         {
             case OperationCanceledException:
@@ -87,37 +137,10 @@ public static class DomainMappingExtensions
                     "Databaskonflikt", 422,
                     "Begäran bryter mot en databaskonstraint.");
 
-            case DomainArgumentFormatException e:
-                logger.LogWarning("Domänfel {Code}: {Message}", e.Code, e.Message);
-                return DomainProblem(self, e, "argument-format", 400);
-
-            case DomainValidationException e:
-                logger.LogWarning("Domänfel {Code}: {Message}", e.Code, e.Message);
-                return DomainProblem(self, e, "validation", 422);
-
-            case DomainAggregateNotFoundException e:
-                logger.LogWarning("Domänfel {Code}: {Message}", e.Code, e.Message);
-                return DomainProblem(self, e, "aggregate-not-found", 404);
-
-            case DomainInvariantViolationException e:
-                logger.LogWarning("Domänfel {Code}: {Message}", e.Code, e.Message);
-                return DomainProblem(self, e, "invariant-violation", 409);
-
-            case DomainInvalidStateTransitionException e:
-                logger.LogWarning("Domänfel {Code}: {Message}", e.Code, e.Message);
-                return DomainProblem(self, e, "invalid-state-transition", 409);
-
-            case DomainConcurrencyConflictException e:
-                logger.LogWarning("Domänfel {Code}: {Message}", e.Code, e.Message);
-                return DomainProblem(self, e, "concurrency-conflict", 409);
-
-            case DomainIdempotencyViolationException e:
-                logger.LogWarning("Domänfel {Code}: {Message}", e.Code, e.Message);
-                return DomainProblem(self, e, "idempotency-violation", 409);
-
-            case DomainUndefinedOperationException e:
-                logger.LogWarning("Domänfel {Code}: {Message}", e.Code, e.Message);
-                return DomainProblem(self, e, "undefined-operation", 422);
+            case DomainException domainEx:
+                logger.LogWarning("Domänfel {Code}: {Message}", domainEx.Code, domainEx.Message);
+                var (statusCode, typeSlug) = Classify(domainEx);
+                return DomainProblem(self, domainEx, typeSlug, statusCode);
 
             default:
                 logger.LogError(ex, "Ohanterat fel.");
@@ -127,6 +150,19 @@ public static class DomainMappingExtensions
                     "Ett oväntat fel inträffade.");
         }
     }
+
+    private static (int StatusCode, string TypeSlug) Classify(DomainException ex) => ex switch
+    {
+        DomainArgumentFormatException       => (400, "argument-format"),
+        DomainValidationException           => (422, "validation"),
+        DomainAggregateNotFoundException    => (404, "aggregate-not-found"),
+        DomainInvariantViolationException   => (409, "invariant-violation"),
+        DomainInvalidStateTransitionException => (409, "invalid-state-transition"),
+        DomainConcurrencyConflictException  => (409, "concurrency-conflict"),
+        DomainIdempotencyViolationException => (409, "idempotency-violation"),
+        DomainUndefinedOperationException   => (422, "undefined-operation"),
+        _                                   => (500, "unknown")
+    };
 
     private static IActionResult DomainProblem(ControllerBase self, DomainException ex, string typeSlug, int statusCode)
     {

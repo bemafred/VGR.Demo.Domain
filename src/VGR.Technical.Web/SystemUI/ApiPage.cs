@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 
-namespace VGR.Technical.Web;
+namespace VGR.Technical.Web.SystemUI;
 
 /// <summary>
 /// Renderar <c>/api</c> — reflection-driven vy av registrerade HTTP-endpoints.

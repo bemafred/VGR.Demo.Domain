@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using VGR.Application.Vårdval;
 using VGR.Domain.SharedKernel;
-using VGR.Web.Controllers;
+using VGR.Technical.Web.Mapping;
 
 namespace VGR.Web.Controllers;
 

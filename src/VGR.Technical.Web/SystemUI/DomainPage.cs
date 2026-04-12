@@ -1,7 +1,7 @@
 using System.Text;
 using VGR.Semantics.Abstractions;
 
-namespace VGR.Technical.Web;
+namespace VGR.Technical.Web.SystemUI;
 
 /// <summary>
 /// Renderar <c>/domain</c> — reflection-driven vy av domänens statiska struktur.

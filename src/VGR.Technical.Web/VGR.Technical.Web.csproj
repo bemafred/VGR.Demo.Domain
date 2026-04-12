@@ -6,6 +6,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\VGR.Technical\VGR.Technical.csproj"/>
+    <ProjectReference Include="..\VGR.Domain\VGR.Domain.csproj"/>
     <ProjectReference Include="..\VGR.Semantics.Linq\VGR.Semantics.Linq.csproj"/>
   </ItemGroup>
   <ItemGroup>

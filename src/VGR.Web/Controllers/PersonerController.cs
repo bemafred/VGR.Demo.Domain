@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using VGR.Application.Personer;
 using VGR.Domain.SharedKernel;
-using VGR.Web.Controllers;
+using VGR.Technical.Web.Mapping;
 
 namespace VGR.Web.Controllers;
 

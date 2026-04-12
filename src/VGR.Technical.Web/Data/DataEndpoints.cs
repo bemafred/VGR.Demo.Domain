@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using VGR.Semantics.Abstractions;
 using VGR.Semantics.Linq;
+using VGR.Technical.Web.Mapping;
 
 namespace VGR.Technical.Web.Data;
 
@@ -149,7 +150,7 @@ internal static class DataEndpoints
             }
             catch (Exception ex)
             {
-                return DomainExceptionHandler.HandleException(ex);
+                return DomainMappingExtensions.HandleException(ex);
             }
         }).ExcludeFromDescription();
 
@@ -193,7 +194,7 @@ internal static class DataEndpoints
             }
             catch (Exception ex)
             {
-                return DomainExceptionHandler.HandleException(ex);
+                return DomainMappingExtensions.HandleException(ex);
             }
         }).ExcludeFromDescription();
     }
