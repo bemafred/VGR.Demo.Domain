@@ -38,6 +38,9 @@ public class HttpMappingVerifieringar
     [MemberData(nameof(DomänfelScenarier))]
     public void HandleException_DomänfelInnehållerCode(DomainException ex, int förväntatStatus, string förväntatTypeSlug)
     {
+        _ = förväntatStatus;
+        _ = förväntatTypeSlug;
+
         var result = DomainMappingExtensions.HandleException(ex);
 
         var problem = result.Should().BeOfType<ProblemHttpResult>().Subject;

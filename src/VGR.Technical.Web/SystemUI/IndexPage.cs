@@ -112,6 +112,7 @@ internal static class IndexPage
                         <a href="/domain">Domän</a>
                         <a href="/api">API</a>
                         <a href="/data">Data</a>
+                        <a href="/diagrams">Diagram</a>
                     </nav>
                 </main>
                 <footer>

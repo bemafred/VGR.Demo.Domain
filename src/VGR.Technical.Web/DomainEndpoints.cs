@@ -37,6 +37,12 @@ public static class DomainEndpoints
             Results.Content(ApiPage.Render(dataSources), "text/html"))
             .ExcludeFromDescription();
 
+        app.MapGet("/diagrams", (HttpContext ctx) =>
+        {
+            var model = SemanticRegistry.GetModel();
+            return Results.Content(DiagramPage.Render(model, ctx.RequestServices), "text/html");
+        }).ExcludeFromDescription();
+
         app.MapGet("/favicon.svg", () =>
             Results.Content(EmbeddedAssets.Read("edgar-favicon.svg"), "image/svg+xml"))
             .ExcludeFromDescription();

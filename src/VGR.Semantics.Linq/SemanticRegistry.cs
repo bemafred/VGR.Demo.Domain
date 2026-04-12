@@ -51,6 +51,13 @@ public static class SemanticRegistry
     /// </summary>
     public static Assembly[] GetDomainAssemblies() => _domainAssemblies;
 
+    /// <summary>
+    /// Returnerar alla registrerade semantiska expansioner.
+    /// Används av <c>/diagrams</c> för att visualisera expansionskedjor.
+    /// </summary>
+    public static IReadOnlyList<KeyValuePair<MethodInfo, LambdaExpression>> GetExpansions()
+        => _registry.ToArray();
+
     private static void DiscoverExpansions()
     {
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
