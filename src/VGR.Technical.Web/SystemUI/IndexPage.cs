@@ -109,10 +109,10 @@ internal static class IndexPage
                     </p>
                     <p class="assemblies">{{summary}}</p>
                     <nav>
+                        <a href="/diagrams">Diagram</a>
                         <a href="/domain">Domän</a>
                         <a href="/api">API</a>
                         <a href="/data">Data</a>
-                        <a href="/diagrams">Diagram</a>
                     </nav>
                 </main>
                 <footer>

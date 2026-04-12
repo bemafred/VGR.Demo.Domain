@@ -39,6 +39,7 @@ internal static class DiagramPage
         var expansionSvg = BuildExpansionSvg();
         var layerSvg = BuildLayerSvg();
         var layerRadialSvg = BuildLayerRadialSvg();
+        var callChainSvg = BuildCallChainSvg();
 
         return $$"""
             <!DOCTYPE html>
@@ -203,6 +204,27 @@ internal static class DiagramPage
                     <a href="/">&larr; Tillbaka</a>
                 </header>
 
+                <section>
+                    <h2>Lagerstruktur</h2>
+                    <nav class="view-toggle">
+                        <button class="active" onclick="switchLayerView('radial')">Koncentrisk</button>
+                        <button onclick="switchLayerView('linear')">Linjär</button>
+                    </nav>
+                    <div id="layer-radial" class="diagram-container">
+                        {{layerRadialSvg}}
+                    </div>
+                    <div id="layer-linear" class="diagram-container" style="display:none">
+                        {{layerSvg}}
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Anropskedja</h2>
+                    <div class="diagram-container">
+                        {{callChainSvg}}
+                    </div>
+                </section>
+
                 <section class="domain-diagram-section">
                     <h2>Domänmodell</h2>
                     <div class="diagram-container">
@@ -234,20 +256,6 @@ internal static class DiagramPage
                     <h2>Semantiska expansioner</h2>
                     <div class="diagram-container">
                         {{expansionSvg}}
-                    </div>
-                </section>
-
-                <section>
-                    <h2>Lagerstruktur</h2>
-                    <nav class="view-toggle">
-                        <button class="active" onclick="switchLayerView('linear')">Linjär</button>
-                        <button onclick="switchLayerView('radial')">Koncentrisk</button>
-                    </nav>
-                    <div id="layer-linear" class="diagram-container">
-                        {{layerSvg}}
-                    </div>
-                    <div id="layer-radial" class="diagram-container" style="display:none">
-                        {{layerRadialSvg}}
                     </div>
                 </section>
 
@@ -587,6 +595,126 @@ internal static class DiagramPage
         svg.AppendLine(F($"  <text x='{x1 + (midX > x1 ? 8 : -8)}' y='{y1 - 6}' text-anchor='middle' fill='#555' font-family='system-ui' font-size='9'>1</text>"));
         var card = isCollection ? "*" : "1";
         svg.AppendLine(F($"  <text x='{x2 + (midX < x2 ? -8 : 8)}' y='{y2 - 6}' text-anchor='middle' fill='#555' font-family='system-ui' font-size='9'>{card}</text>"));
+    }
+
+    // ── Diagram 1b: Anropskedja ───────────────────────────────────────
+
+    private static string BuildCallChainSvg()
+    {
+        const double boxW = 300;
+        const double boxH = 72;
+        const double arrowGap = 32;
+        const double annotW = 170;
+        const double annotGap = 24;
+        const double margin = 20;
+        const double branchGap = 24;
+
+        // Hjälpmetod: rita en lagerbox
+        void DrawBox(StringBuilder s, string name, string[] lines, double bx, double by,
+            string? aLeft, string? aRight)
+        {
+            var (fill, stroke) = LayerColors(name);
+            var cx = bx + boxW / 2;
+
+            s.AppendLine(F($"  <rect x='{bx}' y='{by}' width='{boxW}' height='{boxH}' rx='5' fill='{fill}' stroke='{stroke}' stroke-width='1.5'/>"));
+            s.AppendLine(F($"  <text x='{cx}' y='{by + 20}' text-anchor='middle' fill='{stroke}' font-family='system-ui' font-size='12' font-weight='bold'>{Xml(name)}</text>"));
+
+            for (var j = 0; j < lines.Length; j++)
+                s.AppendLine(F($"  <text x='{cx}' y='{by + 36 + j * 15}' text-anchor='middle' fill='#ccc' font-family=\"'SF Mono','Cascadia Code',monospace\" font-size='10'>{Xml(lines[j])}</text>"));
+
+            if (aLeft is not null)
+            {
+                var ax = bx - annotGap;
+                var annLines = aLeft.Split('\n');
+                for (var j = 0; j < annLines.Length; j++)
+                    s.AppendLine(F($"  <text x='{ax}' y='{by + boxH / 2 - (annLines.Length - 1) * 7 + j * 14}' text-anchor='end' fill='#888' font-family='system-ui' font-size='9' font-style='italic'>{Xml(annLines[j])}</text>"));
+                s.AppendLine(F($"  <line x1='{ax + 4}' y1='{by + boxH / 2}' x2='{bx}' y2='{by + boxH / 2}' stroke='#333' stroke-width='1' stroke-dasharray='3,3'/>"));
+            }
+
+            if (aRight is not null)
+            {
+                var ax = bx + boxW + annotGap;
+                var annLines = aRight.Split('\n');
+                for (var j = 0; j < annLines.Length; j++)
+                    s.AppendLine(F($"  <text x='{ax}' y='{by + boxH / 2 - (annLines.Length - 1) * 7 + j * 14}' text-anchor='start' fill='#888' font-family='system-ui' font-size='9' font-style='italic'>{Xml(annLines[j])}</text>"));
+                s.AppendLine(F($"  <line x1='{bx + boxW}' y1='{by + boxH / 2}' x2='{ax - 4}' y2='{by + boxH / 2}' stroke='#333' stroke-width='1' stroke-dasharray='3,3'/>"));
+            }
+        }
+
+        // Layout:
+        //   Leverans (centrerad)
+        //       ↓
+        //   Applikation (centrerad)
+        //      ↙    ↘
+        //  Kärna    Semantik       ← jämbördiga, sida vid sida
+        //              ↓
+        //          Infrastruktur   ← under Semantik (EF-sidan)
+
+        var totalW = margin + annotW + annotGap + boxW + branchGap + boxW + annotGap + annotW + margin;
+        var centerX = totalW / 2;
+        var leftX = centerX - boxW - branchGap / 2;
+        var rightX = centerX + branchGap / 2;
+
+        // Rad 0: Leverans (centrerad)
+        var row0X = centerX - boxW / 2;
+        var row0Y = margin;
+
+        // Rad 1: Applikation (centrerad)
+        var row1Y = row0Y + boxH + arrowGap;
+
+        // Rad 2: Kärna (vänster) + Semantik (höger)
+        var row2Y = row1Y + boxH + arrowGap;
+
+        // Rad 3: Infrastruktur (under Semantik, höger)
+        var row3Y = row2Y + boxH + arrowGap;
+
+        var svgH = row3Y + boxH + margin;
+
+        var svg = new StringBuilder();
+        svg.AppendLine(F($"<svg viewBox='0 0 {totalW} {svgH}' xmlns='http://www.w3.org/2000/svg' style='max-width:{totalW}px'>"));
+        svg.AppendLine(SvgDefs());
+
+        // Rita boxar
+        DrawBox(svg, "Leverans",
+            ["Controller (tunn, deklarativ)", "HTTP → domänspråk"],
+            row0X, row0Y, null, "ProblemDetails\n← RFC 9457");
+
+        DrawBox(svg, "Applikation",
+            ["Interactor — verkställighetsstrategi:", "• Pushdown   • Selektiv hydrering"],
+            centerX - boxW / 2, row1Y, "ReadDbContext\n(förfråga)", "Utfall<T>\nOk / Fail");
+
+        DrawBox(svg, "Kärna",
+            ["Aggregat.Metod() — invarianter", "Domänhändelser, Throw"],
+            leftX, row2Y, null, null);
+
+        DrawBox(svg, "Semantik",
+            [".WithSemantics()", "[SemanticQuery] → Expansion"],
+            rightX, row2Y, null, null);
+
+        DrawBox(svg, "Infrastruktur",
+            ["EF Core — Read/WriteDbContext", "LINQ → SQL"],
+            rightX, row3Y, null, "SaveChangesAsync\n+ RowVersion");
+
+        // Pilar
+        // Leverans → Applikation (rak ned)
+        svg.AppendLine(F($"  <line x1='{centerX}' y1='{row0Y + boxH}' x2='{centerX}' y2='{row1Y}' stroke='#555' stroke-width='1.5' marker-end='url(#arrow)'/>"));
+
+        // Applikation → Kärna (vänster ned)
+        var appBot = row1Y + boxH;
+        var kernTop = row2Y;
+        var kernCx = leftX + boxW / 2;
+        var dy = (kernTop - appBot) * 0.4;
+        svg.AppendLine(F($"  <path d='M {centerX},{appBot} C {centerX},{appBot + dy} {kernCx},{kernTop - dy} {kernCx},{kernTop}' fill='none' stroke='#555' stroke-width='1.5' marker-end='url(#arrow)'/>"));
+
+        // Applikation → Semantik (höger ned)
+        var semCx = rightX + boxW / 2;
+        svg.AppendLine(F($"  <path d='M {centerX},{appBot} C {centerX},{appBot + dy} {semCx},{kernTop - dy} {semCx},{kernTop}' fill='none' stroke='#555' stroke-width='1.5' marker-end='url(#arrow)'/>"));
+
+        // Semantik → Infrastruktur (rak ned)
+        svg.AppendLine(F($"  <line x1='{semCx}' y1='{row2Y + boxH}' x2='{semCx}' y2='{row3Y}' stroke='#555' stroke-width='1.5' marker-end='url(#arrow)'/>"));
+
+        svg.AppendLine("</svg>");
+        return svg.ToString();
     }
 
     // ── Diagram 2: Semantiska expansioner ──────────────────────────────

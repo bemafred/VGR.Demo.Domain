@@ -32,8 +32,8 @@ Allt som behövs för att generera korrekta diagram finns redan i runtime:
 |-----------|----------------|----------|
 | **DomainModel** | `SemanticRegistry.GetModel()` | Typer, klassificering (Aggregate/Entity/ValueObject/Identity/...), egenskaper, metoder, `[SemanticQuery]`-markeringar |
 | **EF-metadata** | `DbContext.Model` | Navigationer, kardinalitet, relationstyper |
-| **Expansionsregister** | `SemanticRegistry.TryGet()` | `MethodInfo → LambdaExpression`-mappningar |
-| **Assembly-referenser** | `Assembly.GetReferencedAssemblies()` | Beroendegrafen mellan projekt |
+| **Expansionsregister** | `SemanticRegistry.GetExpansions()` | `MethodInfo → LambdaExpression`-mappningar |
+| **Assembly-referencer** | `Assembly.GetReferencedAssemblies()` | Beroendegrafen mellan projekt |
 
 System-UI:ts befintliga mönster — `DomainPage`, `IndexPage`, `ApiPage` — genererar HTML som
 rena C#-strängar från exakt dessa datakällor. En `DiagramPage` följer samma mönster.
@@ -64,58 +64,85 @@ Detta är en direkt konsekvens av E-Clean: om domänens semantik är maskinläsb
 `DomainEndpoints.MapDomainEndpoints()`. Samma mönster som befintliga sidor:
 statisk `Render()`-metod som returnerar en HTML-sträng.
 
-### 2. Mermaid.js för klientsidesrendering
+### 2. Ren SVG-generering, inga externa beroenden
 
-Servern genererar Mermaid-syntax (text) från metadata. Klienten renderar till SVG
-via Mermaid.js. Inga byggsteg, inga npm-beroenden — ett `<script>`-tag.
+Diagram genereras server-side som inline SVG med `StringBuilder` — samma mönster
+som all annan HTML-generering i System-UI. Inga externa JavaScript-beroenden.
 
-Mermaid valdes framför alternativen:
+#### Varför inte Mermaid.js?
+
+Mermaid.js utvärderades initialt men avfördes under engineering-fasen:
+
+| Problem | Konsekvens |
+|---------|------------|
+| `classDef`/`cssClass` ignoreras av `theme: 'dark'` i classDiagram | Inga färger — fyra misslyckade försök |
+| Syntaxfel i v11.14.0 med `}:::styleName` och Unicode-klassnamn | Diagram renderar inte alls |
+| Externt CDN-beroende (~150 KB JavaScript) | Bryter mot BCL-only-principen, ingen kontroll |
+| Trial-and-error mot opak rendering | Gissningar istället för kunskap |
+
+**Lärdomen:** Externa rendering-beroenden bryter mot semantisk suveränitet.
+Om vi inte kontrollerar renderingspipelinen kan vi inte garantera visuell korrekthet.
+Ren SVG-generering ger **deterministisk, offline-kapabel, beroendefri rendering**
+med full kontroll över varje pixel.
+
+#### Varför inte andra alternativ?
 
 | Alternativ | Avfört | Anledning |
 |------------|--------|-----------|
-| D3.js | Ja | Kräver omfattande JavaScript, orimlig komplexitet |
-| Graphviz/viz.js | Ja | WASM-beroende, svagare stöd för klassdiagram |
-| Server-side SVG | Ja | Kräver layoutalgoritm i C# |
+| D3.js | Ja | Externt JS-beroende, samma kontrollproblem som Mermaid |
+| Graphviz/viz.js | Ja | WASM-beroende, runtime-opakt |
 | PowerPoint/Visio | Ja | Divergerar från kod, inte versionshanterat |
-| Statisk Mermaid i docs/ | Ja | Går stale — bryter "kod är modellen" |
+| Statisk SVG i docs/ | Ja | Går stale — bryter "kod är modellen" |
 
-### 3. Tre diagramtyper från tre datakällor
+### 3. Tre diagramtyper
 
-#### Diagram 1: Domänmodell (classDiagram)
+#### Diagram 1: Lagerstruktur (koncentrisk + linjär)
+
+**Datakälla:** `Assembly.GetReferencedAssemblies()`, filtrerat på `VGR.*`.
+
+Två vyer med toggle i UI:t:
+
+- **Koncentrisk** (default): Ringar med domänen i centrum. Jämbördiga lager (Applikation,
+  Infrastruktur, Teknik) som sektioner i samma ring — visar att de inte beror på varandra.
+  Lagernamn och projektnamn roterade längs tangenten. Beroendeflödet kommuniceras av
+  ringstrukturen själv — inga pilar behövs.
+
+- **Linjär**: Gruppboxar med projektboxar inuti. Jämbördiga lager sida vid sida,
+  centrerade horisontellt. Bézier-kurvor för inter-lager-beroenden.
+
+#### Diagram 2: Domänmodell
 
 **Datakälla:** `DomainModel.Types` + EF-metadata (`GetNavigations()`).
 
 Visar aggregat, entiteter och värdeobjekt med egenskaper, metoder och relationer.
 Typer färgkodas efter `DomainTypeKind` — samma färgschema som `/domain`-sidan.
-`[SemanticQuery]`-metoder markeras visuellt.
+`[SemanticQuery]`-metoder markeras med `*`.
+
+**Layout:** Relationsdriven BFS från rottyper — huvudkedjan horisontellt,
+värdeobjekt under sin ägare. Ger naturligt flöde: Region → Person → Vårdval.
+
+**Relationslinjer:** Ortogonala paths (`H → V → H`) med automatiskt kantpunktsval
+(närmaste sida per box) och kardinalitet (`1:*`, `1:1`).
+
+**Interaktivitet:** Klickbara klassrutor med expand-ikon. Popup visar 2x förstorad
+vy av klassen, centrerad horisontellt med halvtransparent backdrop.
 
 Relationer härleds genom:
 - `Property.TypeName` som matchar annan `DomainType.Name` → referensnavigation
 - `IReadOnlyList<T>` där T matchar `DomainType.Name` → samlingsnavigation
-- EF-metadata ger kardinalitet (1:*, 1:1)
+- EF-metadata ger kompletterande navigationer och kardinalitet
 
-#### Diagram 2: Semantisk översättningskedja (flowchart)
+#### Diagram 3: Semantisk översättningskedja
 
-**Datakälla:** `SemanticRegistry`s expansionsregister.
+**Datakälla:** `SemanticRegistry.GetExpansions()`.
 
 Visar hur `[SemanticQuery]`-metoder expanderas steg för steg till SQL-kompatibla
-uttryck. Varje nod är ett expansionssteg; kedjan spåras genom att rekursivt
-kontrollera om en expansion innehåller ytterligare semantiska anrop.
+uttryck. Kedjan spåras genom en `ExpressionVisitor` (`MethodCollector`) som
+detekterar om en expansions body refererar andra expansioner.
 
 ```
-Vårdval.ÄrAktivt → Period.ÄrTillsvidare → Slut == null → WHERE Slut IS NULL
+Vårdval.ÄrAktivt → Tidsrymd.ÄrTillsvidare → Slut == null
 ```
-
-Detta visualiserar den mekanism som gör E-Clean distinkt: domänlogik som
-automatiskt blir SQL utan duplicering.
-
-#### Diagram 3: Vertikal lagerstruktur (flowchart TD)
-
-**Datakälla:** `Assembly.GetReferencedAssemblies()`, filtrerat på `VGR.*`.
-
-Visar beroendegrafen mellan projekt. Varje assembly är en nod; referenser
-är riktade kanter. Lager grupperas visuellt (Core, Semantic, Application,
-Infrastructure, Delivery, Technical).
 
 ### 4. Diagrammen är levande
 
@@ -123,34 +150,26 @@ Diagrammen genereras vid varje sidladdning. Lägger du till ett aggregat, en
 `[SemanticQuery]`-metod eller ett projekt syns det automatiskt — utan att
 någon uppdaterar dokumentation.
 
-### 5. Export till statiska filer (sekundärt)
-
-Som komplement kan `/diagrams` erbjuda nedladdning av genererad Mermaid-syntax
-och renderad SVG. Detta möjliggör inkludering i presentationer och docs/ utan
-att bryta mot principen: **originalet lever i koden, statiska kopior är
-medvetna snapshots**.
-
 ## Konsekvenser
 
 ### Positiva
 
 - **Noll underhåll** — diagram uppdateras automatiskt vid domänförändringar
+- **Noll beroenden** — ren SVG, ingen extern JavaScript, fungerar offline
+- **Full kontroll** — varje pixel deterministisk, färger garanterat korrekta
 - **Onboarding** — nya utvecklare ser strukturen visuellt innan de läser kod
-- **Demo** — inga externa verktyg behövs, systemet presenterar sig självt
-- **Epistemisk koherens** — visuell representation härledd från samma metadata
-  som driver runtime-beteende. Diagrammen kan inte ljuga.
+- **Demo** — systemet presenterar sig självt, inga externa verktyg
+- **Förfinbar** — SVG-generering kan iterativt förbättras utan att byta ramverk
+- **Interaktivitet** — klickbar förstoring följer samma mönster som `/data`-routes
 - **Arkitekturbevis** — att systemet kan rita sig självt visar att den semantiska
-  metadatan är tillräckligt rik för att bära visuell projektion. Det är ett
-  starkare bevis för maskinläsbarhet än textbaserad introspection.
+  metadatan är tillräckligt rik för att bära visuell projektion
 
 ### Negativa
 
-- **Extern JavaScript-dependency** — Mermaid.js (~150 KB). Kan mitigeras genom
-  inbäddning som embedded resource för offline-demo.
-- **Layout-begränsningar** — Mermaids automatiska layout ger inte alltid optimal
-  visuell balans. Acceptabelt för automatgenererade diagram.
+- **Layoutalgoritm i C#** — kräver beräkningslogik för positionering och linjedragning.
+  Acceptabelt: domänmodellen är liten och layouten är enkel (BFS + rutnät).
 - **Komplexitetströskel** — för stora domäner kan klassdiagrammet bli svårläst.
-  Mitigeras genom filtrering per `DomainTypeKind` och interaktiva collapse/expand.
+  Mitigeras genom klickbar förstoring och framtida expand/collapse.
 
 ### Invariant
 
@@ -159,8 +178,8 @@ Befintliga System-UI-sidor (`/`, `/domain`, `/api`, `/data`) påverkas inte.
 
 ## Avgränsning
 
-- **Interaktivitet** (klickbara noder som navigerar till `/data`-routes) är ett
-  naturligt nästa steg men ingår inte i denna ADR.
+- **Expand/collapse** i klassrutor (visa/dölj egenskaper/metoder) är ett
+  naturligt nästa steg men ingår inte i denna iteration.
 - **Sekvensdiagram** (begäransflöde genom lager) kräver runtime-tracing och
   behandlas separat.
 - **RDF/Turtle-export** av diagramstruktur (ADR-000, princip 5) är kompatibelt
@@ -168,11 +187,14 @@ Befintliga System-UI-sidor (`/`, `/domain`, `/api`, `/data`) påverkas inte.
 
 ## Implementationsstatus
 
-- [x] Steg 1: `DiagramPage.cs` med Mermaid.js-integration och grundlayout
-- [x] Steg 2: Domänmodelldiagram (classDiagram) från `DomainModel` + EF-metadata
-- [x] Steg 3: Semantisk expansionskedja (flowchart) från expansionsregistret
-- [x] Steg 4: Vertikal lagerstruktur (flowchart) från assembly-referenser
-- [x] Steg 5: Route-registrering i `DomainEndpoints`, navigering från indexsidan
+- [x] Steg 1: `DiagramPage.cs` med ren SVG-generering och route-registrering
+- [x] Steg 2: Lagerstruktur — koncentrisk vy med sektionerade ringar
+- [x] Steg 3: Lagerstruktur — linjär vy med centrerade jämbördiga lager
+- [x] Steg 4: Lagerstruktur — toggle mellan koncentrisk och linjär
+- [x] Steg 5: Domänmodell — BFS-layout, ortogonala relationslinjer, kardinalitet
+- [x] Steg 6: Domänmodell — klickbar förstoring med popup
+- [x] Steg 7: Semantisk expansionskedja med kedjedetektering
+- [x] Steg 8: `SemanticRegistry.GetExpansions()` exponerar expansionsregistret
 
 ## Relaterade dokument
 

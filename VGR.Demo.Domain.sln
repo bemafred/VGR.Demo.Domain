@@ -129,6 +129,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGR.Infrastructure.SqlServer.Verifications", "src\VGR.Infrastructure.SqlServer.Verifications\VGR.Infrastructure.SqlServer.Verifications.csproj", "{C80A131A-7DE7-4B82-9A4C-4F52B5A9E2EB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Demo", "0. Demo", "{22CE97FF-27B0-406D-8915-ED581B79927A}"
+	ProjectSection(SolutionItems) = preProject
+		docs\demo\DEMO.md = docs\demo\DEMO.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
