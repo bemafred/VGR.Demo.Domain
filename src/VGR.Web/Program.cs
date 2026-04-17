@@ -12,17 +12,20 @@ using VGR.Technical.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DbContexts — PostgreSQL (Mac) / SQL Server (Windows)
+// DbContexts — PostgreSQL (Mac/Linux) / SQL Server (Windows)
 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+var isMac     = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
-builder.Configuration.AddJsonFile(
-    isWindows ? "appsettings.Development.Windows.json" : "appsettings.Development.Mac.json",
-    optional: true, reloadOnChange: false);
+if (isWindows)
+    builder.Configuration.AddJsonFile("appsettings.Development.Windows.json", optional: true, reloadOnChange: false);
 
+// Default för Mac/Linux: peer-auth med aktuell Unix-user → ingen hårdkodad utvecklare.
+// Override vid behov via ConnectionStrings:Vgr i appsettings eller env (ConnectionStrings__Vgr).
+var user = Environment.UserName;
 var connectionString = builder.Configuration.GetConnectionString("Vgr")
-    ?? (isWindows
-        ? "Server=.;Database=vgr;Trusted_Connection=True;TrustServerCertificate=True"
-        : "Host=localhost;Database=vgr;Username=bemafred");
+    ?? (isWindows ? "Server=.;Database=vgr;Trusted_Connection=True;TrustServerCertificate=True"
+        : isMac   ? $"Host=localhost;Database=vgr;Username={user}"
+        :           $"Host=/var/run/postgresql;Database=vgr;Username={user}");
 
 void ConfigureProvider(DbContextOptionsBuilder o) =>
     _ = isWindows ? o.UseSqlServer(connectionString) : o.UseNpgsql(connectionString);
